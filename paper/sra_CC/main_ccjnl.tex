@@ -425,7 +425,7 @@ Our analysis proceeds in three logical steps to construct a complete stability p
 
 The convergence analysis of centrality-based routing is notoriously difficult due to the piecewise constant, non-smooth nature of the map $\kappa(S)$. 
 Heuristic approaches often ignore the discontinuities caused by path switching, leading to theoretical vacuums.
-To establish a rigorous guarantee, we first analyze the baseline step-by-step inclusion ($T_d=1$, or equivalently the block-boundary map) by \textbf{regularizing} the hybrid dynamics into a \textbf{discrete-time differential inclusion} \cite{Aubin1984Differential}. 
+To establish a rigorous guarantee, we first analyze the step-by-step inclusion ($T_d=1$, or the block-boundary map at $\tau_m = m T_d$ with effective step size $\alpha_{T_d} = 1 - (1-\alpha)^{T_d} \in (0,1)$) by \textbf{regularizing} the hybrid dynamics into a \textbf{discrete-time differential inclusion} \cite{Aubin1984Differential}. 
 The update rule on the state space $X = [0,1]^N$ (where node costs $C_i = 1 + \beta_I S_i \ge 1$ are strictly positive) is formalized as the set-valued map:
 \begin{equation}\label{eq:inclusion_map}
 S^{(k+1)} \in F(S^{(k)}) := (1-\alpha)S^{(k)}+\alpha\,\mathcal{N}(S^{(k)})
@@ -957,11 +957,11 @@ LIRP-D (Reactive Queue Deflection) & $89.49 \pm 1.31$ & $[89.02, 89.95]$ & $99.3
 \hline
 Static BC (One-Shot Penalty, Open-Loop) & $89.96 \pm 0.51$ & $[89.78, 90.14]$ & $99.87 \pm 0.41\%$ & $3.95$ / $5.73$ & $66.95\%$ & $1.7\%$ (Open-Loop) \\
 \hline
-IGP Weight Tuning (Fortz--Thorup \cite{Fortz2000OSPF}) & $90.08 \pm 0.38$ & $[89.94, 90.22]$ & $99.98 \pm 0.06\%$ & $3.58$ / $5.00$ & $77.03\%$ & $98.3\%$ (Unstable) \\
+IGP Weight Tuning (Fortz--Thorup \cite{Fortz2000OSPF}) & $90.08 \pm 0.38$ & $[89.94, 90.22]$ & $100.00 \pm 0.06\%$ & $3.58$ / $5.00$ & $77.03\%$ & $98.3\%$ (Unstable) \\
 \hline
-Unnormalized SRA (No $\mathrm{norm}(\cdot)$) & $90.08 \pm 0.38$ & $[89.94, 90.22]$ & $99.98 \pm 0.06\%$ & $3.43$ / $4.10$ & $75.16\%$ & $20.0\%$ \\
+Unnormalized SRA (No $\mathrm{norm}(\cdot)$) & $90.08 \pm 0.38$ & $[89.94, 90.22]$ & $100.00 \pm 0.06\%$ & $3.43$ / $4.10$ & $75.16\%$ & $20.0\%$ \\
 \hline
-SRA w/o Dwell ($T_d=1$) & $90.08 \pm 0.38$ & $[89.94, 90.22]$ & $99.98 \pm 0.06\%$ & $3.51$ / $5.00$ & $81.85\%$ & $98.3\%$ (Chattering) \\
+SRA w/o Dwell ($T_d=1$) & $90.08 \pm 0.38$ & $[89.94, 90.22]$ & $100.00 \pm 0.06\%$ & $3.51$ / $5.00$ & $81.85\%$ & $98.3\%$ (Chattering) \\
 \hline
 \textbf{Full SRA ($\alpha=0.1, \beta_I=10, T_d=5$)} & $\mathbf{89.76 \pm 0.76}$ & $\mathbf{[89.49, 90.04]}$ & $\mathbf{99.65 \pm 0.73\%}$ & $\mathbf{3.62}$ / $\mathbf{5.50}$ & $\mathbf{69.20\%}$ & $\mathbf{20.0\%}$ \textbf{(Stable)} \\
 \hline
