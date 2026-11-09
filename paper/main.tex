@@ -5,7 +5,7 @@
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{textcomp}
 \usepackage{graphicx}
-\usepackage{tabularx}
+\usepackage{tabularx,booktabs,enumitem}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 %\usepackage{newtxtext}
 %\usepackage{newtxmath}
@@ -297,9 +297,9 @@ This quantization is non-trivial; it renders the system dynamics \textit{piecewi
 \begin{equation}
     \label{eq:problem_formulation}
     \begin{aligned}
-    \min_{\{S^{(k)}, C^{(k)}\}} \quad & \limsup_{k \to \infty} \max_{i \in V} \widetilde{\kappa}_i(S^{(k)}; W, \mu) + \eta_{\text{sw}}\,\bar{f}_{\text{sw}} \\
-    \text{s.t.} \quad & S^{(k+1)} = (1-\alpha)S^{(k)} + \alpha\,q^{(k)},\quad S^{(0)} \in [0,1]^N, \\
-    & C^{(k)} = \mathbf{1} + \beta_I S^{(k)}, \quad \tau_{m+1} - \tau_m \ge T_d, \\
+    \min_{\{S^{(k)}, C^{(k)}\}}\; & \limsup_{k \to \infty} \max_{i \in V} \widetilde{\kappa}_i(S^{(k)}; W, \mu) + \eta_{\text{sw}}\bar{f}_{\text{sw}} \\
+    \text{s.t.}\; & S^{(k+1)} = (1-\alpha)S^{(k)} + \alpha q^{(k)},\ S^{(0)} \in [0,1]^N, \\
+    & C^{(k)} = \mathbf{1} + \beta_I S^{(k)},\ \tau_{m+1} - \tau_m \ge T_d, \\
     & \bar{f}_{\text{sw}} \le 1/T_d,
     \end{aligned}
 \end{equation}
@@ -979,7 +979,7 @@ The quantitative results at heavy load ($\rho = 0.9$, 30 independent trials with
 \caption{\rev{Component Ablation Study and Comparison Against Stronger Baselines on BA Scale-Free Networks ($N=100$, Heavy Load $\rho=0.9$, Mean $\pm$ Std and 95\% CI $[\bar{x} \pm 1.96\,s/\sqrt{30}]$ across 30 Independent Trials).}}
 \label{tab:ablation_results}
 \renewcommand{\arraystretch}{1.15}
-\footnotesize\setlength{\tabcolsep}{4pt}
+\scriptsize\setlength{\tabcolsep}{3.5pt}
 \begin{tabular}{|l|c|c|c|c|c|c|}
 \hline
 \textbf{Method / Variant} & \textbf{Throughput} & \textbf{95\% CI} & \textbf{PDR (\%)} & \textbf{Mean/P95 Lat.} & \textbf{Peak $\kappa_{\max}$ Red. (\%)} & \textbf{Switch $\bar{f}_{\text{sw}}$} \\
