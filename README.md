@@ -3,7 +3,7 @@
 Official repository for the manuscript:
 
 > **System Relaxation for Resilient Network Governance: A Model-Driven Control Mechanism Against Structural Stress Concentration**  
-> *Yuhang Li, Chenguang Li, Jiaming Liu, Mingxuan Li, and Jin Li*  
+> *Jie Ding, Zhiyuan Ren, Yuehan Li, Wenchi Cheng, and Zhiliang Shuai*  
 > Submitted to *China Communications* (Manuscript ID: **CNCOMM-2026-0222**, Major Revision).
 
 ---
