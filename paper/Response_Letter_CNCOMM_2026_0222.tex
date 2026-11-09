@@ -3,16 +3,21 @@
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{booktabs}
 \usepackage{xcolor}
+\usepackage[hyphens]{url}
 \usepackage{hyperref}
 \usepackage{enumitem}
 \usepackage{parskip}
+\usepackage{microtype}
 
 \hypersetup{
     colorlinks=true,
     linkcolor=blue!70!black,
     citecolor=blue!70!black,
-    urlcolor=blue!70!black
+    urlcolor=blue!70!black,
+    breaklinks=true
 }
+\Urlmuskip=0mu plus 2mu\relax
+\emergencystretch=2em
 
 \newcommand{\rev}[1]{{\color{blue}#1}}
 
@@ -32,7 +37,7 @@ Dear Associate Editor-in-Chief Prof.\ Ying-Chang Liang, Associate Editor, and An
 
 We sincerely thank the Associate Editor-in-Chief, the Associate Editor, and the two anonymous Reviewers for their thorough reading, insightful critiques, and constructive suggestions on our manuscript (ID: \textbf{CNCOMM-2026-0222}). Your comments have helped us significantly strengthen the theoretical rigor, experimental breadth, and presentation clarity of our work.
 
-In accordance with the journal guidelines, all modifications in the revised manuscript (\texttt{main\_ccjnl.tex} / \texttt{main.tex}) are \textbf{\textcolor{blue}{highlighted in blue text}} (\texttt{\textbackslash rev\{...\}}). Below, we first summarize the major improvements made in this revision, followed by a detailed, point-to-point response to each comment from the Associate Editor, Reviewer~1, and Reviewer~2.
+In accordance with the journal guidelines, all modifications in the revised manuscript (\texttt{main\_ccjnl.tex} / \texttt{main.tex}) are \textbf{\textcolor{blue}{highlighted in blue text}} (\texttt{\string\rev\{...\}}). Below, we first summarize the major improvements made in this revision, followed by a detailed, point-to-point response to each comment from the Associate Editor, Reviewer~1, and Reviewer~2.
 
 \vspace{0.5em}
 \hrule
@@ -182,20 +187,20 @@ We sincerely thank Reviewer~2 for the exceptionally detailed, constructive, and 
     \end{itemize}
 \end{enumerate}
 
-\subsection*{Reviewer 2 --- Comment 2: Mathematical Rigor in Proofs (Theorems 1 \& 2, Lemma 2, Proposition 3, Appendices A, C, D, I, J)}
+\subsection*{Reviewer 2 --- Comment 2: Mathematical Rigor in Proofs (Theorems 1 \& 2, Lemma 2, Proposition 3, Supplement Sections S-A, S-C, S-D, S-I, S-J)}
 
 \textbf{Comment}: \textit{``2. Mathematical Rigor and Gaps in Theoretical Proofs: Several proofs in the appendices contain mathematical gaps or imprecise statements that need careful revision: (a) Theorem 1 and Appendix C (unique equilibrium vs.\ compact invariant set $\Omega$, undefined $\delta^+_{k,i}, \delta^-_{k,i}$ in Appendix A); (b) Theorem 2 and Appendix D (discontinuous $\kappa(S)$, heuristic continuous-time analogy $\dot{V}$, unnormalized $\kappa(S)$ vs.\ $\mathrm{norm}(\kappa)$); (c) Lemma 2 (Appendix I) and Proposition 3 (Appendix J) (conservation law $\sum_i \kappa'_i = \sum_i \kappa_i$, condition for $\max_{j \notin \mathcal{B}} \kappa'_j < \kappa_{\max}$, reversed minimum inequality $\min_i(\mu_i/\kappa_i) \le \mu_{\min}/\kappa_{\max}$, and OR vs.\ AND condition).''}
 
-\textbf{Author Response}: We are deeply grateful to Reviewer~2 for pinpointing each of these exact mathematical issues. We have completely rewritten the corresponding theorem statements and proofs in \textbf{Section~III-C/D/E} and \textbf{Appendices~A, B, C, D, I, and J}:
+\textbf{Author Response}: We are deeply grateful to Reviewer~2 for pinpointing each of these exact mathematical issues. We have completely rewritten the corresponding theorem statements and proof sketches in \textbf{Section~III-C/D/E} and the full formal proofs in \textbf{Supplementary Material Sections~S-A, S-B, S-C, S-D, S-I, and S-J}:
 \begin{enumerate}[leftmargin=1.5em]
-    \item \textbf{Fixed Lemma~1 \& Appendix~A (Explicit Definition of $\delta^+_{k,i}, \delta^-_{k,i}$)}: Defined the coordinate-wise box-violation excesses $\delta^+_{k,i} := \max\{S_i^{(k)} - 1,\, 0\}$ and $\delta^-_{k,i} := \max\{-S_i^{(k)},\, 0\}$ satisfying $\delta^\pm_{k+1,i} \le (1-\alpha)\delta^\pm_{k,i}$, proving positive invariance of $X = [0,1]^N$ and exponential attraction from perturbed initial states $S^{(0)} \in [-1/\beta_I+\epsilon, \infty)^N$.
-    \item \textbf{Fixed Proposition~1, Theorem~1, Remark~2, \& Appendices~B--C (Attraction to Compact Invariant Limit Set $\Omega$ vs.\ Unique Point Equilibrium)}: Defined the Krasovskii regularization $\mathcal{N}(S) := \bigcap_{\delta>0}\overline{\mathrm{co}}(\mathrm{norm}(\kappa(B_\delta(S))))$ and revised \textbf{Theorem~1} to prove global attraction on $X$ to the non-empty, compact, invariant limit set $\Omega = \bigcap_{n=0}^{\infty} F^n(X) \subset X$ ($\lim_{k \to \infty} \mathrm{dist}(S^{(k)}, \Omega) = 0$) via Aubin--Cellina upper-semicontinuous set-valued mappings [28], and added \textbf{Remark~2} distinguishing attraction to $\Omega$ from convergence to a unique point equilibrium.
-    \item \textbf{Fixed Theorem~2 \& Appendix~D (Normalized Feedback $q^{(k)} = \mathrm{norm}(\kappa^{(k)})$ and Exact Discrete-Time Step Bound)}: Unified \textbf{Theorem~2} and \textbf{Appendix~D} with the implemented normalized feedback $q^{(k)} = \mathrm{norm}(\kappa^{(k)}) \in [0,1]^N$ and tracking energy $E_k = \|S^{(k)} - q^{(k)}\|_2^2$. Using the exact discrete identity $S^{(k+1)} - q^{(k+1)} = (1-\alpha)(S^{(k)} - q^{(k)}) + (q^{(k)} - q^{(k+1)})$ and Weighted Young's inequality with $\lambda = \frac{\alpha}{1-\alpha}$, we proved:
+    \item \textbf{Fixed Lemma~1 \& Supplement Section~S-A (Explicit Definition of $\delta^+_{k,i}, \delta^-_{k,i}$)}: Defined the coordinate-wise box-violation excesses $\delta^+_{k,i} := \max\{S_i^{(k)} - 1,\, 0\}$ and $\delta^-_{k,i} := \max\{-S_i^{(k)},\, 0\}$ satisfying $\delta^\pm_{k+1,i} \le (1-\alpha)\delta^\pm_{k,i}$, proving positive invariance of $X = [0,1]^N$ and exponential attraction from perturbed initial states $S^{(0)} \in [-1/\beta_I+\epsilon, \infty)^N$.
+    \item \textbf{Fixed Proposition~1, Theorem~1, Remark~2, \& Supplement Sections~S-B--S-C (Attraction to Compact Invariant Limit Set $\Omega$ vs.\ Unique Point Equilibrium)}: Defined the Krasovskii regularization $\mathcal{N}(S) := \bigcap_{\delta>0}\overline{\mathrm{co}}(\mathrm{norm}(\kappa(B_\delta(S))))$ and revised \textbf{Theorem~1} to prove global attraction on $X$ to the non-empty, compact, invariant limit set $\Omega = \bigcap_{n=0}^{\infty} F^n(X) \subset X$ ($\lim_{k \to \infty} \mathrm{dist}(S^{(k)}, \Omega) = 0$) via Aubin--Cellina upper-semicontinuous set-valued mappings [28], and added \textbf{Remark~2} distinguishing attraction to $\Omega$ from convergence to a unique point equilibrium.
+    \item \textbf{Fixed Theorem~2 \& Supplement Section~S-D (Normalized Feedback $q^{(k)} = \mathrm{norm}(\kappa^{(k)})$ and Exact Discrete-Time Step Bound)}: Unified \textbf{Theorem~2} and \textbf{Supplement Section~S-D} with the implemented normalized feedback $q^{(k)} = \mathrm{norm}(\kappa^{(k)}) \in [0,1]^N$ and tracking energy $E_k = \|S^{(k)} - q^{(k)}\|_2^2$. Using the exact discrete identity $S^{(k+1)} - q^{(k+1)} = (1-\alpha)(S^{(k)} - q^{(k)}) + (q^{(k)} - q^{(k+1)})$ and Weighted Young's inequality with $\lambda = \frac{\alpha}{1-\alpha}$, we proved:
     \[
         E_{k+1} \le (1 - \alpha) E_k + \frac{1}{\alpha}\big\|q^{(k)} - q^{(k+1)}\big\|_2^2 \le (1 - \alpha) E_k + \frac{\bar{\Delta}^2}{\alpha} \implies \limsup_{k \to \infty} E_k \le \frac{\bar{\Delta}^2}{\alpha^2}.
     \]
-    \item \textbf{Fixed Lemma~2 \& Appendix~I (Non-Circular Route-Redistribution Budget $B_j^{(m)}$)}: Removed the circular conservation assumption $\sum_i \kappa'_i = \sum_i \kappa_i$ and defined each non-peak node's route-redistribution budget $B_j^{(m)} := (\kappa_j^{(m+1)} - \kappa_j^{(m)})_+ \le \sum_{(s,t)\in\mathcal{D}_{\text{in}}^{(m)}(j)} W_{st}$. Under positive load shedding at the unique pre-switch peak $u$ ($\Delta_u^- := \kappa_u^{(m)} - \kappa_u^{(m+1)} \ge \delta > 0$) and the explicit \textbf{Non-Overloading Diversion Condition} ($\kappa_j^{(m)} + B_j^{(m)} \le \kappa_{\max}^{(m)} - \delta,\ \forall j \in V\setminus\{u\}$), we proved $\kappa_{\max}^{(m+1)} \le \kappa_{\max}^{(m)} - \delta$.
-    \item \textbf{Fixed Proposition~3 \& Appendix~J (Corrected Minimum Inequality and \texttt{AND} Sufficient Slack Condition)}: Corrected the inequality to $\rho_{\max}(\kappa) = \min_{i\in V}(\mu_i/\kappa_i) \ge \mu_{\min}/\kappa_{\max} =: L(\kappa)$ (where $\rho$ is the per-OD arrival-rate multiplier), and proved: (i) unconditional improvement of the guaranteed safe arrival-rate lower bound $L(\kappa') > L(\kappa)$; (ii) exact proportionality $\rho_{\max}(\kappa')/\rho_{\max}(\kappa) = \kappa_{\max}/\kappa'_{\max}$ under homogeneous $\mu_i \equiv \mu$, and $\rho_{\max}(\widetilde{\kappa}')/\rho_{\max}(\widetilde{\kappa}) = \widetilde{\kappa}_{\max}/\widetilde{\kappa}'_{\max}$ under generalized capacity-normalized stress $\widetilde{\kappa}_i(S;W,\mu)$ whenever $\widetilde{\kappa}'_{\max} < \widetilde{\kappa}_{\max}$; and (iii) the exact joint (\texttt{AND}) sufficient condition $\mu_u/(\kappa_{\max}-d) \ge \rho_0$ and $\mu_j/(\kappa_j+B_j) \ge \rho_0$ ($\forall j \in V\setminus\{u\}$, with $d := \Delta_u^- \ge \delta > 0$) when using unweighted centrality under heterogeneous $\mu_i$.
+    \item \textbf{Fixed Lemma~2 \& Supplement Section~S-I (Non-Circular Route-Redistribution Budget $B_j^{(m)}$)}: Removed the circular conservation assumption $\sum_i \kappa'_i = \sum_i \kappa_i$ and defined each non-peak node's route-redistribution budget $B_j^{(m)} := (\kappa_j^{(m+1)} - \kappa_j^{(m)})_+ \le \sum_{(s,t)\in\mathcal{D}_{\text{in}}^{(m)}(j)} W_{st}$. Under positive load shedding at the unique pre-switch peak $u$ ($\Delta_u^- := \kappa_u^{(m)} - \kappa_u^{(m+1)} \ge \delta > 0$) and the explicit \textbf{Non-Overloading Diversion Condition} ($\kappa_j^{(m)} + B_j^{(m)} \le \kappa_{\max}^{(m)} - \delta,\ \forall j \in V\setminus\{u\}$), we proved $\kappa_{\max}^{(m+1)} \le \kappa_{\max}^{(m)} - \delta$.
+    \item \textbf{Fixed Proposition~3 \& Supplement Section~S-J (Corrected Minimum Inequality and \texttt{AND} Sufficient Slack Condition)}: Corrected the inequality to $\rho_{\max}(\kappa) = \min_{i\in V}(\mu_i/\kappa_i) \ge \mu_{\min}/\kappa_{\max} =: L(\kappa)$ (where $\rho$ is the per-OD arrival-rate multiplier), and proved: (i) unconditional improvement of the guaranteed safe arrival-rate lower bound $L(\kappa') > L(\kappa)$; (ii) exact proportionality $\rho_{\max}(\kappa')/\rho_{\max}(\kappa) = \kappa_{\max}/\kappa'_{\max}$ under homogeneous $\mu_i \equiv \mu$, and $\rho_{\max}(\widetilde{\kappa}')/\rho_{\max}(\widetilde{\kappa}) = \widetilde{\kappa}_{\max}/\widetilde{\kappa}'_{\max}$ under generalized capacity-normalized stress $\widetilde{\kappa}_i(S;W,\mu)$ whenever $\widetilde{\kappa}'_{\max} < \widetilde{\kappa}_{\max}$; and (iii) the exact joint (\texttt{AND}) sufficient condition $\mu_u/(\kappa_{\max}-d) \ge \rho_0$ and $\mu_j/(\kappa_j+B_j) \ge \rho_0$ ($\forall j \in V\setminus\{u\}$, with $d := \Delta_u^- \ge \delta > 0$) when using unweighted centrality under heterogeneous $\mu_i$.
 \end{enumerate}
 
 \subsection*{Reviewer 2 --- Comment 3: Betweenness Centrality vs.\ Non-Uniform Traffic \& Heterogeneous Capacities}

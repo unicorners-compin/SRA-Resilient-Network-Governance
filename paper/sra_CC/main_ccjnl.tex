@@ -32,6 +32,27 @@
 \def\publishmonth{5}
 \def\publishyear{2026}
 
+\usepackage{booktabs,enumitem}
+\AtBeginDocument{%
+\setlength{\abovedisplayskip}{5.5pt plus 2pt minus 2pt}%
+\setlength{\belowdisplayskip}{5.5pt plus 2pt minus 2pt}%
+\setlength{\abovedisplayshortskip}{3pt plus 1pt minus 1pt}%
+\setlength{\belowdisplayshortskip}{3pt plus 1pt minus 1pt}%
+\setlength{\textfloatsep}{8pt plus 2pt minus 2pt}%
+\setlength{\floatsep}{6pt plus 2pt minus 2pt}%
+\setlength{\intextsep}{6pt plus 2pt minus 2pt}%
+\setlength{\dbltextfloatsep}{8pt plus 2pt minus 2pt}%
+\setlength{\dblfloatsep}{6pt plus 2pt minus 2pt}%
+}
+\setlist[itemize]{leftmargin=1.4em,itemsep=1.5pt,topsep=2.5pt,parsep=0pt}
+\setlist[enumerate]{leftmargin=1.6em,itemsep=1.5pt,topsep=2.5pt,parsep=0pt}
+\pdfstringdefDisableCommands{%
+  \def\rev#1{#1}%
+  \def\widetilde#1{#1}%
+  \def\kappa{k}%
+  \def\alpha{alpha}%
+  \def\beta{beta}%
+}
 \begin{document}
 \maketitle
 
@@ -58,7 +79,7 @@ This is not merely a transient congestion issue but a structural vulnerability: 
     \subfloat[Conventional Paradigm: Stress Concentration\label{fig:intro_before}]{%
     \begin{minipage}{0.46\columnwidth}
         \centering
-        \begin{tikzpicture}[scale=0.72]
+        \begin{tikzpicture}[scale=0.64]
             \tikzstyle{node}=[circle, draw, thick, minimum size=6mm]
             \tikzstyle{hub}=[node, fill=red!80, minimum size=10mm]
             \tikzstyle{flow}=[-Latex, gray, thick, shorten <=1mm, shorten >=1mm]
@@ -88,7 +109,7 @@ This is not merely a transient congestion issue but a structural vulnerability: 
     \subfloat[SRA Control Paradigm: System Relaxation\label{fig:intro_after}]{%
     \begin{minipage}{0.46\columnwidth}
         \centering
-        \begin{tikzpicture}[scale=0.72]
+        \begin{tikzpicture}[scale=0.64]
             \tikzstyle{node}=[circle, draw, thick, minimum size=6mm]
             \tikzstyle{hub}=[node, fill=yellow!80, minimum size=8mm]
             \tikzstyle{periph}=[node, fill=green!20]
@@ -135,28 +156,21 @@ Crucially, this control paradigm aligns perfectly with Software-Defined Networki
 
 \begin{table*}[t!]
 \centering
+\scriptsize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.12}
 \caption{\rev{Systematic Feature-by-Feature Comparison of Network Routing and Traffic Governance Paradigms}}
 \label{tab:related_work_comparison}
-\renewcommand{\arraystretch}{1.25}
-\footnotesize
-\begin{tabularx}{\textwidth}{|l|X|X|X|X|X|}
-\hline
+\begin{tabularx}{\textwidth}{@{}l*{5}{>{\raggedright\arraybackslash}X}@{}}
+\toprule
 \textbf{Dimension} & \textbf{Reactive Queue-Aware \cite{Macabale2020Cradle,SM2025Novel}} & \textbf{Dynamic IGP Weight Tuning \cite{Fortz2000OSPF}} & \textbf{Static Centrality Optimization \cite{Upadhyay2024OpticalBC,DeMedeiros2017QuasiShortest}} & \textbf{AI / DRL-Based Routing \cite{Wei2023GRLPS,Feng2025MultiAgentGNN}} & \textbf{SRA (This Work)} \\
-\hline \hline
+\midrule
 \textbf{Sensing Signal} & Instantaneous local queue length / delay & Aggregate link utilization ratio & Static topological BC / degree & High-dimensional state embeddings & \rev{\textbf{Normalized topological or demand/capacity stress $\widetilde{\kappa}_i$}} \\
-\hline
 \textbf{Control Loop \& Memory} & Memoryless reactive feedback ($\alpha=1$) & Iterative combinatorial search & Open-loop one-shot static penalty & Black-box neural policy network & \rev{\textbf{Closed-loop leaky integrator ($\alpha \in (0,1)$)}} \\
-\hline
-\textbf{Anti-Chattering Mechanism} & None (prone to ping-pong oscillation) & Heuristic weight change limits & N/A (static weights) & Reward shaping only (no hard bound) & \rev{\textbf{Temporal dwell-time regularization ($T_d \ge 1$)}} \\
-\hline
-\textbf{Non-Smooth Stability Proof} & None & None (NP-hard local search) & N/A & None (empirical convergence only) & \rev{\textbf{Krasovskii inclusion \& piecewise Lyapunov tube}} \\
-\hline
-\textbf{Heterogeneous Demand/Cap.} & Implicit via queue buildup & Supported via TM input & Neglected (topology-only) & Learned implicitly via training & \rev{\textbf{Explicitly supported via $\widetilde{\kappa}_i(S;W,\mu)$}} \\
-\hline
+\textbf{Anti-Chattering} & None (ping-pong oscillation) & Heuristic weight change limits & N/A (static weights) & Reward shaping only (no hard bound) & \rev{\textbf{Temporal dwell-time regularization ($T_d \ge 1$)}} \\
+\textbf{Stability Proof} & None & None (NP-hard local search) & N/A & None (empirical convergence only) & \rev{\textbf{Krasovskii inclusion \& piecewise Lyapunov tube}} \\
+\textbf{Hetero. Demand/Cap.} & Implicit via queue buildup & Supported via TM input & Neglected (topology-only) & Learned implicitly via training & \rev{\textbf{Explicitly supported via $\widetilde{\kappa}_i(S;W,\mu)$}} \\
 \textbf{Per-Update Complexity} & $O(\text{deg}(i))$ local lookup & $O(I_{\text{search}}\cdot N(E+N\log N))$ & $O(N(E+N\log N))$ offline & $O(L_{\text{GNN}} E d^2)$ inference + training & \rev{\textbf{$O(N(E+N\log N))$ exact / $O(1)$ telemetry}} \\
-\hline
 \textbf{Interpretability} & High & Medium & High & Low (Black-box) & \textbf{High (White-box analytical law)} \\
-\hline
+\bottomrule
 \end{tabularx}
 \end{table*}
 
@@ -278,9 +292,9 @@ where $\mathcal{P}^{(k)}$ denotes the active shortest-path configuration at step
     \centering
     \begin{tikzpicture}[
         auto,
-        node distance=1.5cm and 2.5cm,
-        plant/.style={rectangle, draw, fill=blue!10, text width=10em, text centered, rounded corners, minimum height=5em},
-        module/.style={rectangle, draw, fill=green!10, rounded corners, text width=8em, text centered, minimum height=4em},
+        node distance=1.0cm and 1.6cm,
+        plant/.style={rectangle, draw, fill=blue!10, text width=10em, text centered, rounded corners, minimum height=3.2em},
+        module/.style={rectangle, draw, fill=green!10, rounded corners, text width=8em, text centered, minimum height=3.2em},
         line/.style={draw, -{Latex}},
         signal/.style={draw, -{Latex}, thick},
         feedback/.style={draw, -{Latex}, dashed}
@@ -292,7 +306,7 @@ where $\mathcal{P}^{(k)}$ denotes the active shortest-path configuration at step
     % Network Plant
     \node [plant, below=of law] (plant) {Network Plant \\ (\textit{Nodes, Links, Low-level Routing Protocol})};
     % Dashed container for the SRA controller
-    \node [draw, rounded corners, fit=(sensing) (law) (actuation), label={[yshift=0.2cm]above:\textbf{SRA Controller}}, inner sep=0.6cm, dashed] (controller_box) {};
+    \node [draw, rounded corners, fit=(sensing) (law) (actuation), label={[yshift=0.2cm]above:\textbf{SRA Controller}}, inner sep=0.12cm, dashed] (controller_box) {};
     % Connections
     \path [signal] (actuation.south) -- node [right, pos=0.25, align=center] {Control Signal \\ $C^{(k+1)}$ (Node Costs)} (plant.east);
     \path [feedback] (plant.west) -| node [left, pos=0.25, align=center] {State Feedback \\ (Topology, Paths)} (sensing.south);
@@ -347,9 +361,9 @@ where $1$ is the base physical cost and $\beta_I > 0$ is the ``pressure-to-cost'
 By deriving costs from the system's history ($S$) rather than instantaneous noise, SRA makes stable, proactive decisions.
 
 % --- Fig. 3 Code Remains Unchanged ---
-\begin{figure}[hbtp]
+\begin{figure}[!ht]
     \centering
-    \includegraphics[width=0.9\columnwidth]{fig3xunhuan.eps}
+    \includegraphics[width=0.78\columnwidth]{fig3xunhuan.eps}
     \caption{The iterative workflow of the SRA control loop, illustrating the four key phases of sensing, decision-making, actuation, and system influence that drive the network toward a state of dispersed structural stress.}
     \label{fig:sra_workflow}
 \end{figure}
@@ -364,31 +378,32 @@ As shown conceptually in Fig.~\ref{fig:sra_mechanism_visualization}, this forces
 \begin{breakablealgorithm}
 \caption{System Relaxation Algorithm (SRA)}
 \label{alg:sra}
+{\footnotesize
 \begin{algorithmic}[1]
 \REQUIRE Graph $G=(V,E)$; \rev{optional demand weights $W=[W_{st}]$ and node service rates $\mu=(\mu_i)$}; learning rate $\alpha \in (0,1)$; pressure-cost factor $\beta_I > 0$; stopping threshold $\varepsilon > 0$; max iterations $K_{\max}$; minimum dwell time $T_d \ge 1$.
 \ENSURE \rev{Final node cost vector $C^{(k)}$ and active routing policy $\mathcal{P}^{(k)}$.}
 \STATE Initialize $S^{(0)} \leftarrow \mathbf{0}$, $C^{(0)} \leftarrow \mathbf{1}$, \rev{and dwell counter $\tau_{\text{dwell}} \leftarrow 0$}.
 \FOR{$k=0,1,2,\ldots,K_{\max}-1$}
 \STATE \rev{\textbf{if} $\tau_{\text{dwell}} == 0$ \textbf{then}}
-\STATE \quad \rev{Compute all-pairs shortest-path DAGs $\mathcal{P}^{(k)}$ and stress $\kappa^{(k)}$ (Eq.~\eqref{eq:bc_definition} or $\widetilde{\kappa}^{(k)}$ in Eq.~\eqref{eq:generalized_stress}) via Brandes' algorithm under $C^{(k)}$; set $q^{(k)} \leftarrow \mathrm{norm}(\kappa^{(k)})$ and $\tau_{\text{dwell}} \leftarrow T_d - 1$. \hfill $\triangleright\; O(N(E+N\log N))$}
+\STATE \quad \rev{Compute all-pairs shortest-path DAGs $\mathcal{P}^{(k)}$ and stress $\kappa^{(k)}$ (Eq.~\eqref{eq:bc_definition} or $\widetilde{\kappa}^{(k)}$ in Eq.~\eqref{eq:generalized_stress}) via Brandes' algorithm under $C^{(k)}$; set $q^{(k)} \leftarrow \mathrm{norm}(\kappa^{(k)})$ and $\tau_{\text{dwell}} \leftarrow T_d - 1$ ($\triangleright\; O(N(E+N\log N))$).}
 \STATE \rev{\textbf{else}}
-\STATE \quad \rev{Hold active routing policy and stress target: $\mathcal{P}^{(k)} \leftarrow \mathcal{P}^{(k-1)}$, $q^{(k)} \leftarrow q^{(k-1)}$, and $\tau_{\text{dwell}} \leftarrow \tau_{\text{dwell}} - 1$. \hfill $\triangleright\; O(N)$}
+\STATE \quad \rev{Hold active routing policy and stress target: $\mathcal{P}^{(k)} \leftarrow \mathcal{P}^{(k-1)}$, $q^{(k)} \leftarrow q^{(k-1)}$, and $\tau_{\text{dwell}} \leftarrow \tau_{\text{dwell}} - 1$ ($\triangleright\; O(N)$).}
 \STATE \rev{\textbf{end if}}
-\STATE Update pressure: $S^{(k+1)} \leftarrow (1-\alpha)S^{(k)}+\alpha\,q^{(k)}$. \rev{\hfill $\triangleright\; O(N)$}
-\STATE Update cost: $C^{(k+1)} \leftarrow \mathbf{1}+\beta_I\,S^{(k+1)}$. \rev{\hfill $\triangleright\; O(N)$}
+\STATE Update pressure: $S^{(k+1)} \leftarrow (1-\alpha)S^{(k)}+\alpha\,q^{(k)}$ \rev{($\triangleright\; O(N)$)}.
+\STATE Update cost: $C^{(k+1)} \leftarrow \mathbf{1}+\beta_I\,S^{(k+1)}$ \rev{($\triangleright\; O(N)$)}.
 \IF{\rev{$k > 0$ and $\|S^{(k+1)}-S^{(k)}\|_\infty \le \varepsilon$ and $\mathcal{P}^{(k)} == \mathcal{P}^{(k-1)}$}}
 \STATE \textbf{break}
 \ENDIF
 \ENDFOR
 \RETURN \rev{$C^{(k)}, \mathcal{P}^{(k)}$}
 \end{algorithmic}
+}
 \end{breakablealgorithm}
 
 % --- 这是 Fig. 4 (原文fig 7) 的代码 ---
-\begin{figure}[t!]
+\begin{figure}[!ht]
     \centering
-    % Ensure the file path to your PDF is correct
-    \includegraphics[width=0.8\columnwidth]{figure_7_microscopic_path_change.eps}
+    \includegraphics[width=0.76\columnwidth]{figure_7_microscopic_path_change.eps}
     \caption{A conceptual visualization of SRA's path reshaping mechanism. The algorithm diverts traffic from the efficient but congested 2-hop path (red dashed) through the central hub to a longer but more stable 4-hop peripheral path (green solid).}
     \label{fig:sra_mechanism_visualization}
 \end{figure}
@@ -442,7 +457,7 @@ Formally, $X$ is a \textbf{compact, positively invariant set} ($F(X) \subset X$)
 \textit{Physical Interpretation:} This lemma guarantees that the structural stress never diverges to infinity; the system possesses an intrinsic ``safety boundary'' dictated by the normalization mechanism.
 \end{lemma}
 \begin{proof}[Proof Sketch]
-The proof demonstrates that if a state $S^{(k)}$ resides within the hypercube $X$, its successor $S^{(k+1)}$---being a convex combination of elements in $X$---must inherently remain within $X$. Moreover, for any perturbed initialization $S^{(0)} \notin X$, the $\ell_\infty$ distance to $X$ contracts geometrically by $(1-\alpha)$ at every step. \textit{The full formal proof is provided in Appendix~\ref{app:proof_lemma_invariance}.}
+The proof demonstrates that if a state $S^{(k)}$ resides within the hypercube $X$, its successor $S^{(k+1)}$---being a convex combination of elements in $X$---must inherently remain within $X$. Moreover, for any perturbed initialization $S^{(0)} \notin X$, the $\ell_\infty$ distance to $X$ contracts geometrically by $(1-\alpha)$ at every step. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-A.}
 \end{proof}
 
 With safety guaranteed, we verify the topological regularity of the control map.
@@ -452,7 +467,7 @@ With safety guaranteed, we verify the topological regularity of the control map.
 The set-valued map $F(\cdot)$ defined in \eqref{eq:inclusion_map} is \textbf{Upper Semi-Continuous (USC)} with \textbf{non-empty, compact, and convex} values.
 \end{proposition}
 \begin{proof}[Proof Sketch]
-The proof exploits the piecewise constant structure of $\mathcal{N}(S)$, which stems from the finite nature of the network's path configurations (Assumption 3). This structure ensures that the graph of the map is closed, a sufficient condition for the USC property in compact spaces. \textit{The full formal proof is provided in Appendix~\ref{app:proof_prop_usc}.}
+The proof exploits the piecewise constant structure of $\mathcal{N}(S)$, which stems from the finite nature of the network's path configurations (Assumption 3). This structure ensures that the graph of the map is closed, a sufficient condition for the USC property in compact spaces. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-B.}
 \end{proof}
 
 Combining the global confinement (Lemma~\ref{lemma:invariance}) with topological regularity (Proposition~\ref{prop:usc}), we establish the system's ultimate destiny.
@@ -469,7 +484,7 @@ is a \textbf{non-empty, compact, and positively invariant global attracting set}
 \end{equation}
 \end{theorem}
 \begin{proof}[Proof Sketch]
-Because $X$ is compact and positively invariant ($F(X) \subset X$) and $F$ is USC with compact values (Proposition~\ref{prop:usc}), the forward images $K_n := F^n(X)$ form a nested sequence of non-empty compact subsets $K_{n+1} \subset K_n$. By Cantor's intersection theorem, $\Omega = \bigcap_{n\ge 0} K_n$ is non-empty, compact, and invariant, and attracts all trajectories initialized in $X$. \textit{The full formal proof is provided in Appendix~\ref{app:proof_thm_attractor}.}
+Because $X$ is compact and positively invariant ($F(X) \subset X$) and $F$ is USC with compact values (Proposition~\ref{prop:usc}), the forward images $K_n := F^n(X)$ form a nested sequence of non-empty compact subsets $K_{n+1} \subset K_n$. By Cantor's intersection theorem, $\Omega = \bigcap_{n\ge 0} K_n$ is non-empty, compact, and invariant, and attracts all trajectories initialized in $X$. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-C.}
 \end{proof}
 
 \rev{\begin{remark}[Attraction to a Limit Set vs. Unique Point Equilibrium]
@@ -505,7 +520,7 @@ In particular, whenever the active path set does not change between steps $k$ an
 \end{equation}
 \end{theorem}
 \begin{proof}[Proof Sketch]
-Using the exact identity $S^{(k+1)} - q^{(k+1)} = (1-\alpha)(S^{(k)} - q^{(k)}) + (q^{(k)} - q^{(k+1)})$ and applying the Weighted Young's Inequality with weight $\lambda = \alpha/(1-\alpha)$, we decouple the one-step evolution into a contractive dissipation term $(1-\alpha)E_k$ and a switching disturbance term $\frac{1}{\alpha}\|q^{(k)} - q^{(k+1)}\|_2^2 \le \frac{1}{\alpha}\bar{\Delta}^2$. \textit{The full formal proof is provided in Appendix~\ref{app:proof_thm_drop_jump}.}
+Using the exact identity $S^{(k+1)} - q^{(k+1)} = (1-\alpha)(S^{(k)} - q^{(k)}) + (q^{(k)} - q^{(k+1)})$ and applying the Weighted Young's Inequality with weight $\lambda = \alpha/(1-\alpha)$, we decouple the one-step evolution into a contractive dissipation term $(1-\alpha)E_k$ and a switching disturbance term $\frac{1}{\alpha}\|q^{(k)} - q^{(k+1)}\|_2^2 \le \frac{1}{\alpha}\bar{\Delta}^2$. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-D.}
 \end{proof}
 
 This theorem provides a profound physical insight: the stability of SRA is governed by two competing forces. 
@@ -524,7 +539,7 @@ S^{(k+1)}=(1-\alpha)S^{(k)}+\alpha c,
 which converges exponentially to the unique fixed point $S^\star=c$ at a rate of $(1-\alpha)$.
 \end{corollary}
 \begin{proof}[Proof Sketch]
-The proof follows directly from the Banach Fixed-Point Theorem. By subtracting the fixed point from the update rule, we derive the linear error dynamics $\|S^{(k+1)}-S^\star\|_2 = (1-\alpha)\|S^{(k)}-S^\star\|_2$, confirming exponential decay. \textit{The full formal proof is provided in Appendix~\ref{app:proof_cor_local_convergence}.}
+The proof follows directly from the Banach Fixed-Point Theorem. By subtracting the fixed point from the update rule, we derive the linear error dynamics $\|S^{(k+1)}-S^\star\|_2 = (1-\alpha)\|S^{(k)}-S^\star\|_2$, confirming exponential decay. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-E.}
 \end{proof}
 
 \subsection{Convergence Rate and Practical Stability via Temporal Regularization}
@@ -543,9 +558,9 @@ We define the $m$-th dwell block as the interval $[\tau_m, \tau_{m+1}-1]$, where
 Under the temporal regularization $T_d$ in Algorithm~\ref{alg:sra}, the active routing topology and target vector $q^{(\tau_m+t)} \equiv q^{(\tau_m)}$ remain invariant within each block $t \in \{0, \dots, T_d-1\}$. 
 Letting $\gamma:=1-\alpha$ be the damping factor and $\tilde C:=\bar\Delta^2/\alpha$ be the injection bound, the system exhibits a \textbf{contract-then-jump} behavior:
 \begin{itemize}
-    \item[\textit{(i)}] \textbf{Intra-block Cooling:} Within a block, the injection term vanishes ($q^{(\tau_m+t)} = q^{(\tau_m)}$), and tracking energy decays exponentially:
+    \item[\textit{(i)}] \textbf{Intra-block Cooling:} Within a block, the injection term vanishes ($q^{(\tau_m+t)} = q^{(\tau_m)}$), and tracking energy decays exponentially for $t \in \{0, \dots, T_d-1\}$:
     \begin{equation}\label{eq:intra_block}
-    \rev{E_{\tau_m+t} = \gamma^{\,2t}V_m \le \gamma^{\,t}V_m, \quad \text{for } t \in \{0, \dots, T_d-1\}.}
+    \rev{E_{\tau_m+t} = \gamma^{\,2t}V_m \le \gamma^{\,t}V_m.}
     \end{equation}
     \item[\textit{(ii)}] \textbf{Inter-block Recurrence:} The energy state across adjacent blocks satisfies the linear recurrence:
     \begin{equation}\label{eq:inter_block}
@@ -554,7 +569,7 @@ Letting $\gamma:=1-\alpha$ be the damping factor and $\tilde C:=\bar\Delta^2/\al
 \end{itemize}
 \end{proposition}
 \begin{proof}[Proof Sketch]
-(i) During the dwell period, the path set is held fixed ($q^{(\tau_m+t)} \equiv q^{(\tau_m)}$), so the system operates as a pure leaky integrator (Corollary~\ref{cor:local_convergence}), resulting in strictly exponential decay. (ii) The recurrence combines $T_d-1$ steps of intra-block cooling with a single worst-case switching injection event at the block boundary $\tau_{m+1}$. \textit{The full formal proof is provided in Appendix~\ref{app:proof_prop_block_dynamics}.}
+(i) During the dwell period, the path set is held fixed ($q^{(\tau_m+t)} \equiv q^{(\tau_m)}$), so the system operates as a pure leaky integrator (Corollary~\ref{cor:local_convergence}), resulting in strictly exponential decay. (ii) The recurrence combines $T_d-1$ steps of intra-block cooling with a single worst-case switching injection event at the block boundary $\tau_{m+1}$. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-F.}
 \end{proof}
 
 This recurrence relation allows us to calculate the precise geometry of the system's final resting state.
@@ -574,7 +589,7 @@ Let $\gamma \in (0,1)$ and $\tilde C > 0$. The system trajectories are strictly 
 \end{itemize}
 \end{theorem}
 \begin{proof}[Proof Sketch]
-We iteratively expand the recurrence from Proposition~\ref{prop:block_dynamics}. The energy $V_m$ is upper-bounded by a geometric series which converges to the stated limit. \textit{The full formal proof is provided in Appendix~\ref{app:proof_thm_epsilon_tube}.}
+We iteratively expand the recurrence from Proposition~\ref{prop:block_dynamics}. The energy $V_m$ is upper-bounded by a geometric series which converges to the stated limit. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-G.}
 \end{proof}
 
 Finally, we consolidate these findings into a definitive stability guarantee.
@@ -588,7 +603,7 @@ With a minimum dwell time $T_d \ge 1$, the SRA framework guarantees:
 \end{itemize}
 \end{theorem}
 \begin{proof}[Proof Sketch]
-Direct consequence of the dwell time definition and Theorem~\ref{thm:epsilon_tube}. \textit{The full formal proof is provided in Appendix~\ref{app:proof_thm_practical_stability}.}
+Direct consequence of the dwell time definition and Theorem~\ref{thm:epsilon_tube}. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-H.}
 \end{proof}
 
 Equation~\eqref{eq:limsup_radius} also provides a closed-form design rule. Given a target stability margin $R_{\text{target}}^2 > \tilde C$, the required dwell time is:
@@ -619,7 +634,7 @@ then the post-switch peak stress strictly decreases by at least $\delta$:
 \end{equation}}
 \end{lemma}
 \begin{proof}[Proof Sketch]
-Under the positive load shedding $\Delta_u^- \ge \delta > 0$ at node $u$, its post-switch load satisfies $\kappa_u^{(m+1)} = \kappa_{\max}^{(m)} - \Delta_u^- \le \kappa_{\max}^{(m)} - \delta$. Simultaneously, the non-overloading condition \eqref{eq:non_overloading_diversion} ensures that no other node $j \neq u$ receiving diverted traffic exceeds $\kappa_{\max}^{(m)} - \delta$. Taking the maximum over all $i \in V$ yields \eqref{eq:peak_shaving_bound}. \textit{The full formal proof is provided in Appendix~\ref{app:proof_lem_block_budget}.}
+Under the positive load shedding $\Delta_u^- \ge \delta > 0$ at node $u$, its post-switch load satisfies $\kappa_u^{(m+1)} = \kappa_{\max}^{(m)} - \Delta_u^- \le \kappa_{\max}^{(m)} - \delta$. Simultaneously, the non-overloading condition \eqref{eq:non_overloading_diversion} ensures that no other node $j \neq u$ receiving diverted traffic exceeds $\kappa_{\max}^{(m)} - \delta$. Taking the maximum over all $i \in V$ yields \eqref{eq:peak_shaving_bound}. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-I.}
 \end{proof}
 
 This structural optimization---reducing the maximum stress across nodes---maps directly to network throughput gains. 
@@ -640,12 +655,12 @@ L(\kappa') = \frac{\mu_{\min}}{\kappa'_{\max}} > \frac{\mu_{\min}}{\kappa_{\max}
 Furthermore, for arbitrary heterogeneous capacities $\mu_i > 0$ and demands $W_{st} \ge 0$, using the generalized stress $\widetilde{\kappa}_i(S; W, \mu)$ in Eq.~\eqref{eq:generalized_stress} yields $\rho_{\max}(\widetilde{\kappa}) = \min_{i \in V} (1/\widetilde{\kappa}_i) = 1/\widetilde{\kappa}_{\max}$; hence, whenever relaxation strictly reduces peak generalized stress ($\widetilde{\kappa}'_{\max} < \widetilde{\kappa}_{\max}$), actual capacity satisfies the exact identity $\rho_{\max}(\widetilde{\kappa}')/\rho_{\max}(\widetilde{\kappa}) = \widetilde{\kappa}_{\max}/\widetilde{\kappa}'_{\max} > 1$.
 \item \emph{Sufficient Condition under Heterogeneous Service Rates with Unweighted BC:} When unweighted topological BC $\kappa_i$ is used on a network with heterogeneous service rates $\mu_i$, let $\rho_0 := \rho_{\max}(\kappa) = \min_{i \in V}(\mu_i/\kappa_i)$. Then a sufficient condition for the post-relaxation capacity to satisfy $\rho_{\max}(\kappa') \ge \rho_0$ (and $\rho_{\max}(\kappa') > \rho_0$ when the inequalities are strict) is that both the relieved peak $u$ and all traffic-absorbing alternate nodes $j \neq u$ satisfy the joint service-rate slack conditions:
 \begin{equation}\label{eq:hetero_capacity_condition}
-\frac{\mu_u}{\kappa_{\max} - d} \ge \rho_0 \quad \textbf{and} \quad \frac{\mu_j}{\kappa_j + B_j} \ge \rho_0,\quad \forall j \in V \setminus \{u\}.
+\frac{\mu_u}{\kappa_{\max} - d} \ge \rho_0 \;\text{ and }\; \frac{\mu_j}{\kappa_j + B_j} \ge \rho_0,\; \forall j \neq u.
 \end{equation}
 \end{enumerate}}
 \end{proposition}
 \begin{proof}[Proof Sketch]
-(i) Follows directly from $\kappa'_{\max} < \kappa_{\max}$ with $\mu_{\min}$ constant. (ii) Follows from the exact identity $\min_{i \in V}(\mu/\kappa_i) = \mu / \max_{i \in V}\kappa_i = \mu/\kappa_{\max}$ (and similarly $\min_{i \in V}(1/\widetilde{\kappa}_i) = 1/\widetilde{\kappa}_{\max}$). (iii) Since $\rho_{\max}(\kappa') = \min_{i \in V}(\mu_i/\kappa'_i)$ and $\kappa'_u \le \kappa_{\max}-d$, $\kappa'_j \le \kappa_j+B_j$, satisfying \eqref{eq:hetero_capacity_condition} for $i=u$ and all $j \neq u$ guarantees $\mu_i/\kappa'_i \ge \rho_0$ for every $i \in V$. \textit{The full formal proof is provided in Appendix~\ref{app:proof_prop_perf_bridge}.}
+(i) Follows directly from $\kappa'_{\max} < \kappa_{\max}$ with $\mu_{\min}$ constant. (ii) Follows from the exact identity $\min_{i \in V}(\mu/\kappa_i) = \mu / \max_{i \in V}\kappa_i = \mu/\kappa_{\max}$ (and similarly $\min_{i \in V}(1/\widetilde{\kappa}_i) = 1/\widetilde{\kappa}_{\max}$). (iii) Since $\rho_{\max}(\kappa') = \min_{i \in V}(\mu_i/\kappa'_i)$ and $\kappa'_u \le \kappa_{\max}-d$, $\kappa'_j \le \kappa_j+B_j$, satisfying \eqref{eq:hetero_capacity_condition} for $i=u$ and all $j \neq u$ guarantees $\mu_i/\kappa'_i \ge \rho_0$ for every $i \in V$. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-J.}
 \end{proof}
 
 \begin{remark}[Structural vs. Artificial Constraints]
@@ -686,57 +701,34 @@ To establish comparative dominance, we benchmark SRA against representatives of 
 Q-Routing was configured with standard parameters ($\alpha=0.1, \gamma=0.9, \epsilon=0.3$) to ensure fair learning capabilities.
 All baseline results are the ensemble mean of \textbf{100 independent trials} (and \rev{\textbf{30 independent trials} with 95\% confidence intervals for the multi-factor ablation, noise, and scalability campaigns}) with distinct random seeds.
 
-\begin{table}[t!]
+\begin{table}[!ht]
 \centering
+\scriptsize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.08}
 \caption{Summary of Simulation Parameters. Note: ``Node Service Rate'' ($\mu_i$) reflects the effective steady-state processing budget available to the control plane.}
 \label{tab:sim_params}
-\renewcommand{\arraystretch}{1.2}
-\small
-\begin{tabularx}{\columnwidth}{|l|X|}
-\hline
+\begin{tabularx}{\columnwidth}{@{}l>{\raggedright\arraybackslash}X@{}}
+\toprule
 \textbf{Parameter} & \textbf{Value / Description} \\
-\hline
-\hline
-\multicolumn{2}{|c|}{\textbf{A. Topology Spectrum (Stress Conditions)}} \\
-\hline
+\midrule
+\multicolumn{2}{@{}l}{\textbf{A. Topology Spectrum (Stress Conditions)}} \\
+\midrule
 Network Models & BA (Heterogeneous), WS (Hybrid), ER (Homogeneous)\rev{, NSFNET ($N=14$), GEANT ($N=22$)} \\
-\hline
 Default Size ($N$) & 100 nodes \rev{(Scalability sweep: $N \in \{50, 100, 200, 300, 500\}$)} \\
-\hline
-BA Attachment ($m$) & 4 (High Centrality Skew) \\
-\hline
-WS Neighbors ($k$) & 8 \\
-\hline
-WS Rewiring ($p$) & 0.1 \\
-\hline
-ER Connection ($p$) & 0.1 \\
-\hline
-\hline
-\multicolumn{2}{|c|}{\textbf{B. SRA Controller Parameters}} \\
-\hline
+BA / WS / ER Params & BA $m=4$; WS $k=8, p=0.1$; ER $p=0.1$ \\
+\midrule
+\multicolumn{2}{@{}l}{\textbf{B. SRA Controller Parameters}} \\
+\midrule
 Learning Rate ($\alpha$) & 0.1 (Memory Persistence; \rev{Sweep: $[0.05, 0.5]$}) \\
-\hline
 Integral Gain ($\beta_I$) & 10.0 (Pressure-Cost Sensitivity; \rev{Sweep: $[1.0, 25.0]$}) \\
-\hline
 \rev{Min Dwell Time ($T_d$)} & \rev{$5$ epochs (Default; Sweep: $T_d \in \{1, 2, 3, 5, 8, 10\}$)} \\
-\hline
-Max Iterations ($K_{\max}$) & 200 \\
-\hline
-Convergence Tol. ($\varepsilon$) & $1 \times 10^{-5}$ \\
-\hline
-\hline
-\multicolumn{2}{|c|}{\textbf{C. Traffic Stress Test Parameters}} \\
-\hline
+Max Iterations / Tol. & $K_{\max} = 200$, $\varepsilon = 1 \times 10^{-5}$ \\
+\midrule
+\multicolumn{2}{@{}l}{\textbf{C. Traffic Stress Test Parameters}} \\
+\midrule
 Node Service Rate ($\mu$) & 1.0 packet/timestep \rev{(Heterogeneous test: $\mu_i \propto \deg(i)^{0.5}$)} \\
-\hline
-Total Timesteps ($T$) & 2000 \\
-\hline
-Warmup Period & 300 timesteps \\
-\hline
-Node Proc. Capacity & 10 packets/timestep \\
-\hline
-Node Queue Capacity & 50 packets \\
-\hline
+Simulation Horizon & $T = 2000$ timesteps (Warmup: $300$ timesteps) \\
+Proc. / Queue Cap. & $10$ packets/timestep; Queue buffer $B_{\max} = 50$ packets \\
+\bottomrule
 \end{tabularx}
 \end{table}
 
@@ -748,9 +740,9 @@ Node Queue Capacity & 50 packets \\
 Before analyzing macroscopic traffic performance, we first seek to verify the fundamental mechanistic laws derived in Section~\ref{sec:model}. 
 Specifically, we isolate the algorithm's core logic to validate \rev{three} theoretical propositions: the causal link between peak shaving and capacity expansion (Proposition~\ref{prop:perf-bridge}), the ``dissipation-injection'' stability dynamics (Theorem~\ref{thm:drop_jump}), \rev{and the block-wise dwell-time cooling mechanism (Proposition~\ref{prop:block_dynamics})}.
 
-\begin{figure}[h!]
+\begin{figure}[!ht]
     \centering
-    \includegraphics[width=\columnwidth]{ren_fig1_validation.eps}
+    \includegraphics[width=0.88\columnwidth]{ren_fig1_validation.eps}
     \caption{Independently Measured Network Capacity Gain vs. Structural Optimization Ratio. The empirical data clusters tightly around the theoretical $y=x$ prediction, confirming that performance gains are deterministically driven by structural stress dispersion. ($R^2=0.951$, Sample size $N=100$).}
     \label{fig:peak_validation}
 \end{figure}
@@ -772,16 +764,16 @@ As shown in Fig.~\ref{fig:lyapunov_dynamics}(a), on a macroscopic scale, $V(S^{(
 
 Furthermore, Fig.~\ref{fig:dwell_cooling} contrasts the energy trajectory without temporal regularization ($T_d = 1$, Fig.~\ref{fig:dwell_cooling}(a)) against the block-wise regularized trajectory ($T_d = 5$, Fig.~\ref{fig:dwell_cooling}(b)). Whereas $T_d = 1$ experiences frequent switching impulses at nearly every step, enforcing $T_d = 5$ guarantees $T_d - 1 = 4$ uninterrupted steps of pure exponential cooling ($E_{\tau_m+t} = \gamma^{2t}V_m$) before any subsequent switch is permitted, compressing the steady-state oscillation tube in strict accordance with Theorem~\ref{thm:epsilon_tube}.}
 
-\begin{figure}[t!]
+\begin{figure}[!ht]
     \centering
-    \includegraphics[width=\columnwidth]{ren_fig2_lyapunov.pdf}
+    \includegraphics[width=0.9\columnwidth]{ren_fig2_lyapunov.pdf}
     \caption{\rev{Empirical verification of the Dissipation-Injection Law (Theorem~\ref{thm:drop_jump}). (a) Macroscopic convergence of the piecewise Lyapunov energy $V(S^{(k)})$ into the bounded attracting set $\Omega$. (b) Microscopic steady-state trajectory exhibiting exponential intra-partition dissipation (smooth drops) punctuated by bounded path-switching injections (vertical jumps).}}
     \label{fig:lyapunov_dynamics}
 \end{figure}
 
-\begin{figure}[t!]
+\begin{figure}[!ht]
     \centering
-    \includegraphics[width=\columnwidth]{ren_fig3_dwell_time.pdf}
+    \includegraphics[width=0.9\columnwidth]{ren_fig3_dwell_time.pdf}
     \caption{\rev{Empirical verification of Block-wise Dissipation Dynamics (Proposition~\ref{prop:block_dynamics} and Theorem~\ref{thm:epsilon_tube}). (a) Unregularized switching ($T_d=1$) exhibits persistent high-frequency chattering. (b) Temporal regularization ($T_d=5$) enforces multi-step exponential cooling within each dwell block, substantially suppressing switching frequency and residual energy.}}
     \label{fig:dwell_cooling}
 \end{figure}
@@ -789,30 +781,28 @@ Furthermore, Fig.~\ref{fig:dwell_cooling} contrasts the energy trajectory withou
 \subsection{Macroscopic Structural Relaxation and Equilibrium Analysis}
 \label{subsec:dynamic_relaxation}
 
-\begin{table}[h!]
+\begin{table}[!ht]
 \centering
+\scriptsize\setlength{\tabcolsep}{3.5pt}\renewcommand{\arraystretch}{1.1}
 \caption{Analysis of Structural Optimization Benefits of SRA (Mean $\pm$ Std Dev over 100 runs)}
 \label{tab:structural_benefits_stats}
-\resizebox{\columnwidth}{!}{
-\renewcommand{\arraystretch}{1.2}
-\begin{tabular}{|l|l|r|r|r|}
-\hline
-\textbf{Network} & \textbf{Metric} & \textbf{Initial (Dijkstra)} & \textbf{Final (SRA)} & \textbf{Change (\%)} \\
-\hline\hline
-ER & Peak Centrality & $589.93 (\pm 120.59)$ & $209.40 (\pm 26.87)$ & -64.50\% \\
- & Std Dev of Centrality & $106.93 (\pm 10.62)$ & $33.55 (\pm 9.26)$ & -68.62\% \\
- & Avg Path Length & $2.25 (\pm 0.04)$ & $2.25 (\pm 0.04)$ & +0.00\% \\
-\hline
-BA & Peak Centrality & $2657.37 (\pm 619.87)$ & $431.52 (\pm 45.86)$ & -83.76\% \\
- & Std Dev of Centrality & $370.10 (\pm 43.87)$ & $91.12 (\pm 6.86)$ & -75.38\% \\
- & Avg Path Length & $2.37 (\pm 0.02)$ & $2.51 (\pm 0.01)$ & +5.63\% \\
-\hline
-WS & Peak Centrality & $856.61 (\pm 169.69)$ & $439.76 (\pm 60.07)$ & -48.66\% \\
- & Std Dev of Centrality & $175.10 (\pm 22.43)$ & $86.94 (\pm 14.21)$ & -50.35\% \\
- & Avg Path Length & $3.05 (\pm 0.09)$ & $3.10 (\pm 0.10)$ & +1.78\% \\
-\hline
-\end{tabular}
-}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}llrrr@{}}
+\toprule
+\textbf{Network} & \textbf{Metric} & \textbf{Initial (Dijkstra)} & \textbf{Final (SRA)} & \textbf{Change} \\
+\midrule
+ER & Peak Centrality & $589.93 (\pm 120.59)$ & $209.40 (\pm 26.87)$ & $-64.50\%$ \\
+ & Std Dev of BC & $106.93 (\pm 10.62)$ & $33.55 (\pm 9.26)$ & $-68.62\%$ \\
+ & Avg Path Length & $2.25 (\pm 0.04)$ & $2.25 (\pm 0.04)$ & $+0.00\%$ \\
+\midrule
+BA & Peak Centrality & $2657.37 (\pm 619.87)$ & $431.52 (\pm 45.86)$ & $-83.76\%$ \\
+ & Std Dev of BC & $370.10 (\pm 43.87)$ & $91.12 (\pm 6.86)$ & $-75.38\%$ \\
+ & Avg Path Length & $2.37 (\pm 0.02)$ & $2.51 (\pm 0.01)$ & $+5.63\%$ \\
+\midrule
+WS & Peak Centrality & $856.61 (\pm 169.69)$ & $439.76 (\pm 60.07)$ & $-48.66\%$ \\
+ & Std Dev of BC & $175.10 (\pm 22.43)$ & $86.94 (\pm 14.21)$ & $-50.35\%$ \\
+ & Avg Path Length & $3.05 (\pm 0.09)$ & $3.10 (\pm 0.10)$ & $+1.78\%$ \\
+\bottomrule
+\end{tabular*}
 \end{table}
 
 Having validated the microscopic mechanistic laws, we now examine the macroscopic structural properties of the equilibrium states achieved by SRA. 
@@ -859,27 +849,27 @@ We observe a predictable increase in average latency in this scenario, which rep
     \centering
     % (a) BA Network Plot
     \subfloat[BA network: SRA acts as a proactive performance optimizer.\label{fig:perf_ba_stacked}]{%
-    \begin{minipage}{0.92\textwidth}
+    \begin{minipage}{0.84\textwidth}
         \centering
         \includegraphics[width=\textwidth]{performance_comparison_ba.eps}
     \end{minipage}
     }
     
-    \vspace{0.35cm}
+    \vspace{0.08cm}
 
     % (b) WS Network Plot
     \subfloat[WS network: SRA maintains stability beyond the congestion knee.\label{fig:perf_ws_stacked}]{%
-    \begin{minipage}{0.92\textwidth}
+    \begin{minipage}{0.84\textwidth}
         \centering
         \includegraphics[width=\textwidth]{performance_comparison_ws.eps}
     \end{minipage}
     }
 
-    \vspace{0.35cm}
+    \vspace{0.08cm}
 
     % (c) ER Network Plot
     \subfloat[ER network: SRA trades latency for reliability under structural limits.\label{fig:perf_er_stacked}]{%
-    \begin{minipage}{0.92\textwidth}
+    \begin{minipage}{0.84\textwidth}
         \centering
         \includegraphics[width=\textwidth]{performance_comparison_er.eps}
     \end{minipage}
@@ -910,9 +900,9 @@ The findings provide compelling statistical evidence of SRA's \textbf{vulnerabil
 
 This behavior establishes SRA as a precise governance mechanism: it is highly active where needed and correctly dormant otherwise, ensuring a lean yet robust network state.
 
-\begin{figure}[t!]
+\begin{figure}[!ht]
     \centering
-    \includegraphics[width=\columnwidth]{robustness_advantage_summary_stats.eps}
+    \includegraphics[width=0.9\columnwidth]{robustness_advantage_summary_stats.eps}
     \caption{The SRA PDR advantage over Dijkstra under a targeted hub-removal attack. The results validate SRA's capacity to provide topological hardening in vulnerable networks (BA) and adaptive survival in hybrid ones (WS).}
     \label{fig:robustness_summary_stats}
 \end{figure}
@@ -941,36 +931,29 @@ The quantitative results at heavy load ($\rho = 0.9$, 30 independent trials with
 
 \begin{table*}[t!]
 \centering
+\scriptsize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.12}
 \caption{\rev{Component Ablation Study and Comparison Against Stronger Baselines on BA Scale-Free Networks ($N=100$, Heavy Load $\rho=0.9$, Mean $\pm$ Std and 95\% CI $[\bar{x} \pm 1.96\,s/\sqrt{30}]$ across 30 Independent Trials).}}
 \label{tab:ablation_results}
-\renewcommand{\arraystretch}{1.18}
-\small
-\begin{tabular}{|l|c|c|c|c|c|c|}
-\hline
-\textbf{Method / Ablation Variant} & \textbf{Throughput (pkts/step)} & \textbf{95\% CI} & \textbf{PDR (\%)} & \textbf{Mean / P95 Latency} & \textbf{Peak $\kappa_{\max}$ Red. (\%)} & \textbf{Switch Freq. $\bar{f}_{\text{sw}}$} \\
-\hline\hline
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lcccccc@{}}
+\toprule
+\textbf{Method / Ablation Variant} & \textbf{Throughput (pkts/step)} & \textbf{95\% CI} & \textbf{PDR (\%)} & \textbf{Mean / P95 Latency} & \textbf{Peak $\kappa_{\max}$ Red.} & \textbf{Switch Freq. $\bar{f}_{\text{sw}}$} \\
+\midrule
 Dijkstra (Static Baseline) & $68.88 \pm 5.57$ & $[66.89, 70.88]$ & $76.46 \pm 6.02\%$ & $5.34$ / $10.55$ & $0.00\%$ & $0.0\%$ \\
-\hline
 Memoryless Reactive BC ($\alpha=1$, No Integrator) & $53.39 \pm 5.88$ & $[51.28, 55.49]$ & $59.26 \pm 6.44\%$ & $7.00$ / $12.27$ & $-31.04\%$ (Amplified) & $98.3\%$ (Chattering) \\
-\hline
 LIRP-D (Reactive Queue Deflection) & $89.49 \pm 1.31$ & $[89.02, 89.95]$ & $99.34 \pm 1.29\%$ & $3.79$ / $5.80$ & $0.00\%$ (Local Only) & N/A (Per-Packet) \\
-\hline
 Static BC (One-Shot Penalty, Open-Loop) & $89.96 \pm 0.51$ & $[89.78, 90.14]$ & $99.87 \pm 0.41\%$ & $3.95$ / $5.73$ & $66.95\%$ & $1.7\%$ (Open-Loop) \\
-\hline
 IGP Weight Tuning (Fortz--Thorup \cite{Fortz2000OSPF}) & $90.08 \pm 0.38$ & $[89.94, 90.22]$ & $100.00 \pm 0.06\%$ & $3.58$ / $5.00$ & $77.03\%$ & $98.3\%$ (Unstable) \\
-\hline
 Unnormalized SRA (No $\mathrm{norm}(\cdot)$) & $90.08 \pm 0.38$ & $[89.94, 90.22]$ & $100.00 \pm 0.06\%$ & $3.43$ / $4.10$ & $75.16\%$ & $20.0\%$ \\
-\hline
 SRA w/o Dwell ($T_d=1$) & $90.08 \pm 0.38$ & $[89.94, 90.22]$ & $100.00 \pm 0.06\%$ & $3.51$ / $5.00$ & $81.85\%$ & $98.3\%$ (Chattering) \\
-\hline
+\midrule
 \textbf{Full SRA ($\alpha=0.1, \beta_I=10, T_d=5$)} & $\mathbf{89.76 \pm 0.76}$ & $\mathbf{[89.49, 90.04]}$ & $\mathbf{99.65 \pm 0.73\%}$ & $\mathbf{3.62}$ / $\mathbf{5.50}$ & $\mathbf{69.20\%}$ & $\mathbf{20.0\%}$ \textbf{(Stable)} \\
-\hline
-\end{tabular}
+\bottomrule
+\end{tabular*}
 \end{table*}
 
 \begin{figure*}[t!]
     \centering
-    \includegraphics[width=0.96\textwidth]{fig_revision_ablation_baselines.pdf}
+    \includegraphics[width=0.9\textwidth]{fig_revision_ablation_baselines.pdf}
     \caption{\rev{Component ablation and stronger baseline comparison across 30 trials (shaded bands and error bars denote 95\% confidence intervals). (a) Throughput vs. offered load on BA networks ($N=100$). (b) Packet loss rate and control-plane route switching frequency at $\rho=0.9$, demonstrating that Full SRA ($T_d=5$) eliminates the $98.3\%$ route flapping of memoryless ($\alpha=1$), $T_d=1$, and IGP Weight Tuning baselines. (c) Cross-topology throughput comparison at $\rho=0.9$ across BA, WS, and ER networks.}}
     \label{fig:ablation_baselines}
 \end{figure*}
@@ -987,7 +970,7 @@ To address realistic operational environments where traffic is non-uniform, node
 
 \begin{figure*}[t!]
     \centering
-    \includegraphics[width=0.96\textwidth]{fig_revision_hetero_timevarying_noise.pdf}
+    \includegraphics[width=0.9\textwidth]{fig_revision_hetero_timevarying_noise.pdf}
     \caption{\rev{Robustness under non-uniform traffic, heterogeneous capacities, time-varying surges, and sensing noise (30 trials, 95\% CI). (a) Skewed Pareto gravity traffic $W_{st}$ and heterogeneous node capacities $\mu_i$: Generalized Weighted SRA ($\widetilde{\kappa}_i$) and Topology-Only SRA ($\kappa_i$) substantially reduce peak stress and boost PDR by $>13.7\%$ over Dijkstra. (b) Real-time throughput response under a $2\times$ mid-run traffic surge ($t \in [500, 1100)$). (c) Sensitivity to multiplicative sensing noise $\sigma \in [0\%, 20\%]$, demonstrating the low-pass filtering advantage of SRA's leaky integrator.}}
     \label{fig:hetero_timevarying_noise}
 \end{figure*}
@@ -1010,49 +993,40 @@ Table~\ref{tab:scalability_table} and Fig.~\ref{fig:dwell_scalability}(b)--(c) r
 
 \begin{figure*}[t!]
     \centering
-    \includegraphics[width=0.92\textwidth]{sensitivity_3d_surfaces_full.pdf}
+    \includegraphics[width=0.84\textwidth]{sensitivity_3d_surfaces_full.pdf}
     \caption{\rev{Three-dimensional hyperparameter sensitivity surfaces across learning rate $\alpha$ and pressure-cost gain $\beta_I$ on BA networks ($N=100$), showing (left) Peak Centrality Reduction (\%), (center) Average Path Length Increase (\%), and (right) Convergence Iterations. The wide, flat performance plateau around $(\alpha=0.1, \beta_I=10)$ demonstrates high parameter robustness without overfitting.}}
     \label{fig:sensitivity_3d}
 \end{figure*}
 
 \begin{figure*}[t!]
     \centering
-    \includegraphics[width=0.96\textwidth]{fig_revision_dwell_scalability.pdf}
+    \includegraphics[width=0.88\textwidth]{fig_revision_dwell_scalability.pdf}
     \caption{\rev{Dwell-time sensitivity and network scalability analysis (30 trials, 95\% CI). (a) Minimum dwell time $T_d \in \{1..10\}$ trade-off between packet delivery ratio and route-switching frequency $\bar{f}_{\text{sw}}$. (b) Per-evaluation computation time (ms) vs. network size $N \in [14, 500]$ across BA, WS, NSFNET, and GEANT, closely matching the theoretical $O(N(E+N\log N))$ curve. (c) Throughput scaling across $N \in \{50, 100, 200, 300, 500\}$, showing SRA's capacity gain over Dijkstra expanding from $+8.31\%$ ($N=50$) to $+107.42\%$ ($N=500$).}}
     \label{fig:dwell_scalability}
 \end{figure*}
 
 \begin{table*}[t!]
 \centering
+\scriptsize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
 \caption{\rev{Computational Complexity, Runtime Benchmark, and Performance Scaling Across Synthetic ($N=50..500$) and Real-World ISP Topologies (NSFNET, GEANT) Across 30 Trials (TP Gain Reports the Mean of Seedwise Relative Throughput Gains; Steady-State Window Drop Rate $1-\mathrm{PDR}$ Clipped at $0.00\%$ When Pre-Warmup In-Flight Packets Drain).}}
 \label{tab:scalability_table}
-\renewcommand{\arraystretch}{1.18}
-\small
-\begin{tabular}{|l|r|r|r|r|r|r|r|r|}
-\hline
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lrrrrrrrr@{}}
+\toprule
 \textbf{Topology} & \textbf{Nodes $N$} & \textbf{Edges $E$} & \textbf{Time / Eval (ms)} & \textbf{Peak $\kappa_{\max}$ Red.} & \textbf{Dijkstra TP} & \textbf{SRA TP} & \textbf{TP Gain (\%)} & \textbf{Drop Rate (Dijk $\to$ SRA)} \\
-\hline\hline
+\midrule
 NSFNET (Real ISP) & 14 & 21 & $0.33 \pm 0.00$ & $13.33\%$ & $11.92$ & $11.92$ & $+0.00\%$ & $0.00\% \to 0.00\%$ \\
-\hline
 GEANT (Real ISP) & 22 & 36 & $0.85 \pm 0.01$ & $20.00\%$ & $18.67$ & $18.67$ & $+0.00\%$ & $0.04\% \to 0.04\%$ \\
-\hline
 BA Scale-Free & 50 & 184 & $7.52 \pm 0.02$ & $59.70\%$ & $39.45$ & $42.52$ & $+8.31\%$ & $7.23\% \to 0.01\%$ \\
-\hline
 BA Scale-Free & 100 & 384 & $31.17 \pm 0.02$ & $63.15\%$ & $65.07$ & $84.06$ & $+29.79\%$ & $23.44\% \to 1.11\%$ \\
-\hline
 BA Scale-Free & 200 & 784 & $132.00 \pm 0.18$ & $72.28\%$ & $104.76$ & $166.95$ & $+59.99\%$ & $38.33\% \to 1.71\%$ \\
-\hline
 BA Scale-Free & 300 & 1184 & $302.35 \pm 1.79$ & $72.08\%$ & $135.37$ & $243.15$ & $+80.39\%$ & $46.92\% \to 4.66\%$ \\
-\hline
 BA Scale-Free & 500 & 1984 & $850.99 \pm 5.98$ & $78.25\%$ & $193.09$ & $399.82$ & $\mathbf{+107.42\%}$ & $\mathbf{54.56\% \to 5.91\%}$ \\
-\hline
+\midrule
 WS Small-World & 100 & 400 & $31.02 \pm 0.89$ & $39.82\%$ & $83.84$ & $85.02$ & $+1.51\%$ & $1.38\% \to 0.00\%$ \\
-\hline
 WS Small-World & 300 & 1200 & $316.85 \pm 3.53$ & $46.39\%$ & $242.25$ & $254.83$ & $+5.32\%$ & $5.02\% \to 0.08\%$ \\
-\hline
 WS Small-World & 500 & 2000 & $854.09 \pm 6.22$ & $51.49\%$ & $385.65$ & $424.72$ & $+10.29\%$ & $9.25\% \to 0.05\%$ \\
-\hline
-\end{tabular}
+\bottomrule
+\end{tabular*}
 \end{table*}
 
 \section{Discussion, \rev{Limitations,} and Conclusion}
@@ -1084,272 +1058,6 @@ To ensure full reproducibility, the complete simulation source code, topology ge
 \section*{Acknowledgement}
 
 This work was supported by the Open Fund of the National Key Laboratory of Multi-domain Data Collaborative Processing and Control (No. MDCPC-20250108).
-
-\appendix
-\setcounter{section}{0}
-\setcounter{equation}{0}
-\renewcommand{\thesection}{\Alph{section}}
-\renewcommand{\theequation}{\thesection.\arabic{equation}}
-\renewcommand{\theHsection}{appendix.\Alph{section}}
-
-\section{Proof of Lemma \ref{lemma:invariance}}
-\label{app:proof_lemma_invariance}
-\begin{proof}
-\textit{(a) Positive Invariance:}
-Take any $S^{(k)}\in X$. By max-value normalization, $\mathcal N(S^{(k)})\subset[0,1]^N=X$. For any choice of $c^{(k)}\in\mathcal N(S^{(k)})$ and any coordinate $i$, we have
-\begin{equation}
-\begin{aligned}
-S^{(k+1)}_i&=(1-\alpha)S^{(k)}_i+\alpha\,c^{(k)}_i,\\
-S^{(k)}_i,c^{(k)}_i&\in[0,1].
-\end{aligned}
-\end{equation}
-Thus,
-\begin{equation}
-0\cdot(1-\alpha)+0\cdot\alpha\ \le\ S^{(k+1)}_i\ \le\ 1\cdot(1-\alpha)+1\cdot\alpha,
-\end{equation}
-which implies $S^{(k+1)}_i\in[0,1]$. As this holds for each coordinate, $S^{(k+1)}\in X$. This shows that $F(X)\subset X$: \textbf{if the state is in $X$ at the current step, it remains in $X$ at the next step}. Therefore, $X$ is a positively invariant set.
-
-\textit{(b) Compactness:}
-The set $X=[0,1]^N$ is a closed and bounded hypercube in $\mathbb{R}^N$, and is therefore compact.
-
-\textit{(c) Forward Invariance on the Effective State Space:}
-The algorithm and analysis in this paper are initialized within $X$ ($S^{(0)}\in X$), and from (a), we know $F(X)\subset X$. Therefore, for the discrete-time semi-flow on the state space $X$,
-\begin{equation}
-\begin{aligned}
-\Phi(k,\cdot)&:X\to 2^X,\qquad \Phi(1,\cdot)=F,\\
-\Phi(k+1,\cdot)&=F\circ\Phi(k,\cdot),
-\end{aligned}
-\end{equation}
-any bounded subset $B\subset X$ remains in $X$ for all $n\ge 0$ ($\Phi(n,B)\subset X$).
-
-\rev{\textit{(d) Exponential Attraction from Perturbed Initial States $S^{(0)} \in [-1/\beta_I + \epsilon, \infty)^N$:}
-Suppose a perturbed initial state $S^{(0)}$ lies outside $X=[0,1]^N$ while preserving positive node costs $C_i^{(0)} = 1 + \beta_I S_i^{(0)} > 0$. For each step $k \ge 0$ and coordinate $i \in \{1,\dots,N\}$, define the coordinate-wise upper and lower box-violation excesses with respect to $[0,1]$:
-\begin{equation}
-\delta^+_{k,i} := \max\{S_i^{(k)} - 1,\, 0\}, \qquad \delta^-_{k,i} := \max\{-S_i^{(k)},\, 0\}.
-\end{equation}
-Since $c_i^{(k)} \in [0,1]$, we have $S_i^{(k+1)} - 1 = (1-\alpha)(S_i^{(k)} - 1) + \alpha(c_i^{(k)} - 1) \le (1-\alpha)(S_i^{(k)} - 1)$ and $-S_i^{(k+1)} = (1-\alpha)(-S_i^{(k)}) - \alpha c_i^{(k)} \le (1-\alpha)(-S_i^{(k)})$. Taking the positive part yields}
-\begin{equation}
-\delta^+_{k+1,i}\ \le\ (1-\alpha)\,\delta^+_{k,i},\qquad 
-\delta^-_{k+1,i}\ \le\ (1-\alpha)\,\delta^-_{k,i}.
-\end{equation}
-This means that $\max\{\delta^+_{k,i},\delta^-_{k,i}\}$ converges geometrically to 0 at a rate of $1-\alpha$, and thus $\mathrm{dist}_\infty(S^{(k)},X)\le (1-\alpha)^k\,\mathrm{dist}_\infty(S^{(0)},X)\to0$. This shows \textbf{exponential attraction} to $X$. Since Algorithm~\ref{alg:sra} initializes $S^{(0)} = \mathbf{0} \in X$, all trajectories remain strictly inside $X$ for all $k \ge 0$.
-
-In conclusion, $X=[0,1]^N$ is positively invariant, compact, and exponentially attracting for the system.
-\end{proof}
-
-\section{Proof of Proposition \ref{prop:usc}}
-\label{app:proof_prop_usc}
-\begin{proof}
-\textit{(a) Non-empty, Compact, and Convex Values:}
-\rev{By definition of the Krasovskii regularization in Eq.~\eqref{eq:inclusion_map}, for any $S \in X$,
-\begin{equation}
-\mathcal N(S) := \bigcap_{\delta > 0} \overline{\mathrm{co}}\!\big(\mathrm{norm}(\kappa(B_\delta(S)))\big) \subset [0,1]^N.
-\end{equation}
-Because $\mathrm{norm}(\kappa(S')) \in [0,1]^N$ for every $S' \in B_\delta(S)$, each set $C_\delta(S) := \overline{\mathrm{co}}\big(\mathrm{norm}(\kappa(B_\delta(S)))\big)$ is a non-empty, closed, bounded, and convex subset of the compact hypercube $[0,1]^N$. As the nested intersection of non-empty compact convex sets as $\delta \downarrow 0$, $\mathcal N(S)$ is \textbf{non-empty, compact, and convex}.}
-
-\textit{(b) Piecewise Constant Structure and Finiteness:}
-The graph $G$ and the set of source-destination (OD) pairs are finite. The node cost $C(S)$ is an affine function of $S$. For each OD pair $(s,t)$, the set of candidate simple paths is \textbf{finite}. The cost of each path is an affine function of $S$. Thus, there exists a \textbf{finite polyhedral decomposition} of the state space $X$ (comprising full-dimensional open polyhedral cells and lower-dimensional tie-breaking faces) such that within the relative interior of each stratum, the set of active shortest paths for every OD pair remains \textbf{constant}. Therefore, within each stratum $\ell \in \{1,\dots,M\}$, $\kappa(S)$ (as well as $\widetilde{\kappa}(S;W,\mu)$) and $\mathrm{norm}(\kappa(S)) \equiv v_\ell$ are \textbf{constant vectors}. For any point $S \in X$, let $\mathcal I(S) := \{\ell \in \{1,\dots,M\} : S \in \overline{\mathcal{R}_\ell}\}$ denote the finite index set of strata whose closures contain $S$. Then for all sufficiently small $\delta > 0$, $B_\delta(S)$ intersects exactly the strata in $\mathcal I(S)$, so
-\begin{equation}
-\mathcal N(S)=\mathrm{co}\big(\{v_\ell:\,\ell\in\mathcal I(S)\}\big).
-\end{equation}
-This establishes the structure of $\mathcal N(\cdot)$ as being \textbf{piecewise constant on open cells with the closed convex hull of incident strata taken on boundary faces}.
-
-\textit{(c) Upper Semi-Continuity (USC) via Sequential Criterion / Closed Graph:}
-Take an arbitrary sequence $S_n\to S$, and let $c_n\in\mathcal N(S_n)$ such that $c_n\to c$. We must show that $c\in\mathcal N(S)$. From (b), for each $n$, there exists a finite set $\{v_{\ell}: \ell\in\mathcal I(S_n)\}$ such that $c_n\in\mathrm{co}\big(\{v_{\ell}:\ell\in\mathcal I(S_n)\}\big)$. By Carathéodory's theorem, we can write
-\begin{equation}
-\begin{aligned}
-c_n&=\sum_{j=0}^{N} \lambda_{n,j}\, v_{\ell_{n,j}},\\
-\lambda_{n,j}&\ge 0,\qquad
-\sum_{j=0}^{N}\lambda_{n,j}=1,\qquad
-\ell_{n,j}\in\mathcal I(S_n).
-\end{aligned}
-\end{equation}
-Since the vectors $v_{\ell}$ come from a \textbf{globally finite} set $\{v_1,\dots,v_M\}$, we can pass to a subsequence to ensure $\ell_{n,j}\equiv \bar\ell_j$ is \textbf{fixed}, and (by compactness of $[0,1]$) $\lambda_{n,j}\to \bar\lambda_j$. Then,
-\begin{equation}
-c=\lim_{n\to\infty} c_n=\sum_{j=0}^{N}\bar\lambda_j\, v_{\bar\ell_j},
-\quad\sum_{j=0}^{N}\bar\lambda_j=1,\ \bar\lambda_j\ge 0.
-\end{equation}
-Since $S_n\to S$, for $n$ large enough, any limit index $\bar\ell_j$ must belong to $\mathcal I(S)$. Thus, each limit vector $v_{\bar\ell_j}$ is one of the constant vectors from a stratum incident to $S$. Therefore,
-\begin{equation}
-c=\sum_{j=0}^{N}\bar\lambda_j\, v_{\bar\ell_j}\ \in\ 
-\mathrm{co}\big(\{v_\ell:\,\ell\in\mathcal I(S)\}\big)=\mathcal N(S).
-\end{equation}
-This means the graph of $\mathcal N$, $\mathrm{gph}\,\mathcal N:=\{(S,c):\,c\in\mathcal N(S)\}$, is closed. Since $\mathcal{N}$ maps into the compact set $X$, a closed-graph map is \textbf{USC} \cite{Aubin1984Differential}.
-
-\textit{(d) Properties of $F(\cdot)$:}
-Scaling and translation preserve the USC property and non-empty, compact, convex values. The map $S\mapsto (1-\alpha)S$ is continuous (single-valued). The Minkowski sum $F(S)=(1-\alpha)S+\alpha\,\mathcal N(S)$ of a continuous map and a USC map is also USC with non-empty, compact, and convex values.
-\end{proof}
-
-\section{Proof of Theorem \ref{thm:attractor}}
-\label{app:proof_thm_attractor}
-\begin{proof}
-\rev{\textit{(a) Nested Sequence of Compact Forward Images:}
-Define the forward image sequence $K_0 := X = [0,1]^N$ and $K_{n+1} := F(K_n) = \bigcup_{S \in K_n} F(S)$ for $n \ge 0$. By Lemma~\ref{lemma:invariance}, $K_1 = F(X) \subset X = K_0$. By induction, $K_{n+1} \subset K_n$ for all $n \ge 0$. Because $F$ is upper semi-continuous with non-empty compact values (Proposition~\ref{prop:usc}) and the image of a compact set under a compact-valued USC map is compact \cite{Aubin1984Differential}, each $K_n$ is a non-empty compact subset of $X$.
-
-\textit{(b) Non-Emptiness and Compactness of $\Omega$:}
-By Cantor's intersection theorem, the nested intersection of non-empty compact sets
-\begin{equation}
-\Omega := \bigcap_{n=0}^{\infty} K_n = \bigcap_{n=0}^{\infty} F^n(X)
-\end{equation}
-is \textbf{non-empty} and \textbf{compact}.
-
-\textit{(c) Invariance ($F(\Omega) = \Omega$):}
-Since $\Omega \subset K_n$ for every $n$, we have $F(\Omega) \subset F(K_n) = K_{n+1}$ for all $n \ge 0$, which implies $F(\Omega) \subset \bigcap_{n\ge 0} K_{n+1} = \Omega$ (positive invariance). Conversely, take any $y \in \Omega$. Then for each $n \ge 1$, $y \in K_n = F(K_{n-1})$, so there exists $x_n \in K_{n-1}$ such that $y \in F(x_n)$. Since $X$ is compact, $\{x_n\}$ has a convergent subsequence $x_{n_j} \to x^\star$. Because $K_m$ is closed and $x_{n_j} \in K_m$ for all $n_j > m$, the limit satisfies $x^\star \in \bigcap_{m\ge 0} K_m = \Omega$. By the closed-graph property of $F$ (Proposition~\ref{prop:usc}), $x_{n_j} \to x^\star$ and $y \in F(x_{n_j})$ imply $y \in F(x^\star) \subset F(\Omega)$. Thus $\Omega \subset F(\Omega)$, establishing exact invariance $F(\Omega) = \Omega$.
-
-\textit{(d) Global Uniform Attraction on $X$:}
-For any initial state $S^{(0)} \in X$, the $k$-th iterate satisfies $S^{(k)} \in F^k(S^{(0)}) \subset F^k(X) = K_k$. Suppose for contradiction that $\sup_{S^{(0)}\in X}\mathrm{dist}(S^{(k)}, \Omega)$ does not converge to $0$. Then there exist $\epsilon > 0$ and a sequence $z_{k_j} \in K_{k_j}$ ($k_j \uparrow \infty$) such that $\mathrm{dist}(z_{k_j}, \Omega) \ge \epsilon$. By compactness of $X$, a subsequence converges to some $z^\star \in X$. Since $K_m$ is closed and $z_{k_j} \in K_{k_j} \subset K_m$ for all $k_j \ge m$, we have $z^\star \in \bigcap_{m\ge 0} K_m = \Omega$, contradicting $\mathrm{dist}(z^\star, \Omega) \ge \epsilon$. Hence, for every trajectory starting in $X$,
-\begin{equation}
-\lim_{k\to\infty}\mathrm{dist}\big(S^{(k)},\Omega\big) = 0,
-\end{equation}
-and the $\omega$-limit set of every trajectory initialized in $X$ satisfies $\emptyset \neq \omega(S^{(0)}) \subset \Omega$.}
-\end{proof}
-
-\section{Proof of Theorem \ref{thm:drop_jump}}
-\label{app:proof_thm_drop_jump}
-\begin{proof}
-\rev{At step $k$, the SRA controller updates the pressure state via $S^{(k+1)} = (1-\alpha)S^{(k)} + \alpha\,q^{(k)}$, where $q^{(k)} = \mathrm{norm}(\kappa^{(k)}) \in \{v_1,\dots,v_M\}$ is the active normalized stress vector, and $E_k = \|S^{(k)} - q^{(k)}\|_2^2$ is the tracking energy. Subtracting the next-step active stress vector $q^{(k+1)}$ from both sides yields the exact algebraic identity:
-\begin{equation}
-\begin{aligned}
-S^{(k+1)} - q^{(k+1)} &= (1-\alpha)S^{(k)} + \alpha q^{(k)} - q^{(k)} + (q^{(k)} - q^{(k+1)}) \\
-&= (1-\alpha)\big(S^{(k)} - q^{(k)}\big) + \big(q^{(k)} - q^{(k+1)}\big).
-\end{aligned}
-\end{equation}
-Notice first that if no path switch occurs between steps $k$ and $k+1$, then $q^{(k+1)} = q^{(k)}$, so $E_{k+1} = \|S^{(k+1)} - q^{(k+1)}\|_2^2 = (1-\alpha)^2 \|S^{(k)} - q^{(k)}\|_2^2 = (1-\alpha)^2 E_k \le (1-\alpha)E_k$.
-
-In the general case where a path switch may occur ($q^{(k+1)} \neq q^{(k)}$), we apply the Weighted Young's Inequality $\|x+y\|_2^2 \le (1+\lambda)\|x\|_2^2 + (1+1/\lambda)\|y\|_2^2$ with $x = (1-\alpha)(S^{(k)}-q^{(k)})$, $y = q^{(k)} - q^{(k+1)}$, and weight $\lambda = \frac{\alpha}{1-\alpha} > 0$. Since $(1+\lambda)(1-\alpha)^2 = \frac{1}{1-\alpha}(1-\alpha)^2 = 1-\alpha$ and $1 + \frac{1}{\lambda} = 1 + \frac{1-\alpha}{\alpha} = \frac{1}{\alpha}$, we obtain
-\begin{equation}
-\begin{aligned}
-E_{k+1} = \|S^{(k+1)} - q^{(k+1)}\|_2^2 &\le (1-\alpha)\|S^{(k)} - q^{(k)}\|_2^2 + \frac{1}{\alpha}\|q^{(k)} - q^{(k+1)}\|_2^2 \\
-&= (1-\alpha)E_k + \frac{1}{\alpha}\|q^{(k)} - q^{(k+1)}\|_2^2.
-\end{aligned}
-\end{equation}
-Since $q^{(k)}, q^{(k+1)} \in \mathrm{co}(\{v_1, \dots, v_M\})$ whose diameter is $\bar{\Delta} = \max_{\ell,m}\|v_\ell - v_m\|_2$, we have $\|q^{(k)} - q^{(k+1)}\|_2 \le \bar{\Delta}$, yielding Eq.~\eqref{eq:drop_jump_one_step}:
-\begin{equation}
-E_{k+1} \le (1-\alpha)E_k + \frac{\bar{\Delta}^2}{\alpha}.
-\end{equation}
-Unrolling this linear recurrence gives $E_k \le (1-\alpha)^k E_0 + \frac{\bar{\Delta}^2}{\alpha}\sum_{j=0}^{k-1}(1-\alpha)^j \le (1-\alpha)^k E_0 + \frac{\bar{\Delta}^2}{\alpha^2}$. Taking $\limsup_{k\to\infty}$ yields Eq.~\eqref{eq:limsup_boundedness}. Moreover, at every recomputation epoch where $q^{(k)} \in \mathcal{N}(S^{(k)})$, $V(S^{(k)}) = \min_{c \in \mathcal{N}(S^{(k)})}\|S^{(k)} - c\|_2^2 \le E_k$ satisfies the same asymptotic bound.}
-\end{proof}
-
-\section{Proof of Corollary \ref{cor:local_convergence}}
-\label{app:proof_cor_local_convergence}
-\begin{proof}
-(1) \textbf{Uniqueness of Fixed Point:} Solving $S=(1-\alpha)S+\alpha c$ gives $\alpha S=\alpha c$, so $S=c$. The unique fixed point is $S^\star=c$.
-(2) \textbf{Contraction and Convergence Rate:}
-\begin{equation}
-S^{(k+1)}-c = (1-\alpha)S^{(k)}+\alpha c-c = (1-\alpha)\big(S^{(k)}-c\big).
-\end{equation}
-Taking the 2-norm and iterating gives the result:
-\begin{equation}
-\|S^{(k)}-S^\star\|_2 = (1-\alpha)^k\,\|S^{(0)}-S^\star\|_2.
-\end{equation}
-\end{proof}
-
-\section{Proof of Proposition \ref{prop:block_dynamics}}
-\label{app:proof_prop_block_dynamics}
-\begin{proof}
-\rev{(i) Within dwell block $m$, the active path set is held fixed for $t \in \{0, \dots, T_d-1\}$, so $q^{(\tau_m+t)} \equiv q^{(\tau_m)}$ is constant. Consequently, for $t \in \{0, \dots, T_d-1\}$, $S^{(\tau_m+t)} - q^{(\tau_m)} = (1-\alpha)^t (S^{(\tau_m)} - q^{(\tau_m)})$, and taking the squared Euclidean norm yields
-\begin{equation}
-E_{\tau_m+t} = (1-\alpha)^{2t} E_{\tau_m} = \gamma^{2t} V_m \le \gamma^t V_m.
-\end{equation}
-(ii) At the last step of block $m$ (transitioning from $\tau_m + T_d - 1$ to $\tau_{m+1} = \tau_m + T_d$), a path switch is permitted ($q^{(\tau_{m+1})}$ may differ from $q^{(\tau_m + T_d - 1)} = q^{(\tau_m)}$). Applying the one-step Drop-Jump inequality from Theorem~\ref{thm:drop_jump} at $k = \tau_{m+1}-1$ gives:}
-\begin{equation}
-\begin{split}
-V_{m+1} = E_{\tau_{m+1}} & \le \gamma\,E_{\tau_{m+1}-1} + \tilde C \\
-& = \gamma\,E_{\tau_m+T_d-1} + \tilde C \\
-& \le \gamma \cdot (\gamma^{T_d-1}V_m) + \tilde C \\
-& = \gamma^{T_d}V_m + \tilde C,
-\end{split}
-\end{equation}
-where the third line uses the intra-block cooling bound from (i).
-\end{proof}
-
-\section{Proof of Theorem \ref{thm:epsilon_tube}}
-\label{app:proof_thm_epsilon_tube}
-\begin{proof}
-(a) Iteratively expanding the linear recurrence from Proposition \ref{prop:block_dynamics}(ii), $V_{m+1}\le \gamma^{T_d}V_m+\tilde C$, gives:
-\begin{equation}
-\begin{split}
-V_m &\le (\gamma^{T_d})^m V_0 + \tilde C \sum_{j=0}^{m-1}(\gamma^{T_d})^j \\
-    &= \gamma^{mT_d}V_0 + \tilde C\,\frac{1-\gamma^{mT_d}}{1-\gamma^{T_d}} \\
-    &\le \gamma^{mT_d}V_0+\frac{\tilde C}{1-\gamma^{T_d}}.
-\end{split}
-\end{equation}
-Taking the limit superior as $m\to\infty$ gives the steady-state radius.
-(b) \rev{If $V_0 \le \varepsilon^2 - \frac{\tilde C}{1-\gamma^{T_d}}$ (including $V_0 = 0$), then $V_m \le \varepsilon^2$ holds from $m=0$. For $V_0 > \varepsilon^2 - \frac{\tilde C}{1-\gamma^{T_d}} > 0$, setting $\gamma^{mT_d}V_0 + \frac{\tilde C}{1-\gamma^{T_d}} \le \varepsilon^2$ and solving for $m$ yields Eq.~\eqref{eq:finite_time_blocks}.}
-\end{proof}
-
-\section{Proof of Theorem \ref{thm:practical_stability}}
-\label{app:proof_thm_practical_stability}
-\begin{proof}
-(a) \rev{By Algorithm~\ref{alg:sra}, shortest-path recomputations and route switches occur only at block boundaries $\tau_m = m T_d$, separated by $T_d - 1$ frozen steps. Thus, the number of switches in any window of length $T \ge 1$ satisfies $N_{\text{sw}}(T) \le \lceil T / T_d \rceil$, which implies $\bar{f}_{\text{sw}} = \limsup_{T\to\infty} N_{\text{sw}}(T)/T \le 1/T_d$.}
-(b) This result is a direct consequence of solving the inter-block recurrence, as shown in the proof of Theorem \ref{thm:epsilon_tube}(a), where $\tilde{C}/(1-\gamma^{T_d})$ decreases monotonically toward $\tilde{C}$ with $T_d$.
-\end{proof}
-
-% --- START: Revised Appendices for Section III-E ---
-
-\section{Proof of Lemma~\ref{lem:block-budget}}
-\label{app:proof_lem_block_budget}
-\begin{proof}
-\rev{The proof proceeds in two direct steps: (1) bounding the post-switch stress of the relieved peak node $u$ and all non-peak nodes $j \neq u$, and (2) taking the maximum over $V$.
-
-\noindent\textit{1) Route-Redistribution Budget and Node-wise Bounds:}
-Let $\kappa^{(m)}$ and $\kappa^{(m+1)}$ denote the stress profiles before and after the switching event between blocks $m$ and $m+1$, and let $u$ be the unique pre-switch peak node with $\kappa_u^{(m)} = \kappa_{\max}^{(m)} > \kappa_j^{(m)}$ ($\forall j \neq u$). Under the positive load-shedding hypothesis $\Delta_u^- := \kappa_u^{(m)} - \kappa_u^{(m+1)} \ge \delta > 0$, the post-switch load at node $u$ satisfies
-\begin{equation}
-\kappa_u^{(m+1)} = \kappa_{\max}^{(m)} - \Delta_u^- \le \kappa_{\max}^{(m)} - \delta.
-\end{equation}
-Meanwhile, for any other node $j \in V \setminus \{u\}$, let $\mathcal{D}_{\text{in}}^{(m)}(j)$ denote the set of OD pairs whose shortest-path transit fraction $\sigma_{st}(j)/\sigma_{st}$ through node $j$ increases at step $m+1$. The net stress increment on node $j$ is bounded by its route-redistribution budget $B_j^{(m)}$:
-\begin{equation}
-\kappa_j^{(m+1)} - \kappa_j^{(m)} \le (\kappa_j^{(m+1)} - \kappa_j^{(m)})_+ =: B_j^{(m)} \le \sum_{(s,t)\in\mathcal{D}_{\text{in}}^{(m)}(j)} W_{st}
-\end{equation}
-(where $W_{st} \equiv 1$ for unweighted BC, so $B_j^{(m)} \le |\mathcal{D}_{\text{in}}^{(m)}(j)|$).
-
-\noindent\textit{2) Strict Peak Reduction under Non-Overloading Diversion:}
-By the Non-Overloading Diversion Condition in Eq.~\eqref{eq:non_overloading_diversion}, every node $j \in V \setminus \{u\}$ has sufficient slack to absorb $B_j^{(m)}$ without exceeding $\kappa_{\max}^{(m)} - \delta$:
-\begin{equation}
-\kappa_j^{(m+1)} \le \kappa_j^{(m)} + B_j^{(m)} \le \kappa_{\max}^{(m)} - \delta, \qquad \forall j \in V \setminus \{u\}.
-\end{equation}
-Combining the bound for $i=u$ and the bound for all $j \in V \setminus \{u\}$ yields
-\begin{equation}
-\kappa_{\max}^{(m+1)} = \max\Big\{\kappa_u^{(m+1)},\ \max_{j \in V \setminus \{u\}} \kappa_j^{(m+1)}\Big\} \le \kappa_{\max}^{(m)} - \delta,
-\end{equation}
-completing the proof.}
-\end{proof}
-
-\section{Proof of Proposition~\ref{prop:perf-bridge}}
-\label{app:proof_prop_perf_bridge}
-\begin{proof}
-\rev{The proof establishes each of the three claims using the peak reduction $\kappa'_{\max} \le \kappa_{\max} - \delta < \kappa_{\max}$ from Lemma~\ref{lem:block-budget} (with $d := \Delta_u^- \ge \delta > 0$).
-
-\noindent\textit{(i) Unconditional Expansion of Robust Capacity Lower Bound:}
-For any node service rate vector $\mu = (\mu_i)_{i \in V}$ with $\mu_{\min} = \min_{i \in V} \mu_i > 0$, the actual maximum stable traffic multiplier satisfies
-\begin{equation}
-\rho_{\max}(\kappa) = \min_{i \in V} \frac{\mu_i}{\kappa_i} \ge \frac{\min_{i \in V}\mu_i}{\max_{i \in V}\kappa_i} = \frac{\mu_{\min}}{\kappa_{\max}} = L(\kappa).
-\end{equation}
-Since $\mu_{\min} > 0$ is invariant under routing updates and $\kappa'_{\max} < \kappa_{\max}$, we immediately have
-\begin{equation}
-L(\kappa') = \frac{\mu_{\min}}{\kappa'_{\max}} > \frac{\mu_{\min}}{\kappa_{\max}} = L(\kappa).
-\end{equation}
-
-\noindent\textit{(ii) Exact Capacity Proportionality under Homogeneous Service Rates or Generalized Stress:}
-When node service rates are homogeneous ($\mu_i \equiv \mu > 0$ for all $i \in V$), factoring out the constant $\mu$ yields the exact identity:
-\begin{equation}
-\rho_{\max}(\kappa) = \min_{i \in V} \frac{\mu}{\kappa_i} = \frac{\mu}{\max_{i \in V}\kappa_i} = \frac{\mu}{\kappa_{\max}}, \qquad \rho_{\max}(\kappa') = \min_{i \in V} \frac{\mu}{\kappa'_i} = \frac{\mu}{\kappa'_{\max}}.
-\end{equation}
-Dividing the two expressions gives the exact proportionality in Eq.~\eqref{eq:exact_capacity_ratio}:
-\begin{equation}
-\frac{\rho_{\max}(\kappa')}{\rho_{\max}(\kappa)} = \frac{\mu / \kappa'_{\max}}{\mu / \kappa_{\max}} = \frac{\kappa_{\max}}{\kappa'_{\max}} > 1.
-\end{equation}
-Similarly, under heterogeneous service rates $\mu_i > 0$ and demands $W_{st} \ge 0$, using the generalized stress $\widetilde{\kappa}_i(S;W,\mu) = \frac{1}{\mu_i}\sum_{s\neq i\neq t} W_{st}\frac{\sigma_{st}(i)}{\sigma_{st}}$ in Eq.~\eqref{eq:generalized_stress} gives node $i$'s utilization as $\rho\,\widetilde{\kappa}_i < 1$, so $\rho_{\max}(\widetilde{\kappa}) = \min_{i \in V}(1/\widetilde{\kappa}_i) = 1/\widetilde{\kappa}_{\max}$, and whenever $\widetilde{\kappa}'_{\max} < \widetilde{\kappa}_{\max}$ we obtain $\rho_{\max}(\widetilde{\kappa}')/\rho_{\max}(\widetilde{\kappa}) = \widetilde{\kappa}_{\max}/\widetilde{\kappa}'_{\max} > 1$.
-
-\noindent\textit{(iii) Sufficient Condition under Heterogeneous Service Rates with Unweighted BC:}
-Let $\rho_0 := \rho_{\max}(\kappa) = \min_{i \in V}(\mu_i/\kappa_i)$. Because $\rho_{\max}(\kappa') = \min_{i \in V}(\mu_i/\kappa'_i)$ is the minimum over all $i \in V$, the inequality $\rho_{\max}(\kappa') \ge \rho_0$ holds if and only if $\mu_i / \kappa'_i \ge \rho_0$ holds simultaneously for every $i \in V$. Since $\kappa'_u \le \kappa_{\max} - d$ for the relieved peak $u$ and $\kappa'_j \le \kappa_j + B_j$ for all $j \in V \setminus \{u\}$, we have $\frac{\mu_u}{\kappa'_u} \ge \frac{\mu_u}{\kappa_{\max}-d}$ and $\frac{\mu_j}{\kappa'_j} \ge \frac{\mu_j}{\kappa_j+B_j}$. Consequently, the joint condition in Eq.~\eqref{eq:hetero_capacity_condition}:
-\begin{equation}
-\frac{\mu_u}{\kappa_{\max} - d} \ge \rho_0 \quad \text{and} \quad \frac{\mu_j}{\kappa_j + B_j} \ge \rho_0,\quad \forall j \in V \setminus \{u\},
-\end{equation}
-is sufficient to guarantee $\rho_{\max}(\kappa') = \min\big\{\frac{\mu_u}{\kappa'_u},\, \min_{j\neq u}\frac{\mu_j}{\kappa'_j}\big\} \ge \rho_0$ (and strict inequality $\rho_{\max}(\kappa') > \rho_0$ whenever the inequalities in \eqref{eq:hetero_capacity_condition} are strict).}
-\end{proof}
-
-
 
 \bibliographystyle{gbt7714-numerical}
 \bibliography{refs}

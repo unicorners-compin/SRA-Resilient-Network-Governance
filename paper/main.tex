@@ -477,7 +477,7 @@ Formally, $X$ is a \textbf{compact, positively invariant set} ($F(X) \subset X$)
 \textit{Physical Interpretation:} This lemma guarantees that the structural stress never diverges to infinity; the system possesses an intrinsic ``safety boundary'' dictated by the normalization mechanism.
 \end{lemma}
 \begin{IEEEproof}[Proof Sketch]
-The proof demonstrates that if a state $S^{(k)}$ resides within the hypercube $X$, its successor $S^{(k+1)}$---being a convex combination of elements in $X$---must inherently remain within $X$. Moreover, for any perturbed initialization $S^{(0)} \notin X$, the $\ell_\infty$ distance to $X$ contracts geometrically by $(1-\alpha)$ at every step. \textit{The full formal proof is provided in Appendix~\ref{app:proof_lemma_invariance}.}
+The proof demonstrates that if a state $S^{(k)}$ resides within the hypercube $X$, its successor $S^{(k+1)}$---being a convex combination of elements in $X$---must inherently remain within $X$. Moreover, for any perturbed initialization $S^{(0)} \notin X$, the $\ell_\infty$ distance to $X$ contracts geometrically by $(1-\alpha)$ at every step. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-A.}
 \end{IEEEproof}
 
 With safety guaranteed, we verify the topological regularity of the control map.
@@ -487,7 +487,7 @@ With safety guaranteed, we verify the topological regularity of the control map.
 The set-valued map $F(\cdot)$ defined in \eqref{eq:inclusion_map} is \textbf{Upper Semi-Continuous (USC)} with \textbf{non-empty, compact, and convex} values.
 \end{proposition}
 \begin{IEEEproof}[Proof Sketch]
-The proof exploits the piecewise constant structure of $\mathcal{N}(S)$, which stems from the finite nature of the network's path configurations (Assumption 3). This structure ensures that the graph of the map is closed, a sufficient condition for the USC property in compact spaces. \textit{The full formal proof is provided in Appendix~\ref{app:proof_prop_usc}.}
+The proof exploits the piecewise constant structure of $\mathcal{N}(S)$, which stems from the finite nature of the network's path configurations (Assumption 3). This structure ensures that the graph of the map is closed, a sufficient condition for the USC property in compact spaces. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-B.}
 \end{IEEEproof}
 
 Combining the global confinement (Lemma~\ref{lemma:invariance}) with topological regularity (Proposition~\ref{prop:usc}), we establish the system's ultimate destiny.
@@ -504,7 +504,7 @@ is a \textbf{non-empty, compact, and positively invariant global attracting set}
 \end{equation}
 \end{theorem}
 \begin{IEEEproof}[Proof Sketch]
-Because $X$ is compact and positively invariant ($F(X) \subset X$) and $F$ is USC with compact values (Proposition~\ref{prop:usc}), the forward images $K_n := F^n(X)$ form a nested sequence of non-empty compact subsets $K_{n+1} \subset K_n$. By Cantor's intersection theorem, $\Omega = \bigcap_{n\ge 0} K_n$ is non-empty, compact, and invariant, and attracts all trajectories initialized in $X$. \textit{The full formal proof is provided in Appendix~\ref{app:proof_thm_attractor}.}
+Because $X$ is compact and positively invariant ($F(X) \subset X$) and $F$ is USC with compact values (Proposition~\ref{prop:usc}), the forward images $K_n := F^n(X)$ form a nested sequence of non-empty compact subsets $K_{n+1} \subset K_n$. By Cantor's intersection theorem, $\Omega = \bigcap_{n\ge 0} K_n$ is non-empty, compact, and invariant, and attracts all trajectories initialized in $X$. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-C.}
 \end{IEEEproof}
 
 \rev{\begin{remark}[Attraction to a Limit Set vs. Unique Point Equilibrium]
@@ -540,7 +540,7 @@ In particular, whenever the active path set does not change between steps $k$ an
 \end{equation}
 \end{theorem}
 \begin{IEEEproof}[Proof Sketch]
-Using the exact identity $S^{(k+1)} - q^{(k+1)} = (1-\alpha)(S^{(k)} - q^{(k)}) + (q^{(k)} - q^{(k+1)})$ and applying the Weighted Young's Inequality with weight $\lambda = \alpha/(1-\alpha)$, we decouple the one-step evolution into a contractive dissipation term $(1-\alpha)E_k$ and a switching disturbance term $\frac{1}{\alpha}\|q^{(k)} - q^{(k+1)}\|_2^2 \le \frac{1}{\alpha}\bar{\Delta}^2$. \textit{The full formal proof is provided in Appendix~\ref{app:proof_thm_drop_jump}.}
+Using the exact identity $S^{(k+1)} - q^{(k+1)} = (1-\alpha)(S^{(k)} - q^{(k)}) + (q^{(k)} - q^{(k+1)})$ and applying the Weighted Young's Inequality with weight $\lambda = \alpha/(1-\alpha)$, we decouple the one-step evolution into a contractive dissipation term $(1-\alpha)E_k$ and a switching disturbance term $\frac{1}{\alpha}\|q^{(k)} - q^{(k+1)}\|_2^2 \le \frac{1}{\alpha}\bar{\Delta}^2$. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-D.}
 \end{IEEEproof}
 
 This theorem provides a profound physical insight: the stability of SRA is governed by two competing forces. 
@@ -559,7 +559,7 @@ S^{(k+1)}=(1-\alpha)S^{(k)}+\alpha c,
 which converges exponentially to the unique fixed point $S^\star=c$ at a rate of $(1-\alpha)$.
 \end{corollary}
 \begin{IEEEproof}[Proof Sketch]
-The proof follows directly from the Banach Fixed-Point Theorem. By subtracting the fixed point from the update rule, we derive the linear error dynamics $\|S^{(k+1)}-S^\star\|_2 = (1-\alpha)\|S^{(k)}-S^\star\|_2$, confirming exponential decay. \textit{The full formal proof is provided in Appendix~\ref{app:proof_cor_local_convergence}.}
+The proof follows directly from the Banach Fixed-Point Theorem. By subtracting the fixed point from the update rule, we derive the linear error dynamics $\|S^{(k+1)}-S^\star\|_2 = (1-\alpha)\|S^{(k)}-S^\star\|_2$, confirming exponential decay. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-E.}
 \end{IEEEproof}
 
 \subsection{Convergence Rate and Practical Stability via Temporal Regularization}
@@ -589,7 +589,7 @@ Letting $\gamma:=1-\alpha$ be the damping factor and $\tilde C:=\bar\Delta^2/\al
 \end{itemize}
 \end{proposition}
 \begin{IEEEproof}[Proof Sketch]
-(i) During the dwell period, the path set is held fixed ($q^{(\tau_m+t)} \equiv q^{(\tau_m)}$), so the system operates as a pure leaky integrator (Corollary~\ref{cor:local_convergence}), resulting in strictly exponential decay. (ii) The recurrence combines $T_d-1$ steps of intra-block cooling with a single worst-case switching injection event at the block boundary $\tau_{m+1}$. \textit{The full formal proof is provided in Appendix~\ref{app:proof_prop_block_dynamics}.}
+(i) During the dwell period, the path set is held fixed ($q^{(\tau_m+t)} \equiv q^{(\tau_m)}$), so the system operates as a pure leaky integrator (Corollary~\ref{cor:local_convergence}), resulting in strictly exponential decay. (ii) The recurrence combines $T_d-1$ steps of intra-block cooling with a single worst-case switching injection event at the block boundary $\tau_{m+1}$. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-F.}
 \end{IEEEproof}
 
 This recurrence relation allows us to calculate the precise geometry of the system's final resting state.
@@ -609,7 +609,7 @@ Let $\gamma \in (0,1)$ and $\tilde C > 0$. The system trajectories are strictly 
 \end{itemize}
 \end{theorem}
 \begin{IEEEproof}[Proof Sketch]
-We iteratively expand the recurrence from Proposition~\ref{prop:block_dynamics}. The energy $V_m$ is upper-bounded by a geometric series which converges to the stated limit. \textit{The full formal proof is provided in Appendix~\ref{app:proof_thm_epsilon_tube}.}
+We iteratively expand the recurrence from Proposition~\ref{prop:block_dynamics}. The energy $V_m$ is upper-bounded by a geometric series which converges to the stated limit. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-G.}
 \end{IEEEproof}
 
 Finally, we consolidate these findings into a definitive stability guarantee.
@@ -623,7 +623,7 @@ With a minimum dwell time $T_d \ge 1$, the SRA framework guarantees:
 \end{itemize}
 \end{theorem}
 \begin{IEEEproof}[Proof Sketch]
-Direct consequence of the dwell time definition and Theorem~\ref{thm:epsilon_tube}. \textit{The full formal proof is provided in Appendix~\ref{app:proof_thm_practical_stability}.}
+Direct consequence of the dwell time definition and Theorem~\ref{thm:epsilon_tube}. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-H.}
 \end{IEEEproof}
 
 Equation~\eqref{eq:limsup_radius} also provides a closed-form design rule. Given a target stability margin $R_{\text{target}}^2 > \tilde C$, the required dwell time is:
@@ -654,7 +654,7 @@ then the post-switch peak stress strictly decreases by at least $\delta$:
 \end{equation}}
 \end{lemma}
 \begin{IEEEproof}[Proof Sketch]
-Under the positive load shedding $\Delta_u^- \ge \delta > 0$ at node $u$, its post-switch load satisfies $\kappa_u^{(m+1)} = \kappa_{\max}^{(m)} - \Delta_u^- \le \kappa_{\max}^{(m)} - \delta$. Simultaneously, the non-overloading condition \eqref{eq:non_overloading_diversion} ensures that no other node $j \neq u$ receiving diverted traffic exceeds $\kappa_{\max}^{(m)} - \delta$. Taking the maximum over all $i \in V$ yields \eqref{eq:peak_shaving_bound}. \textit{The full formal proof is provided in Appendix~\ref{app:proof_lem_block_budget}.}
+Under the positive load shedding $\Delta_u^- \ge \delta > 0$ at node $u$, its post-switch load satisfies $\kappa_u^{(m+1)} = \kappa_{\max}^{(m)} - \Delta_u^- \le \kappa_{\max}^{(m)} - \delta$. Simultaneously, the non-overloading condition \eqref{eq:non_overloading_diversion} ensures that no other node $j \neq u$ receiving diverted traffic exceeds $\kappa_{\max}^{(m)} - \delta$. Taking the maximum over all $i \in V$ yields \eqref{eq:peak_shaving_bound}. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-I.}
 \end{IEEEproof}
 
 This structural optimization---reducing the maximum stress across nodes---maps directly to network throughput gains. 
@@ -680,7 +680,7 @@ Furthermore, for arbitrary heterogeneous capacities $\mu_i > 0$ and demands $W_{
 \end{enumerate}}
 \end{proposition}
 \begin{IEEEproof}[Proof Sketch]
-(i) Follows directly from $\kappa'_{\max} < \kappa_{\max}$ with $\mu_{\min}$ constant. (ii) Follows from the exact identity $\min_{i \in V}(\mu/\kappa_i) = \mu / \max_{i \in V}\kappa_i = \mu/\kappa_{\max}$ (and similarly $\min_{i \in V}(1/\widetilde{\kappa}_i) = 1/\widetilde{\kappa}_{\max}$). (iii) Since $\rho_{\max}(\kappa') = \min_{i \in V}(\mu_i/\kappa'_i)$ and $\kappa'_u \le \kappa_{\max}-d$, $\kappa'_j \le \kappa_j+B_j$, satisfying \eqref{eq:hetero_capacity_condition} for $i=u$ and all $j \neq u$ guarantees $\mu_i/\kappa'_i \ge \rho_0$ for every $i \in V$. \textit{The full formal proof is provided in Appendix~\ref{app:proof_prop_perf_bridge}.}
+(i) Follows directly from $\kappa'_{\max} < \kappa_{\max}$ with $\mu_{\min}$ constant. (ii) Follows from the exact identity $\min_{i \in V}(\mu/\kappa_i) = \mu / \max_{i \in V}\kappa_i = \mu/\kappa_{\max}$ (and similarly $\min_{i \in V}(1/\widetilde{\kappa}_i) = 1/\widetilde{\kappa}_{\max}$). (iii) Since $\rho_{\max}(\kappa') = \min_{i \in V}(\mu_i/\kappa'_i)$ and $\kappa'_u \le \kappa_{\max}-d$, $\kappa'_j \le \kappa_j+B_j$, satisfying \eqref{eq:hetero_capacity_condition} for $i=u$ and all $j \neq u$ guarantees $\mu_i/\kappa'_i \ge \rho_0$ for every $i \in V$. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-J.}
 \end{IEEEproof}
 
 \begin{remark}[Structural vs. Artificial Constraints]
@@ -1119,252 +1119,6 @@ To ensure full reproducibility, the complete simulation source code, topology ge
 
 \bibliographystyle{IEEEtran}
 \bibliography{refs}
-
-
-\appendices
-\section{Proof of Lemma \ref{lemma:invariance}}
-\label{app:proof_lemma_invariance}
-\begin{IEEEproof}
-\textit{(a) Positive Invariance:}
-Take any $S^{(k)}\in X$. By max-value normalization, $\mathcal N(S^{(k)})\subset[0,1]^N=X$. For any choice of $c^{(k)}\in\mathcal N(S^{(k)})$ and any coordinate $i$, we have
-\begin{equation}
-S^{(k+1)}_i=(1-\alpha)S^{(k)}_i+\alpha\,c^{(k)}_i,
-\quad\text{where}\quad S^{(k)}_i,c^{(k)}_i\in[0,1].
-\end{equation}
-Thus,
-\begin{equation}
-0\cdot(1-\alpha)+0\cdot\alpha\ \le\ S^{(k+1)}_i\ \le\ 1\cdot(1-\alpha)+1\cdot\alpha,
-\end{equation}
-which implies $S^{(k+1)}_i\in[0,1]$. As this holds for each coordinate, $S^{(k+1)}\in X$. This shows that $F(X)\subset X$: \textbf{if the state is in $X$ at the current step, it remains in $X$ at the next step}. Therefore, $X$ is a positively invariant set.
-
-\textit{(b) Compactness:}
-The set $X=[0,1]^N$ is a closed and bounded hypercube in $\mathbb{R}^N$, and is therefore compact.
-
-\textit{(c) Forward Invariance on the Effective State Space:}
-The algorithm and analysis in this paper are initialized within $X$ ($S^{(0)}\in X$), and from (a), we know $F(X)\subset X$. Therefore, for the discrete-time semi-flow on the state space $X$,
-\begin{equation}
-\Phi(k,\cdot):X\to 2^X,\quad \Phi(1,\cdot)=F,\ \ \Phi(k+1,\cdot)=F\circ\Phi(k,\cdot),
-\end{equation}
-any bounded subset $B\subset X$ remains in $X$ for all $n\ge 0$ ($\Phi(n,B)\subset X$).
-
-\rev{\textit{(d) Exponential Attraction from Perturbed Initial States $S^{(0)} \in [-1/\beta_I + \epsilon, \infty)^N$:}
-Suppose a perturbed initial state $S^{(0)}$ lies outside $X=[0,1]^N$ while preserving positive node costs $C_i^{(0)} = 1 + \beta_I S_i^{(0)} > 0$. For each step $k \ge 0$ and coordinate $i \in \{1,\dots,N\}$, define the coordinate-wise upper and lower box-violation excesses with respect to $[0,1]$:
-\begin{equation}
-\delta^+_{k,i} := \max\{S_i^{(k)} - 1,\, 0\}, \qquad \delta^-_{k,i} := \max\{-S_i^{(k)},\, 0\}.
-\end{equation}
-Since $c_i^{(k)} \in [0,1]$, we have $S_i^{(k+1)} - 1 = (1-\alpha)(S_i^{(k)} - 1) + \alpha(c_i^{(k)} - 1) \le (1-\alpha)(S_i^{(k)} - 1)$ and $-S_i^{(k+1)} = (1-\alpha)(-S_i^{(k)}) - \alpha c_i^{(k)} \le (1-\alpha)(-S_i^{(k)})$. Taking the positive part yields}
-\begin{equation}
-\delta^+_{k+1,i}\ \le\ (1-\alpha)\,\delta^+_{k,i},\qquad 
-\delta^-_{k+1,i}\ \le\ (1-\alpha)\,\delta^-_{k,i}.
-\end{equation}
-This means that $\max\{\delta^+_{k,i},\delta^-_{k,i}\}$ converges geometrically to 0 at a rate of $1-\alpha$, and thus $\mathrm{dist}_\infty(S^{(k)},X)\le (1-\alpha)^k\,\mathrm{dist}_\infty(S^{(0)},X)\to0$. This shows \textbf{exponential attraction} to $X$. Since Algorithm~\ref{alg:sra} initializes $S^{(0)} = \mathbf{0} \in X$, all trajectories remain strictly inside $X$ for all $k \ge 0$.
-
-In conclusion, $X=[0,1]^N$ is positively invariant, compact, and exponentially attracting for the system.
-\end{IEEEproof}
-
-\section{Proof of Proposition \ref{prop:usc}}
-\label{app:proof_prop_usc}
-\begin{IEEEproof}
-\textit{(a) Non-empty, Compact, and Convex Values:}
-\rev{By definition of the Krasovskii regularization in Eq.~\eqref{eq:inclusion_map}, for any $S \in X$,
-\begin{equation}
-\mathcal N(S) := \bigcap_{\delta > 0} \overline{\mathrm{co}}\!\big(\mathrm{norm}(\kappa(B_\delta(S)))\big) \subset [0,1]^N.
-\end{equation}
-Because $\mathrm{norm}(\kappa(S')) \in [0,1]^N$ for every $S' \in B_\delta(S)$, each set $C_\delta(S) := \overline{\mathrm{co}}\big(\mathrm{norm}(\kappa(B_\delta(S)))\big)$ is a non-empty, closed, bounded, and convex subset of the compact hypercube $[0,1]^N$. As the nested intersection of non-empty compact convex sets as $\delta \downarrow 0$, $\mathcal N(S)$ is \textbf{non-empty, compact, and convex}.}
-
-\textit{(b) Piecewise Constant Structure and Finiteness:}
-The graph $G$ and the set of source-destination (OD) pairs are finite. The node cost $C(S)$ is an affine function of $S$. For each OD pair $(s,t)$, the set of candidate simple paths is \textbf{finite}. The cost of each path is an affine function of $S$. Thus, there exists a \textbf{finite polyhedral decomposition} of the state space $X$ (comprising full-dimensional open polyhedral cells and lower-dimensional tie-breaking faces) such that within the relative interior of each stratum, the set of active shortest paths for every OD pair remains \textbf{constant}. Therefore, within each stratum $\ell \in \{1,\dots,M\}$, $\kappa(S)$ (as well as $\widetilde{\kappa}(S;W,\mu)$) and $\mathrm{norm}(\kappa(S)) \equiv v_\ell$ are \textbf{constant vectors}. For any point $S \in X$, let $\mathcal I(S) := \{\ell \in \{1,\dots,M\} : S \in \overline{\mathcal{R}_\ell}\}$ denote the finite index set of strata whose closures contain $S$. Then for all sufficiently small $\delta > 0$, $B_\delta(S)$ intersects exactly the strata in $\mathcal I(S)$, so
-\begin{equation}
-\mathcal N(S)=\mathrm{co}\big(\{v_\ell:\,\ell\in\mathcal I(S)\}\big).
-\end{equation}
-This establishes the structure of $\mathcal N(\cdot)$ as being \textbf{piecewise constant on open cells with the closed convex hull of incident strata taken on boundary faces}.
-
-\textit{(c) Upper Semi-Continuity (USC) via Sequential Criterion / Closed Graph:}
-Take an arbitrary sequence $S_n\to S$, and let $c_n\in\mathcal N(S_n)$ such that $c_n\to c$. We must show that $c\in\mathcal N(S)$. From (b), for each $n$, there exists a finite set $\{v_{\ell}: \ell\in\mathcal I(S_n)\}$ such that $c_n\in\mathrm{co}\big(\{v_{\ell}:\ell\in\mathcal I(S_n)\}\big)$. By Carathéodory's theorem, we can write
-\begin{equation}
-c_n=\sum_{j=0}^{N} \lambda_{n,j}\, v_{\ell_{n,j}},\quad 
-\lambda_{n,j}\ge 0,\ \sum_{j=0}^{N}\lambda_{n,j}=1,\ 
-\ell_{n,j}\in\mathcal I(S_n).
-\end{equation}
-Since the vectors $v_{\ell}$ come from a \textbf{globally finite} set $\{v_1,\dots,v_M\}$, we can pass to a subsequence to ensure $\ell_{n,j}\equiv \bar\ell_j$ is \textbf{fixed}, and (by compactness of $[0,1]$) $\lambda_{n,j}\to \bar\lambda_j$. Then,
-\begin{equation}
-c=\lim_{n\to\infty} c_n=\sum_{j=0}^{N}\bar\lambda_j\, v_{\bar\ell_j},
-\quad\sum_{j=0}^{N}\bar\lambda_j=1,\ \bar\lambda_j\ge 0.
-\end{equation}
-Since $S_n\to S$, for $n$ large enough, any limit index $\bar\ell_j$ must belong to $\mathcal I(S)$. Thus, each limit vector $v_{\bar\ell_j}$ is one of the constant vectors from a stratum incident to $S$. Therefore,
-\begin{equation}
-c=\sum_{j=0}^{N}\bar\lambda_j\, v_{\bar\ell_j}\ \in\ 
-\mathrm{co}\big(\{v_\ell:\,\ell\in\mathcal I(S)\}\big)=\mathcal N(S).
-\end{equation}
-This means the graph of $\mathcal N$, $\mathrm{gph}\,\mathcal N:=\{(S,c):\,c\in\mathcal N(S)\}$, is closed. Since $\mathcal{N}$ maps into the compact set $X$, a closed-graph map is \textbf{USC} \cite{Aubin1984Differential}.
-
-\textit{(d) Properties of $F(\cdot)$:}
-Scaling and translation preserve the USC property and non-empty, compact, convex values. The map $S\mapsto (1-\alpha)S$ is continuous (single-valued). The Minkowski sum $F(S)=(1-\alpha)S+\alpha\,\mathcal N(S)$ of a continuous map and a USC map is also USC with non-empty, compact, and convex values.
-\end{IEEEproof}
-
-\section{Proof of Theorem \ref{thm:attractor}}
-\label{app:proof_thm_attractor}
-\begin{IEEEproof}
-\rev{\textit{(a) Nested Sequence of Compact Forward Images:}
-Define the forward image sequence $K_0 := X = [0,1]^N$ and $K_{n+1} := F(K_n) = \bigcup_{S \in K_n} F(S)$ for $n \ge 0$. By Lemma~\ref{lemma:invariance}, $K_1 = F(X) \subset X = K_0$. By induction, $K_{n+1} \subset K_n$ for all $n \ge 0$. Because $F$ is upper semi-continuous with non-empty compact values (Proposition~\ref{prop:usc}) and the image of a compact set under a compact-valued USC map is compact \cite{Aubin1984Differential}, each $K_n$ is a non-empty compact subset of $X$.
-
-\textit{(b) Non-Emptiness and Compactness of $\Omega$:}
-By Cantor's intersection theorem, the nested intersection of non-empty compact sets
-\begin{equation}
-\Omega := \bigcap_{n=0}^{\infty} K_n = \bigcap_{n=0}^{\infty} F^n(X)
-\end{equation}
-is \textbf{non-empty} and \textbf{compact}.
-
-\textit{(c) Invariance ($F(\Omega) = \Omega$):}
-Since $\Omega \subset K_n$ for every $n$, we have $F(\Omega) \subset F(K_n) = K_{n+1}$ for all $n \ge 0$, which implies $F(\Omega) \subset \bigcap_{n\ge 0} K_{n+1} = \Omega$ (positive invariance). Conversely, take any $y \in \Omega$. Then for each $n \ge 1$, $y \in K_n = F(K_{n-1})$, so there exists $x_n \in K_{n-1}$ such that $y \in F(x_n)$. Since $X$ is compact, $\{x_n\}$ has a convergent subsequence $x_{n_j} \to x^\star$. Because $K_m$ is closed and $x_{n_j} \in K_m$ for all $n_j > m$, the limit satisfies $x^\star \in \bigcap_{m\ge 0} K_m = \Omega$. By the closed-graph property of $F$ (Proposition~\ref{prop:usc}), $x_{n_j} \to x^\star$ and $y \in F(x_{n_j})$ imply $y \in F(x^\star) \subset F(\Omega)$. Thus $\Omega \subset F(\Omega)$, establishing exact invariance $F(\Omega) = \Omega$.
-
-\textit{(d) Global Uniform Attraction on $X$:}
-For any initial state $S^{(0)} \in X$, the $k$-th iterate satisfies $S^{(k)} \in F^k(S^{(0)}) \subset F^k(X) = K_k$. Suppose for contradiction that $\sup_{S^{(0)}\in X}\mathrm{dist}(S^{(k)}, \Omega)$ does not converge to $0$. Then there exist $\epsilon > 0$ and a sequence $z_{k_j} \in K_{k_j}$ ($k_j \uparrow \infty$) such that $\mathrm{dist}(z_{k_j}, \Omega) \ge \epsilon$. By compactness of $X$, a subsequence converges to some $z^\star \in X$. Since $K_m$ is closed and $z_{k_j} \in K_{k_j} \subset K_m$ for all $k_j \ge m$, we have $z^\star \in \bigcap_{m\ge 0} K_m = \Omega$, contradicting $\mathrm{dist}(z^\star, \Omega) \ge \epsilon$. Hence, for every trajectory starting in $X$,
-\begin{equation}
-\lim_{k\to\infty}\mathrm{dist}\big(S^{(k)},\Omega\big) = 0,
-\end{equation}
-and the $\omega$-limit set of every trajectory initialized in $X$ satisfies $\emptyset \neq \omega(S^{(0)}) \subset \Omega$.}
-\end{IEEEproof}
-
-\section{Proof of Theorem \ref{thm:drop_jump}}
-\label{app:proof_thm_drop_jump}
-\begin{IEEEproof}
-\rev{At step $k$, the SRA controller updates the pressure state via $S^{(k+1)} = (1-\alpha)S^{(k)} + \alpha\,q^{(k)}$, where $q^{(k)} = \mathrm{norm}(\kappa^{(k)}) \in \{v_1,\dots,v_M\}$ is the active normalized stress vector, and $E_k = \|S^{(k)} - q^{(k)}\|_2^2$ is the tracking energy. Subtracting the next-step active stress vector $q^{(k+1)}$ from both sides yields the exact algebraic identity:
-\begin{equation}
-S^{(k+1)} - q^{(k+1)} = (1-\alpha)\big(S^{(k)} - q^{(k)}\big) + \big(q^{(k)} - q^{(k+1)}\big).
-\end{equation}
-Notice first that if no path switch occurs between steps $k$ and $k+1$, then $q^{(k+1)} = q^{(k)}$, so $E_{k+1} = \|S^{(k+1)} - q^{(k+1)}\|_2^2 = (1-\alpha)^2 \|S^{(k)} - q^{(k)}\|_2^2 = (1-\alpha)^2 E_k \le (1-\alpha)E_k$.
-
-In the general case where a path switch may occur ($q^{(k+1)} \neq q^{(k)}$), we apply the Weighted Young's Inequality $\|x+y\|_2^2 \le (1+\lambda)\|x\|_2^2 + (1+1/\lambda)\|y\|_2^2$ with $x = (1-\alpha)(S^{(k)}-q^{(k)})$, $y = q^{(k)} - q^{(k+1)}$, and weight $\lambda = \frac{\alpha}{1-\alpha} > 0$. Since $(1+\lambda)(1-\alpha)^2 = 1-\alpha$ and $1 + \frac{1}{\lambda} = \frac{1}{\alpha}$, we obtain
-\begin{equation}
-E_{k+1} = \|S^{(k+1)} - q^{(k+1)}\|_2^2 \le (1-\alpha)E_k + \frac{1}{\alpha}\|q^{(k)} - q^{(k+1)}\|_2^2.
-\end{equation}
-Since $q^{(k)}, q^{(k+1)} \in \mathrm{co}(\{v_1, \dots, v_M\})$ whose diameter is $\bar{\Delta} = \max_{\ell,m}\|v_\ell - v_m\|_2$, we have $\|q^{(k)} - q^{(k+1)}\|_2 \le \bar{\Delta}$, yielding Eq.~\eqref{eq:drop_jump_one_step}:
-\begin{equation}
-E_{k+1} \le (1-\alpha)E_k + \frac{\bar{\Delta}^2}{\alpha}.
-\end{equation}
-Unrolling this linear recurrence gives $E_k \le (1-\alpha)^k E_0 + \frac{\bar{\Delta}^2}{\alpha^2}$. Taking $\limsup_{k\to\infty}$ yields Eq.~\eqref{eq:limsup_boundedness}. Moreover, at every recomputation epoch where $q^{(k)} \in \mathcal{N}(S^{(k)})$, $V(S^{(k)}) = \min_{c \in \mathcal{N}(S^{(k)})}\|S^{(k)} - c\|_2^2 \le E_k$ satisfies the same asymptotic bound.}
-\end{IEEEproof}
-
-\section{Proof of Corollary \ref{cor:local_convergence}}
-\label{app:proof_cor_local_convergence}
-\begin{IEEEproof}
-(1) \textbf{Uniqueness of Fixed Point:} Solving $S=(1-\alpha)S+\alpha c$ gives $\alpha S=\alpha c$, so $S=c$. The unique fixed point is $S^\star=c$.
-(2) \textbf{Contraction and Convergence Rate:}
-\begin{equation}
-S^{(k+1)}-c = (1-\alpha)S^{(k)}+\alpha c-c = (1-\alpha)\big(S^{(k)}-c\big).
-\end{equation}
-Taking the 2-norm and iterating gives the result:
-\begin{equation}
-\|S^{(k)}-S^\star\|_2 = (1-\alpha)^k\,\|S^{(0)}-S^\star\|_2.
-\end{equation}
-\end{IEEEproof}
-
-\section{Proof of Proposition \ref{prop:block_dynamics}}
-\label{app:proof_prop_block_dynamics}
-\begin{IEEEproof}
-\rev{(i) Within dwell block $m$, the active path set is held fixed for $t \in \{0, \dots, T_d-1\}$, so $q^{(\tau_m+t)} \equiv q^{(\tau_m)}$ is constant. Consequently, for $t \in \{0, \dots, T_d-1\}$, $S^{(\tau_m+t)} - q^{(\tau_m)} = (1-\alpha)^t (S^{(\tau_m)} - q^{(\tau_m)})$, and taking the squared Euclidean norm yields
-\begin{equation}
-E_{\tau_m+t} = (1-\alpha)^{2t} E_{\tau_m} = \gamma^{2t} V_m \le \gamma^t V_m.
-\end{equation}
-(ii) At the last step of block $m$ (transitioning from $\tau_m + T_d - 1$ to $\tau_{m+1} = \tau_m + T_d$), a path switch is permitted ($q^{(\tau_{m+1})}$ may differ from $q^{(\tau_m + T_d - 1)} = q^{(\tau_m)}$). Applying the one-step Drop-Jump inequality from Theorem~\ref{thm:drop_jump} at $k = \tau_{m+1}-1$ gives:}
-\begin{equation}
-\begin{split}
-V_{m+1} = E_{\tau_{m+1}} & \le \gamma\,E_{\tau_{m+1}-1} + \tilde C \\
-& = \gamma\,E_{\tau_m+T_d-1} + \tilde C \\
-& \le \gamma \cdot (\gamma^{T_d-1}V_m) + \tilde C = \gamma^{T_d}V_m + \tilde C,
-\end{split}
-\end{equation}
-where the last inequality uses the intra-block cooling bound from (i).
-\end{IEEEproof}
-
-\section{Proof of Theorem \ref{thm:epsilon_tube}}
-\label{app:proof_thm_epsilon_tube}
-\begin{IEEEproof}
-(a) Iteratively expanding the linear recurrence from Proposition \ref{prop:block_dynamics}(ii), $V_{m+1}\le \gamma^{T_d}V_m+\tilde C$, gives:
-\begin{equation}
-\begin{split}
-V_m &\le (\gamma^{T_d})^m V_0 + \tilde C \sum_{j=0}^{m-1}(\gamma^{T_d})^j \\
-    &= \gamma^{mT_d}V_0 + \tilde C\,\frac{1-\gamma^{mT_d}}{1-\gamma^{T_d}} \\
-    &\le \gamma^{mT_d}V_0+\frac{\tilde C}{1-\gamma^{T_d}}.
-\end{split}
-\end{equation}
-Taking the limit superior as $m\to\infty$ gives the steady-state radius.
-(b) \rev{If $V_0 \le \varepsilon^2 - \frac{\tilde C}{1-\gamma^{T_d}}$ (including $V_0 = 0$), then $V_m \le \varepsilon^2$ holds from $m=0$. For $V_0 > \varepsilon^2 - \frac{\tilde C}{1-\gamma^{T_d}} > 0$, setting $\gamma^{mT_d}V_0 + \frac{\tilde C}{1-\gamma^{T_d}} \le \varepsilon^2$ and solving for $m$ yields Eq.~\eqref{eq:finite_time_blocks}.}
-\end{IEEEproof}
-
-\section{Proof of Theorem \ref{thm:practical_stability}}
-\label{app:proof_thm_practical_stability}
-\begin{IEEEproof}
-(a) \rev{By Algorithm~\ref{alg:sra}, shortest-path recomputations and route switches occur only at block boundaries $\tau_m = m T_d$, separated by $T_d - 1$ frozen steps. Thus, the number of switches in any window of length $T \ge 1$ satisfies $N_{\text{sw}}(T) \le \lceil T / T_d \rceil$, which implies $\bar{f}_{\text{sw}} = \limsup_{T\to\infty} N_{\text{sw}}(T)/T \le 1/T_d$.}
-(b) This result is a direct consequence of solving the inter-block recurrence, as shown in the proof of Theorem \ref{thm:epsilon_tube}(a), where $\tilde{C}/(1-\gamma^{T_d})$ decreases monotonically toward $\tilde{C}$ with $T_d$.
-\end{IEEEproof}
-
-% --- START: Revised Appendices for Section III-E ---
-
-\section{Proof of Lemma~\ref{lem:block-budget}}
-\label{app:proof_lem_block_budget}
-\begin{IEEEproof}
-\rev{The proof proceeds in two direct steps: (1) bounding the post-switch stress of the relieved peak node $u$ and all non-peak nodes $j \neq u$, and (2) taking the maximum over $V$.
-
-\noindent\textit{1) Route-Redistribution Budget and Node-wise Bounds:}
-Let $\kappa^{(m)}$ and $\kappa^{(m+1)}$ denote the stress profiles before and after the switching event between blocks $m$ and $m+1$, and let $u$ be the unique pre-switch peak node with $\kappa_u^{(m)} = \kappa_{\max}^{(m)} > \kappa_j^{(m)}$ ($\forall j \neq u$). Under the positive load-shedding hypothesis $\Delta_u^- := \kappa_u^{(m)} - \kappa_u^{(m+1)} \ge \delta > 0$, the post-switch load at node $u$ satisfies
-\begin{equation}
-\kappa_u^{(m+1)} = \kappa_{\max}^{(m)} - \Delta_u^- \le \kappa_{\max}^{(m)} - \delta.
-\end{equation}
-Meanwhile, for any other node $j \in V \setminus \{u\}$, let $\mathcal{D}_{\text{in}}^{(m)}(j)$ denote the set of OD pairs whose shortest-path transit fraction $\sigma_{st}(j)/\sigma_{st}$ through node $j$ increases at step $m+1$. The net stress increment on node $j$ is bounded by its route-redistribution budget $B_j^{(m)}$:
-\begin{equation}
-\kappa_j^{(m+1)} - \kappa_j^{(m)} \le (\kappa_j^{(m+1)} - \kappa_j^{(m)})_+ =: B_j^{(m)} \le \sum_{(s,t)\in\mathcal{D}_{\text{in}}^{(m)}(j)} W_{st}
-\end{equation}
-(where $W_{st} \equiv 1$ for unweighted BC, so $B_j^{(m)} \le |\mathcal{D}_{\text{in}}^{(m)}(j)|$).
-
-\noindent\textit{2) Strict Peak Reduction under Non-Overloading Diversion:}
-By the Non-Overloading Diversion Condition in Eq.~\eqref{eq:non_overloading_diversion}, every node $j \in V \setminus \{u\}$ has sufficient slack to absorb $B_j^{(m)}$ without exceeding $\kappa_{\max}^{(m)} - \delta$:
-\begin{equation}
-\kappa_j^{(m+1)} \le \kappa_j^{(m)} + B_j^{(m)} \le \kappa_{\max}^{(m)} - \delta, \qquad \forall j \in V \setminus \{u\}.
-\end{equation}
-Combining the bound for $i=u$ and the bound for all $j \in V \setminus \{u\}$ yields
-\begin{equation}
-\kappa_{\max}^{(m+1)} = \max\Big\{\kappa_u^{(m+1)},\ \max_{j \in V \setminus \{u\}} \kappa_j^{(m+1)}\Big\} \le \kappa_{\max}^{(m)} - \delta,
-\end{equation}
-completing the proof.}
-\end{IEEEproof}
-
-\section{Proof of Proposition~\ref{prop:perf-bridge}}
-\label{app:proof_prop_perf_bridge}
-\begin{IEEEproof}
-\rev{The proof establishes each of the three claims using the peak reduction $\kappa'_{\max} \le \kappa_{\max} - \delta < \kappa_{\max}$ from Lemma~\ref{lem:block-budget} (with $d := \Delta_u^- \ge \delta > 0$).
-
-\noindent\textit{(i) Unconditional Expansion of Robust Capacity Lower Bound:}
-For any node service rate vector $\mu = (\mu_i)_{i \in V}$ with $\mu_{\min} = \min_{i \in V} \mu_i > 0$, the actual maximum stable traffic multiplier satisfies
-\begin{equation}
-\rho_{\max}(\kappa) = \min_{i \in V} \frac{\mu_i}{\kappa_i} \ge \frac{\min_{i \in V}\mu_i}{\max_{i \in V}\kappa_i} = \frac{\mu_{\min}}{\kappa_{\max}} = L(\kappa).
-\end{equation}
-Since $\mu_{\min} > 0$ is invariant under routing updates and $\kappa'_{\max} < \kappa_{\max}$, we immediately have
-\begin{equation}
-L(\kappa') = \frac{\mu_{\min}}{\kappa'_{\max}} > \frac{\mu_{\min}}{\kappa_{\max}} = L(\kappa).
-\end{equation}
-
-\noindent\textit{(ii) Exact Capacity Proportionality under Homogeneous Service Rates or Generalized Stress:}
-When node service rates are homogeneous ($\mu_i \equiv \mu > 0$ for all $i \in V$), factoring out the constant $\mu$ yields the exact identity:
-\begin{equation}
-\rho_{\max}(\kappa) = \min_{i \in V} \frac{\mu}{\kappa_i} = \frac{\mu}{\max_{i \in V}\kappa_i} = \frac{\mu}{\kappa_{\max}}, \qquad \rho_{\max}(\kappa') = \min_{i \in V} \frac{\mu}{\kappa'_i} = \frac{\mu}{\kappa'_{\max}}.
-\end{equation}
-Dividing the two expressions gives the exact proportionality in Eq.~\eqref{eq:exact_capacity_ratio}:
-\begin{equation}
-\frac{\rho_{\max}(\kappa')}{\rho_{\max}(\kappa)} = \frac{\mu / \kappa'_{\max}}{\mu / \kappa_{\max}} = \frac{\kappa_{\max}}{\kappa'_{\max}} > 1.
-\end{equation}
-Similarly, under heterogeneous service rates $\mu_i > 0$ and demands $W_{st} \ge 0$, using the generalized stress $\widetilde{\kappa}_i(S;W,\mu) = \frac{1}{\mu_i}\sum_{s\neq i\neq t} W_{st}\frac{\sigma_{st}(i)}{\sigma_{st}}$ in Eq.~\eqref{eq:generalized_stress} gives node $i$'s utilization as $\rho\,\widetilde{\kappa}_i < 1$, so $\rho_{\max}(\widetilde{\kappa}) = \min_{i \in V}(1/\widetilde{\kappa}_i) = 1/\widetilde{\kappa}_{\max}$, and whenever $\widetilde{\kappa}'_{\max} < \widetilde{\kappa}_{\max}$ we obtain $\rho_{\max}(\widetilde{\kappa}')/\rho_{\max}(\widetilde{\kappa}) = \widetilde{\kappa}_{\max}/\widetilde{\kappa}'_{\max} > 1$.
-
-\noindent\textit{(iii) Sufficient Condition under Heterogeneous Service Rates with Unweighted BC:}
-Let $\rho_0 := \rho_{\max}(\kappa) = \min_{i \in V}(\mu_i/\kappa_i)$. Because $\rho_{\max}(\kappa') = \min_{i \in V}(\mu_i/\kappa'_i)$ is the minimum over all $i \in V$, the inequality $\rho_{\max}(\kappa') \ge \rho_0$ holds if and only if $\mu_i / \kappa'_i \ge \rho_0$ holds simultaneously for every $i \in V$. Since $\kappa'_u \le \kappa_{\max} - d$ for the relieved peak $u$ and $\kappa'_j \le \kappa_j + B_j$ for all $j \in V \setminus \{u\}$, we have $\frac{\mu_u}{\kappa'_u} \ge \frac{\mu_u}{\kappa_{\max}-d}$ and $\frac{\mu_j}{\kappa'_j} \ge \frac{\mu_j}{\kappa_j+B_j}$. Consequently, the joint condition in Eq.~\eqref{eq:hetero_capacity_condition}:
-\begin{equation}
-\frac{\mu_u}{\kappa_{\max} - d} \ge \rho_0 \quad \text{and} \quad \frac{\mu_j}{\kappa_j + B_j} \ge \rho_0,\quad \forall j \in V \setminus \{u\},
-\end{equation}
-is sufficient to guarantee $\rho_{\max}(\kappa') = \min\big\{\frac{\mu_u}{\kappa'_u},\, \min_{j\neq u}\frac{\mu_j}{\kappa'_j}\big\} \ge \rho_0$ (and strict inequality $\rho_{\max}(\kappa') > \rho_0$ whenever the inequalities in \eqref{eq:hetero_capacity_condition} are strict).}
-\end{IEEEproof}
-
-
 
 
 \end{document}
