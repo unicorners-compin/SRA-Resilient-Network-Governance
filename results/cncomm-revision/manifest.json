@@ -1,0 +1,23 @@
+{
+  "project": "SRA-Resilient-Network-Governance",
+  "run_id": "cncomm-2026-0222-rev-20261109T113518Z",
+  "created_at_utc": "2026-11-09T11:48:49Z",
+  "host": "node09",
+  "user": "rzy",
+  "command": "python3 scripts/run_revision_campaign.py --max-workers 20 --seeds 30 --output-dir /home/rzy/research/sra-revision/cncomm-2026-0222-rev-20261109T113518Z",
+  "slots": 20,
+  "git_repo": "unicorners-compin/SRA-Resilient-Network-Governance",
+  "git_branch": "main",
+  "git_commit": "b7563b5ee18bd4a3998916fa361c32741157bf2c",
+  "cos_bucket": "compin-team-docs-1326842184",
+  "cos_region": "ap-chengdu",
+  "cos_prefix": "users/rzy/simulation-results/SRA-Resilient-Network-Governance/cncomm-2026-0222-rev-20261109T113518Z",
+  "files": [
+    {
+      "relative_path": "cncomm-2026-0222-rev-20261109T113518Z.tar.gz",
+      "cos_key": "users/rzy/simulation-results/SRA-Resilient-Network-Governance/cncomm-2026-0222-rev-20261109T113518Z/cncomm-2026-0222-rev-20261109T113518Z.tar.gz",
+      "size_bytes": 115219,
+      "sha256": "8492bb00259101d6a7afecac054bdc9a540488d48b9e5d99603c40bc970411eb"
+    }
+  ]
+}
