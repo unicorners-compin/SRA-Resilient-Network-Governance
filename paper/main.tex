@@ -300,10 +300,10 @@ This quantization is non-trivial; it renders the system dynamics \textit{piecewi
     \min_{\{S^{(k)}, C^{(k)}\}} \quad & \limsup_{k \to \infty} \max_{i \in V} \widetilde{\kappa}_i(S^{(k)}; W, \mu) + \eta_{\text{sw}}\,\bar{f}_{\text{sw}} \\
     \text{s.t.} \quad & S^{(k+1)} = (1-\alpha)S^{(k)} + \alpha\,q^{(k)},\quad S^{(0)} \in [0,1]^N, \\
     & C^{(k)} = \mathbf{1} + \beta_I S^{(k)}, \quad \tau_{m+1} - \tau_m \ge T_d, \\
-    & \bar{f}_{\text{sw}} := \limsup_{K\to\infty}\frac{1}{K}\sum_{k=0}^{K-1}\mathbb{I}\big(\mathcal{P}^{(k+1)}\neq \mathcal{P}^{(k)}\big) \le \frac{1}{T_d},
+    & \bar{f}_{\text{sw}} \le 1/T_d,
     \end{aligned}
 \end{equation}
-where $\mathcal{P}^{(k)}$ denotes the active shortest-path configuration at step $k$, $\{\tau_m\}$ are the route-switching epochs separated by at least the minimum dwell time $T_d \ge 1$, and $\bar{f}_{\text{sw}}$ is the asymptotic route-switching frequency.}
+where $\bar{f}_{\text{sw}} := \limsup_{K\to\infty}\frac{1}{K}\sum_{k=0}^{K-1}\mathbb{I}(\mathcal{P}^{(k+1)}\neq\mathcal{P}^{(k)})$ is the asymptotic switching frequency, $\mathcal{P}^{(k)}$ denotes the active shortest-path configuration at step $k$, $\{\tau_m\}$ are the route-switching epochs separated by at least the minimum dwell time $T_d \ge 1$.}
 
 % --- 这是 Fig. 2 的完整代码 ---
 \begin{figure*}[t!]
@@ -832,7 +832,7 @@ Furthermore, Fig.~\ref{fig:dwell_cooling} contrasts the energy trajectory withou
 \renewcommand{\arraystretch}{1.2}
 \begin{tabular}{|l|l|r|r|r|}
 \hline
-\textbf{Network} & \textbf{Metric} & \textbf{Initial (Dijkstra)} & \textbf{Final (SRA)} & \textbf{Change (\%)} \\
+\textbf{Net.} & \textbf{Metric} & \textbf{Initial (Dijk.)} & \textbf{Final (SRA)} & \textbf{Change (\%)} \\
 \hline\hline
 ER & Peak Centrality & $589.93 (\pm 120.59)$ & $209.40 (\pm 26.87)$ & -64.50\% \\
  & Std Dev of Centrality & $106.93 (\pm 10.62)$ & $33.55 (\pm 9.26)$ & -68.62\% \\
@@ -976,27 +976,27 @@ The quantitative results at heavy load ($\rho = 0.9$, 30 independent trials with
 
 \begin{table*}[t!]
 \centering
-\caption{\rev{Component Ablation Study and Comparison Against Stronger Baselines on BA Scale-Free Networks ($N=100$, Heavy Load $\rho=0.9$, Mean $\pm$ Std and 95\% CI $[\bar{x} \pm 1.96\,s/\sqrt{30}]$ across 30 Independent Trials).}}
+\caption{\rev{Component Ablation Study and Comparison Against Stronger Baselines on BA Scale-Free Net.s ($N=100$, Heavy Load $\rho=0.9$, Mean $\pm$ Std and 95\% CI $[\bar{x} \pm 1.96\,s/\sqrt{30}]$ across 30 Independent Trials).}}
 \label{tab:ablation_results}
 \renewcommand{\arraystretch}{1.18}
 \small
 \begin{tabular}{|l|c|c|c|c|c|c|}
 \hline
-\textbf{Method / Ablation Variant} & \textbf{Throughput (pkts/step)} & \textbf{95\% CI} & \textbf{PDR (\%)} & \textbf{Mean / P95 Latency} & \textbf{Peak $\kappa_{\max}$ Red. (\%)} & \textbf{Switch Freq. $\bar{f}_{\text{sw}}$} \\
+\textbf{Method / Variant} & \textbf{Throughput} & \textbf{95\% CI} & \textbf{PDR (\%)} & \textbf{Mean/P95 Lat.} & \textbf{Peak $\kappa_{\max}$ Red. (\%)} & \textbf{Switch $\bar{f}_{\text{sw}}$} \\
 \hline\hline
 Dijkstra (Static Baseline) & $68.88 \pm 5.57$ & $[66.89, 70.88]$ & $76.46 \pm 6.02\%$ & $5.34$ / $10.55$ & $0.00\%$ & $0.0\%$ \\
 \hline
-Memoryless Reactive BC ($\alpha=1$, No Integrator) & $53.39 \pm 5.88$ & $[51.28, 55.49]$ & $59.26 \pm 6.44\%$ & $7.00$ / $12.27$ & $-31.04\%$ (Amplified) & $98.3\%$ (Chattering) \\
+Memoryless Reactive BC ($\alpha=1$) & $53.39 \pm 5.88$ & $[51.28, 55.49]$ & $59.26 \pm 6.44\%$ & $7.00$ / $12.27$ & $-31.04\%$ (Amp.) & $98.3\%$ (Chat.) \\
 \hline
-LIRP-D (Reactive Queue Deflection) & $89.49 \pm 1.31$ & $[89.02, 89.95]$ & $99.34 \pm 1.29\%$ & $3.79$ / $5.80$ & $0.00\%$ (Local Only) & N/A (Per-Packet) \\
+LIRP-D (Queue Deflection) & $89.49 \pm 1.31$ & $[89.02, 89.95]$ & $99.34 \pm 1.29\%$ & $3.79$ / $5.80$ & $0.00\%$ (Local) & N/A (Packet) \\
 \hline
-Static BC (One-Shot Penalty, Open-Loop) & $89.96 \pm 0.51$ & $[89.78, 90.14]$ & $99.87 \pm 0.41\%$ & $3.95$ / $5.73$ & $66.95\%$ & $1.7\%$ (Open-Loop) \\
+Static BC (One-Shot Open-Loop) & $89.96 \pm 0.51$ & $[89.78, 90.14]$ & $99.87 \pm 0.41\%$ & $3.95$ / $5.73$ & $66.95\%$ & $1.7\%$ (Open-Loop) \\
 \hline
 IGP Weight Tuning (Fortz--Thorup \cite{Fortz2000OSPF}) & $90.08 \pm 0.38$ & $[89.94, 90.22]$ & $99.98 \pm 0.06\%$ & $3.58$ / $5.00$ & $77.03\%$ & $98.3\%$ (Unstable) \\
 \hline
 Unnormalized SRA (No $\mathrm{norm}(\cdot)$) & $90.08 \pm 0.38$ & $[89.94, 90.22]$ & $99.98 \pm 0.06\%$ & $3.43$ / $4.10$ & $75.16\%$ & $20.0\%$ \\
 \hline
-SRA w/o Dwell ($T_d=1$) & $90.08 \pm 0.38$ & $[89.94, 90.22]$ & $99.98 \pm 0.06\%$ & $3.51$ / $5.00$ & $81.85\%$ & $98.3\%$ (Chattering) \\
+SRA w/o Dwell ($T_d=1$) & $90.08 \pm 0.38$ & $[89.94, 90.22]$ & $99.98 \pm 0.06\%$ & $3.51$ / $5.00$ & $81.85\%$ & $98.3\%$ (Chat.) \\
 \hline
 \textbf{Full SRA ($\alpha=0.1, \beta_I=10, T_d=5$)} & $\mathbf{89.76 \pm 0.76}$ & $\mathbf{[89.49, 90.04]}$ & $\mathbf{99.65 \pm 0.73\%}$ & $\mathbf{3.62}$ / $\mathbf{5.50}$ & $\mathbf{69.20\%}$ & $\mathbf{20.0\%}$ \textbf{(Stable)} \\
 \hline
@@ -1065,7 +1065,7 @@ Table~\ref{tab:scalability_table} and Fig.~\ref{fig:dwell_scalability}(b)--(c) r
 \small
 \begin{tabular}{|l|r|r|r|r|r|r|r|r|}
 \hline
-\textbf{Topology} & \textbf{Nodes $N$} & \textbf{Edges $E$} & \textbf{Time / Eval (ms)} & \textbf{Peak $\kappa_{\max}$ Red.} & \textbf{Dijkstra TP} & \textbf{SRA TP} & \textbf{TP Gain (\%)} & \textbf{Drop Rate (Dijk $\to$ SRA)} \\
+\textbf{Topology} & \textbf{$N$} & \textbf{$E$} & \textbf{Time/Eval (ms)} & \textbf{Peak $\kappa_{\max}$ Red.} & \textbf{Dijk. TP} & \textbf{SRA TP} & \textbf{TP Gain} & \textbf{Drop (Dijk.$\to$SRA)} \\
 \hline\hline
 NSFNET (Real ISP) & 14 & 21 & $0.33 \pm 0.00$ & $13.33\%$ & $11.92$ & $11.92$ & $+0.00\%$ & $0.00\% \to 0.00\%$ \\
 \hline
