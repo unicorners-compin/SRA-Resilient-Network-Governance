@@ -998,7 +998,7 @@ To address realistic operational environments where traffic is non-uniform, node
 Finally, we justify the selection of the controller hyperparameters $(\alpha, \beta_I, T_d)$ and evaluate computational scalability across network sizes $N \in \{50, 100, 200, 300, 500\}$ as well as the real-world NSFNET and GEANT topologies.
 
 \paragraph{1) Joint $(\alpha, \beta_I)$ and Dwell-Time $T_d$ Sensitivity}
-Fig.~\ref{fig:sensitivity_3d} displays the 3D response surfaces of Peak Centrality Reduction, Average Path Length Increase, and Convergence Iterations across the parameter space $\alpha \in [0.05, 0.50] \times \beta_I \in [2.0, 20.0]$. From a control-theoretic standpoint, $\alpha$ sets the discrete relaxation time constant $\tau_{\text{relax}} = -1/\ln(1-\alpha) \approx 1/\alpha$ epochs, while $\beta_I$ scales the maximum node-cost penalty $1+\beta_I$ relative to the network's shortest-path hop diameter. The surfaces exhibit a broad, flat plateau of near-optimal structural relaxation (>80\% peak reduction with <6\% path stretch) across $\alpha \in [0.08, 0.25]$ and $\beta_I \in [8.0, 20.0]$, confirming that SRA does not require fragile hyperparameter tuning. Furthermore, Fig.~\ref{fig:dwell_scalability}(a) quantifies the empirical effect of $T_d \in \{1, 2, 3, 5, 8, 10\}$: increasing $T_d$ from $1$ to $5$ reduces the route-switching frequency from $98.3\%$ to $20.0\%$ while maintaining $99.10\%$--$99.99\%$ PDR; only when $T_d \ge 10$ does the controller become overly sluggish during initial transient adaptation (PDR $86.50\%$). Thus, $\alpha=0.1, \beta_I=10, T_d=5$ represents a principled operating point balancing damping, responsiveness, and routing stability.
+Fig.~\ref{fig:sensitivity_3d} displays the 3D response surfaces of Peak Centrality Reduction, Average Path Length Increase, and Convergence Iterations across the parameter space $\alpha \in [0.05, 0.50] \times \beta_I \in [2.0, 20.0]$. From a control-theoretic standpoint, $\alpha$ sets the discrete relaxation time constant $\tau_{\text{relax}} = -1/\ln(1-\alpha) \approx 1/\alpha$ epochs, while $\beta_I$ scales the maximum node-cost penalty $1+\beta_I$ relative to the network's shortest-path hop diameter. The surfaces exhibit a broad, flat plateau of near-optimal structural relaxation (>80\% peak reduction with <6\% path stretch) across $\alpha \in [0.08, 0.25]$ and $\beta_I \in [8.0, 20.0]$, confirming that SRA does not require fragile hyperparameter tuning. Furthermore, Fig.~\ref{fig:dwell_scalability}(a) quantifies the empirical effect of $T_d \in \{1, 2, 3, 5, 8, 10\}$: increasing $T_d$ from $1$ to $5$ reduces the route-switching frequency from $98.3\%$ to $20.0\%$ while maintaining $99.07\%$--$99.99\%$ PDR across $T_d \in [1, 8]$; only when $T_d \ge 10$ does the controller become overly sluggish during initial transient adaptation (PDR $86.46\%$). Thus, $\alpha=0.1, \beta_I=10, T_d=5$ represents a principled operating point balancing damping, responsiveness, and routing stability.
 
 \paragraph{2) Computational Scalability and Real-World ISP Topologies}
 Table~\ref{tab:scalability_table} and Fig.~\ref{fig:dwell_scalability}(b)--(c) report the per-evaluation wall-clock execution time of Brandes' centrality step (benchmarked on an Intel Xeon Gold 6248R 3.0~GHz processor) and throughput gains from $N=50$ up to $N=500$ nodes, alongside the real-world NSFNET ($N=14, E=21$) and GEANT ($N=22, E=36$) backbones. Three findings stand out:
@@ -1024,7 +1024,7 @@ Table~\ref{tab:scalability_table} and Fig.~\ref{fig:dwell_scalability}(b)--(c) r
 
 \begin{table*}[t!]
 \centering
-\caption{\rev{Computational Complexity, Runtime Benchmark, and Performance Scaling Across Synthetic ($N=50..500$) and Real-World ISP Topologies (NSFNET, GEANT) Across 30 Trials (TP Gain Reports the Mean of Seedwise Relative Throughput Gains).}}
+\caption{\rev{Computational Complexity, Runtime Benchmark, and Performance Scaling Across Synthetic ($N=50..500$) and Real-World ISP Topologies (NSFNET, GEANT) Across 30 Trials (TP Gain Reports the Mean of Seedwise Relative Throughput Gains; Steady-State Window Drop Rate $1-\mathrm{PDR}$ Clipped at $0.00\%$ When Pre-Warmup In-Flight Packets Drain).}}
 \label{tab:scalability_table}
 \renewcommand{\arraystretch}{1.18}
 \small
@@ -1046,7 +1046,7 @@ BA Scale-Free & 300 & 1184 & $302.35 \pm 1.79$ & $72.08\%$ & $135.37$ & $243.15$
 \hline
 BA Scale-Free & 500 & 1984 & $850.99 \pm 5.98$ & $78.25\%$ & $193.09$ & $399.82$ & $\mathbf{+107.42\%}$ & $\mathbf{54.56\% \to 5.91\%}$ \\
 \hline
-WS Small-World & 100 & 400 & $31.02 \pm 0.89$ & $39.82\%$ & $83.84$ & $85.02$ & $+1.51\%$ & $1.38\% \to <0.01\%$ \\
+WS Small-World & 100 & 400 & $31.02 \pm 0.89$ & $39.82\%$ & $83.84$ & $85.02$ & $+1.51\%$ & $1.38\% \to 0.00\%$ \\
 \hline
 WS Small-World & 300 & 1200 & $316.85 \pm 3.53$ & $46.39\%$ & $242.25$ & $254.83$ & $+5.32\%$ & $5.02\% \to 0.08\%$ \\
 \hline
@@ -1297,7 +1297,7 @@ Let $\kappa^{(m)}$ and $\kappa^{(m+1)}$ denote the stress profiles before and af
 \begin{equation}
 \kappa_u^{(m+1)} = \kappa_{\max}^{(m)} - \Delta_u^- \le \kappa_{\max}^{(m)} - \delta.
 \end{equation}
-Meanwhile, for any other node $j \in V \setminus \{u\}$, let $\mathcal{D}_{\text{in}}^{(m)}(j)$ denote the set of OD pairs whose shortest paths newly traverse $j$ at step $m+1$. The net stress increment on node $j$ is bounded by its route-redistribution budget $B_j^{(m)}$:
+Meanwhile, for any other node $j \in V \setminus \{u\}$, let $\mathcal{D}_{\text{in}}^{(m)}(j)$ denote the set of OD pairs whose shortest-path transit fraction $\sigma_{st}(j)/\sigma_{st}$ through node $j$ increases at step $m+1$. The net stress increment on node $j$ is bounded by its route-redistribution budget $B_j^{(m)}$:
 \begin{equation}
 \kappa_j^{(m+1)} - \kappa_j^{(m)} \le (\kappa_j^{(m+1)} - \kappa_j^{(m)})_+ =: B_j^{(m)} \le \sum_{(s,t)\in\mathcal{D}_{\text{in}}^{(m)}(j)} W_{st}
 \end{equation}
