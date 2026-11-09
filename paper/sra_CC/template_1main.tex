@@ -1,0 +1,547 @@
+% !TEX TS-program = pdflatex
+% !BIB TS-program = bibtex
+
+\documentclass{ccjnl}
+%\CCJNLtheme{China Communications}%Do not delete this line of code, thank you!
+
+\title{A New Nonlinear Companding Algorithm Based on Tangent Linearization Processing for PAPR Reduction in OFDM Systems}
+\author{Bei Liu\inst{1,2,*}, Fei Zhang\inst{1}, Yu Guan\inst{1,2}\corinfo{http://www.cic-chinacommunications.cn}}
+\receiveddate{Sep. 25, 2019}
+\reviseddate{Mar. 24, 2020}
+\Editor{Wei Ma}
+
+\address[1]{School of Electronic Engineering, Beijing University of Posts and Telecommunications, Beijing 100876, China}
+\address[2]{Beijing Key Laboratory of Work Safety Intelligent Monitoring (Beijing University of Posts and Tel-ecommunications), Beijing 100876, China}
+
+% publish date
+\def\publishmonth{January}
+\def\publishyear{2023}
+
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+In this paper, a novel nonlinear companding transform (NCT) is proposed to reduce the Peak-to-Average Power Ratio (PAPR) of orthogonal frequency division multiplexing (OFDM) signals. The companding function is designed based on continuously differentiable reshaping of the probability density function (PDF) of signal amplitudes. The original PDF is cut off for PAPR reduction, and lower and medium segments of original PDF are scaled and linearized respectively, for maintaining power and cumulative distribution constraints. The linearized segment is set to be the tangent of the scaled version at the inflexion point, so as to reduce the out-of-band (OOB) radiation as much as possible. Parameters of the proposed scheme are solved under joint con-straints of constant power and unity cumulative distribution. A new receiving method is also proposed to improve the bit error rate (BER) performance of OFDM systems. Simulation results indicate the proposed scheme can achieve better OOB radiation and BER performance at same PAPR levels, compared with existing similar companding algorithms.
+\keywords{OFDM; PAPR; nonlinear companding transform; tangent linearization}
+\end{abstract}
+
+\section{introduction}
+\label{s1}
+
+Due to advantages of high spectral efficiency and robustness to multipath fading, orthogonal frequency division multiplexing (OFDM) has already been adopted by many wireless communication standards, such as Section~\ref{s1} Video Broadcasting (DVB), variations of IEEE 802.11 and IEEE 802.16, the third generation partnership program long-term evolution (3GPP-LTE), and LTE-Advanced \cite{1,2}. Currently, the cyclic prefix (CP) OFDM has also been adopted as the transmission waveform for both of the uplink and downlink in the fifth generation (5G) New Radio (NR) \cite{3}. However, as a multisubcarrier modulation scheme, OFDM suffers from the problem of high Peak-to-Average Power Ratio (PAPR), especially when number of subcarriers is relatively high \cite{4}. Practically, high PAPR would cause nonlinear distortion of the high power amplifier (HPA), and thus degrade system bit error rate (BER) performance. Although power back-off can be used to alleviate the nonlinear distortion, it will reduce the power efficiency of the amplifier. On the other hand, employing a power amplifier with large dynamic range will generally require high cost.
+
+In order to reduce the PAPR of OFDM signal, various techniques have been proposed \cite{5,6}, such as probability techniques \cite{7,8}, coding techniques \cite{9}, and signal distortion techniques \cite{10,11,12,13,14,15,16,17,18,19,20,21,22,23}. The core idea of probability techniques is to redistribute signal phases on different subcarriers, thus changing the autocorrelation property of these signals, and pick out the lowest PAPR signals to transmit. Both partial transmit sequence (PTS) \cite{7} and selective mapping (SLM) \cite{8} schemes have been proposed. Probability techniques introduce none nonlinear distortion thus having good BER performance and low out-of-band interference (OBI), but the computational complexity is generally very high, and the receiver needs side information for demodulation, which reduces the spectrum efficiency. Coding algorithms reduce the PAPR of the system by introducing redundant code and selecting the lowest PAPR signal to transmit. This technique also introduces none signal distortion, but it typically results in a loss of coding rate, and the complexity of searching for the best code group in order to achieve desired PAPR reduction is also generally very high. Compared with LTE, 5G NR requires lower delay, and the complexity of both probabilistic and coding techniques is relatively too high, which leads to a large increase in processing delay at the transmitting end of OFDM systems. 
+
+Compares with above two techniques, signal distortion techniques are more attractive for practical implementations, due to their simplicity and effectiveness \cite{5,6}. Signal distortion techniques generally include iterative clipping and filtering (ICF) \cite{10}, linear companding \cite{11,12} and nonlinear companding transform (NCT) \cite{13,14,15,16,17,18,19,20,21,22,23}. Compared with ICF and linear companding schemes, NCT has gained great attentions owing to its relatively low complexity and more flexibility of performance trade-off among PAPR reduction, BER and out-of-band (OOB) radiation. NCT can be mainly divided into two categories: the first type designs NCT functions directly \cite{13,14,15,16}. The $\mu$-law companding (MC) scheme was proposed in \cite{13}, and an improved scheme, named root-based MC (RMC), was proposed in \cite{14}. Authors in \cite{15} proposed an ampli-tude-limiting companding (ALC) scheme, which can achieve better performance. And recently, a hybrid clipping and com-panding (HCC) scheme was proposed in \cite{16}, which can achieve better BER and OOB radiation performance than ALC. The second type designs reasonable NCT functions by reshaping the probability density function (PDF) of signal amplitudes, i.e. altering the statistical distribution of companded signal amplitudes \cite{17,18,19,20,21,22,23}. The well-known exponential com-panding (EC) scheme was proposed in \cite{17}. And two trape-zoidal-distributed companding (TC) schemes were proposed in \cite{18} and \cite{19}, respectively, to achieve better tradeoff between the PAPR reduction and BER performance. A piecewise com-panding (PC) scheme by employing uniform distribution for larger amplitudes was proposed in \cite{20}. In \cite{21}, Wang et al. proposed a new segmentation companding scheme, which maintained the original PDF for smaller amplitudes and set the PDF of larger amplitudes to be a linear function. This scheme can also be viewed a generalized version of EC, PC and TC scheme, and offer better overall performance in terms of PAPR reduction, BER and OOB radiation performance. However, the desired PDF of this scheme is not differentiable at the inflexion point, which may produce more OBI. Another segmentation companding scheme with the desired PDF consisting of two linear functions was proposed in \cite{22}, which achieved comparable performance to that of the scheme in \cite{21}. Recently,  Perturbed scheme was introduced in \cite{23}, which altered the original PDF to be polylines. This scheme can achieve lower BER, but the computational complexity is too high, and the OOB and BER performance may drop to be poor when the cut-off value is small.
+
+5G NR should offer higher transmission rate, accommodate more users, thus has greater demand for spectrum resources. The OOB radiation of signals must be as low as possible, so as to reduce the frequency domain protection interval and reduce the waste of spectrum resource. However, NCT will introduce distortion to OFDM signals and affect the OOB radiation and BER performance of OFDM systems. How to achieve appropriate PAPR reduction performance while reducing the OOB radiation as much as possible is the key to NCT scheme design.
+
+Contributions of this paper can be stated as follows. Firstly, we propose a novel NCT scheme which is based on continuously differentiable reshaping of the PDF of signal amplitudes. The original PDF is cut off to limit the maximum amplitude, so as to reduce the PAPR. Lower and medium segments of original PDF are linearly scaled and linearized respectively, for maintaining constant power and unity cumulative distribution function (CDF) of signal amplitudes. Especially, the linearized segment is set to be the tangent line of the scaled segment at the inflexion point, making the reshaped PDF continuous and differentiable. This reshaped PDF is different from that of previous schemes (e.g., PDFs in \cite{17,18,19,20,21,22,23}). As indicated in \cite{24}, a continuous and differentiable function will lead to less OBI. Thus the proposed scheme is desired to produce lower OOB radiation. Secondly, solution method for parameters of the proposed companding function is developed under joint constraints of constant power and unity CDF, and the feasible range of the cutoff point factor is derived. This feasible range can help to appropriately select parameters for practical applications. Lastly, a new receiving method based on interference cancellation is proposed, which can effectively improve the BER performance of the proposed companding scheme\endnote{5G NR should offer higher transmission rate, accommodate more users, thus has greater demand for spectrum resources.}.
+
+\begin{proof}
+\label{proof1}
+where $N$ is the number of carriers. 
+\end{proof}
+
+\begin{theorem}
+\label{theorem1}
+5G NR should offer higher transmission rate, accommodate more users, thus has greater demand for spectrum resources.
+\end{theorem}
+
+\begin{definition}
+\label{definition1}
+5G NR should offer higher transmission rate, accommodate more users, thus has greater demand for spectrum resources.
+\end{definition}
+
+\begin{theorem}
+\label{theorem2}
+5G NR should offer higher transmission rate, accommodate more users, thus has greater demand for spectrum resources.
+\end{theorem}
+
+\begin{proof}
+\label{proof2}
+where $N$ is the number of carriers. 
+\end{proof}
+
+\begin{definition}
+\label{definition2}
+5G NR should offer higher transmission rate, accommodate more users, thus has greater demand for spectrum resources.
+\end{definition}
+
+\begin{lemma}
+\label{lemma1}
+5G NR should offer higher transmission rate, accommodate more users, thus has greater demand for spectrum resources.
+\end{lemma}
+
+\begin{proposition}
+\label{proposition1}
+5G NR should offer higher transmission rate, accommodate more users, thus has greater demand for spectrum resources.
+\end{proposition}
+
+\begin{corollary}
+\label{corollary1}
+5G NR should offer higher transmission rate, accommodate more users, thus has greater demand for spectrum resources.
+\end{corollary}
+
+\begin{breakablealgorithm}
+\caption{Euclid’s algorithm.}
+\label{euclid}
+\begin{algorithmic}[1]
+\REQUIRE some condition
+\ENSURE other condition
+\IF{some condition is true} 
+\STATE do some processing 
+\ELSIF{some other condition is true} 
+\STATE do some different processing 
+\ELSIF{some even more bizarre condition is met}
+\STATE do something else 
+\ELSE 
+\STATE do the default actions 
+\ENDIF 
+\end{algorithmic}
+\end{breakablealgorithm}
+
+\begin{example}
+\label{example1}
+5G NR should offer higher transmission rate, accommodate more users, thus has greater demand for spectrum resources.
+\end{example}
+
+\begin{exercise}
+\label{exercise1}
+5G NR should offer higher transmission rate, accommodate more users, thus has greater demand for spectrum resources.
+\end{exercise}
+
+\begin{remark}
+\label{remark1}
+5G NR should offer higher transmission rate, accommodate more users, thus has greater demand for spectrum resources.\endnote{5G NR should offer higher transmission rate, accommodate more users, thus has greater demand for spectrum resources.}
+\end{remark}
+
+\begin{case}
+\label{case1}
+5G NR should offer higher transmission rate, accommodate more users, thus has greater demand for spectrum resources.
+\end{case}
+
+
+
+\section{OFDM model and PAPR formulation $a+b=c$}
+\label{s2}
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.3\textwidth]{1.eps}
+\caption{Block diagram of OFDM system with companding transform.}
+\label{fig1}
+\end{figure}
+
+\begin{breakablealgorithm}
+\caption{Euclid’s algorithm.}
+\label{euclid}
+\begin{algorithmic}[1]
+\IF{some condition is true} 
+\STATE do some processing 
+\ELSIF{some other condition is true} 
+\STATE do some different processing 
+\ELSIF{some even more bizarre condition is met}
+\STATE do something else 
+\ELSE 
+\STATE do the default actions 
+\ENDIF 
+\end{algorithmic}
+\end{breakablealgorithm}
+
+Figure~\ref{fig1} shows  the block diagram of an OFDM system with companding transform. The OFDM signal uses IFFT transform to move the data to be transmitted to each subcarrier, and the discrete-time transmitted OFDM signal is given by where $N$ is the number of carriers. If the input data is independent and identically distributed, when the number of carriers is large enough $(N \geqslant 64)$, it can be known from the central limit theorem that the real and imaginary parts of ${x_n}$ obey complex Gaussian distribution with zero mean, and the amplitudes obey the Rayleigh distribution. The original PDF of signal amplitudes can be expressed as 
+\begin{equation}
+{f_{\left| {{x_n}} \right|}}(x) = \frac{{2x}}{{{\sigma ^2}}}\exp \left( { - \frac{{{x^2}}}{{{\sigma ^2}}}} \right),~~\left| {{x_n}} \right| \geqslant 0,
+\label{eq2}
+\end{equation}
+where $\sigma^{2}=E\left\{\left|x_{n}\right|^{2}\right\}$, and $E\{\cdot\}$ is the mathematical expectation. The CDF of ${x_n}$ is then given by
+\begin{equation}
+\begin{aligned}
+{F_{\left| {{x_n}} \right|}}(x) &= {\text{Prob}}\left\{ {\left| {{x_n}} \right| > x} \right\}\\
+&= 1 - \exp \left( { - \frac{{{x^2}}}{{{\sigma ^2}}}} \right),
+\left| {{x_n}} \right| \geqslant 0,
+\end{aligned}
+\label{eq3}
+\end{equation}
+
+The PAPR of the transmitted signal can be expressed as
+\begin{equation}
+{f_{\left| {{x_n}} \right|}}(x) = \frac{{2x}}{{{\sigma ^2}}}\exp \left( { - \frac{{{x^2}}}{{{\sigma ^2}}}} \right),~~\left| {{x_n}} \right| \geqslant 0.
+\label{eq4}
+\end{equation}
+
+\begin{algorithm*}[!ht]
+\caption{Algorithm example.}
+\label{algorithm1}
+\begin{algorithmic}[1]
+\IF{some condition is true} 
+\STATE do some processing 
+\ELSIF{some other condition is true} 
+\STATE do some different processing 
+\ELSIF{some even more bizarre condition is met}
+\STATE do something else 
+\ELSE 
+\STATE do the default actions 
+\ENDIF 
+\end{algorithmic}
+\end{algorithm*}
+
+
+In general, we use the complementary cumulative distribution function (CCDF) to describe the PAPR level of signals, which is defined as the probability that the signal PAPR exceeds a certain value and can be expressed by
+\begin{equation}
+\begin{aligned}
+CCD{F_{PAPR}}\left( \gamma  \right)& = {\text{Prob}}\left\{ {PAPR > \gamma } \right\} \\
+&=1 - {\left[ {1 - \exp \left( { - \gamma } \right)} \right]^N}.
+\end{aligned}
+\label{eq5}
+\end{equation}
+
+\section{proposed nonlinear companding technique $a\Phi+b=c$}
+\label{s3}
+
+In this section, an effective nonlinear companding algorithm is presented, which can effectively reduce the PAPR of OFDM signals while ensuring the power and CDF conservation, and make the OOB radiation of companded signals be at a lower level. At the same time, a new receiving method is proposed, which estimates the companding noise to improve the decom-panding results and reduce the system BER effectively.
+\begin{equation}
+\widehat{\mathbf{h}}_\mathbf{b}=(\mathbf{\Phi}^H\mathbf{\Phi})^{-1} \mathbf{\Phi}^H  \mathbf{d}.
+\end{equation}
+
+\subsection{design of the proposed companding less scheme  $a\Phi+b=c$}
+\label{s3-1}
+\subsubsection{design of the proposed companding scheme $a\Phi+b=c$}
+\label{s3-1-1}
+\paragraph{design of the proposed companding less scheme  $a\Phi+b=c$}
+\label{s3-1-1-1}
+
+As indicated in \cite{24}, continuous and differentiable PDF can produce less OBI. We take this as the key consideration for the design of companding scheme. 
+
+The derivation of the new companding function is based on reshaping of the PDF of signal amplitudes. For small amplitude signals, we linearly scale the original PDF, and then we take the tangent line of the scaled PDF at the inflexion point as the new PDF for large amplitude signals and cut off it, which makes the PDF differentiable at the inflexion point and can effectively reduce the PAPR of the signal, while making less distortion to the signal. Parameters are appropriately selected so as to maintain the constraint conditions including unity CDF and constant power.
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.3\textwidth]{1.eps}
+\caption{Desired Probability Density Function form of the proposed scheme.}
+\label{fig2}
+\end{figure}
+
+Let $y_n$ denotes the companding signal, the desired target PDF can be expressed as
+\begin{equation}
+\begin{aligned}
+\widehat{\mathbf{H}}&={\mathbf{F}} {\widehat{\mathbf{h}}_{\rm p}} \\
+&=\left[\widehat{H}_{0}, \cdots, \widehat{H}_{N-1}\right]^{T} ,
+\end{aligned}
+\label{eq6}
+\end{equation}
+where $a (a > 0)$, $k$ and $b$ are constant parameters, $t\sigma$ is the inflexion point, and $A\sigma$ is the cutoff point of companded signals. Let the second part of ${f_{\left| {{y_n}} \right|}}(y)$ be the tangent line of $a \cdot {f_{\left| {{x_n}} \right|}}(y)$ at the inflexion point, as shown in Figure~\ref{fig2}. Then $k$ should be the slope of the tangent line and can be expressed by
+\begin{equation}
+k = \frac{{2a}}{{{\sigma ^2}}} \cdot {e^{ - {t^2}}} \cdot \left( {1 - 2{t^2}} \right),
+\label{eq7}
+\end{equation}
+and the intercept $b$ can be expressed by 
+\begin{equation}
+b = \frac{{4a{t^3}}}{\sigma } \cdot {e^{ - {t^2}}}.
+\label{eq8}
+\end{equation}
+
+The CDF of $y_n$ is then given by Eq.~\eqref{eq9}.
+
+And the inverse function of ${F_{\left| {{y_n}} \right|}}(x)$ is given by Eq.~\eqref{eq10}, shown at the bottom of this page.
+\begin{strip}
+\begin{equation}
+b = \frac{{4a{t^3}}}{\sigma } \cdot {e^{ - {t^2}}},
+\label{eq9}
+\end{equation}
+\end{strip}%
+ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la ba la 
+\begin{strip}
+\begin{equation}
+b = \frac{{4a{t^3}}}{\sigma } \cdot {e^{ - {t^2}}}.
+\label{eq10}
+\end{equation}
+\end{strip}%
+
+Assume the companding function $h(x)$ is a strictly monotonic increasing and reversible function, we have Eq.~\eqref{eq11}
+\begin{equation}
+\begin{aligned}
+{F_{\left| {{x_n}} \right|}}\left( x \right) &= {\text{Prob}}\left( {\left| {{x_n}} \right| \leqslant x} \right)\\
+&= {\text{Prob}}\left( {h\left( {\left| {{x_n}} \right|} \right) \leqslant h\left( x \right)} \right)\\
+& = {F_{\left| {{y_n}} \right|}}\left( {h\left( x \right)} \right).
+\end{aligned}
+\label{eq11}
+\end{equation}
+
+Therefor the companding function can be calculated by
+\begin{equation}
+h(x) = \operatorname{sgn} (x) \cdot {F^{ - 1}}_{\left| {{y_n}} \right|}({F_{\left| {{x_n}} \right|}}(x)).
+\label{eq12}
+\end{equation}
+
+The derived companding function is given by~\eqref{eq12}. Here, we set $D = {b^2} - k \cdot \left( {2a\left( {1 - {e^{ - {t^2}}}} \right) - k{t^2}{\sigma ^2} - 2bt\sigma } \right)$, and the value of $k$ and $b$ can refer to~\eqref{eq7} and~\eqref{eq8}, respectively. The companding function can be simplified as 
+
+And the decompanding function can be expressed by 
+\begin{equation}
+\int_0^{A\sigma } {{f_{\left| {{y_n}} \right|}}(y)dy = 1} .
+\label{eq15}
+\end{equation}
+
+The constraint condition of unity CDF can be writen as
+\begin{equation}
+\int_0^{A\sigma } {{f_{\left| {{y_n}} \right|}}(y)dy = 1} .
+\label{eq16}
+\end{equation}
+
+According to~\eqref{eq16}, we will have
+\begin{equation}
+a{A^2} - 2{A^2}{t^2} + 4A{t^3}= 1.
+\label{eq17}
+\end{equation}
+
+Additionally, the constraint condition of constant power is $E\left\{\left|x_{n}\right|^{2}\right\}=E\left\{\left|y_{n}\right|^{2}\right\}$, or equivalently expressed by
+\begin{equation}
+\int_0^\infty  {{x^2}{f_{\left| {{x_n}} \right|}}(x)dx}  = \int_0^{A\sigma } {{y^2}{f_{\left| {{y_n}} \right|}}(y)dy} .
+\label{eq18}
+\end{equation}
+
+According to~\eqref{eq18}, we can obtain 
+\begin{equation}
+a{A^2} - 2{A^2}{t^2} + 4A{t^3}= 1.
+\label{eq19}
+\end{equation}
+
+According to~\eqref{eq17} and~\eqref{eq19}, once $A$ is selected, $a$ and $t$ can be determined by solving~\eqref{eq17} and~\eqref{eq19} numerically. Figure~\ref{fig3} shows the relationship of scaling factor $a$ and inflexion point factor $t$ 
+versus cutoff point factor $A$. Considering the normal constraint of non-negative PDF, the feasible range of $A$ can be analyzed and find to be about $[1.415, 2.085]$ (see APPENDIX).
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.3\textwidth]{3.eps}
+\caption{Scaling factor $a$ and inflexion point factor $t$ versus $A$.}
+\label{fig3}
+\end{figure}
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.31\textwidth]{4.eps}
+\caption{Transform profiles of the proposed companding function.}
+\label{fig4}
+\end{figure}
+
+Figure~\ref{fig4} describes companding curves with different parameters. It can be seen that the companding transformation can effectively compress large amplitude signals and appropriately expand small amplitude signals, so that signal PAPR can effectively be reduced. With $A$ increasing, the maximum output of the transform will increase, and the PAPR reduction performance decreases, but less signal distortion will be produced. Thus by adjusting the value of $A$, flexible performance tradeoff can be achieved.
+
+According to~\eqref{eq4}, the PAPR of companded signals can be calculated by 
+\begin{align}\notag
+&PAP{R_{{y_n}}} 
+= \frac{{\mathop {\max }\limits_{n \in \{ 0,1,\ldots,NL - 1\} } \left( {{{\left| {{y_n}} \right|}^2}} \right)}}{{E\left\{ {{{\left| {{y_n}} \right|}^2}} \right\}}}\\
+= &\frac{{{{\left( { - b + \sqrt {D + 2k\left( {1 - \exp ( - X_{\max }^2/{\sigma ^2})} \right)} } \right)}^2}}}{{{k^2}{\sigma ^2}}}.
+\label{eq20}
+\end{align}
+where $X_{\max }=\max \left(\left|x_{n}\right|^{2}\right)(n=0,1, \ldots, N-1)$.
+
+In order to analyze the of PAPR reduction performance of the propose scheme more intuitively, we evaluate the companding gain $G$, which is defined as the ratio of the PAPR of original signals to that of companded signals \cite{21}, i.e., 	
+\begin{equation}
+P_{e}=\frac{1}{2}\left(1-\sqrt{\left.\frac{\mathrm{E}_{\mathrm{b}} / \mathrm{N}_{0}}{\mathrm{E}_{\mathrm{b}} / \mathrm{N}_{0}+1}\right)}\right. 
+\label{eq21}
+\end{equation}
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.3\textwidth]{1.eps}
+\caption{Results of PAPR and $G$ versus $A$ with the proposed scheme.}
+\label{fig5}
+\end{figure}
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.3\textwidth]{1.eps}
+\caption{Attenuation factor $\alpha $ versus $A$.}
+\label{fig6}
+\end{figure}
+
+Figure~\ref{fig5} depicts the curves of theoretical results of PAPR and $G$ versus $A$ with the proposed scheme. We can find that by adjusting $A$, the proposed scheme can achieve different PAPR reduction performance. When $A \in[1.415,2.085]$, the PAPR of companded signals is confined to the interval of [3.2dB, 6.5dB], with the achievable companding gain varying from about 8.9dB to 5.5dB. In \cite{21}, the achievable range of PAPR is about [4.2dB, 6.2dB], and companding gain varies from about 7.4dB to 5.5dB. Obviously, the proposed scheme has larger adjusting range of PAPR reduction and can achieve better PAPR reduction performance.
+
+Next, we analyze the companding distortion. According to the Bussgang theorem \cite{25,26}, the companded signal consists of two parts, i.e., attenuated signal component and companding noise. Accordingly, the companded signal can be written as
+\begin{equation}
+{y_n} = \alpha {x_n} + {b_n},
+\label{eq22}
+\end{equation}
+where $\alpha $ is the attenuation factor and $b_n$ is the companding noise. For the non-stationary OFDM signal, the attenuation factor can be calculated by
+\begin{equation}
+\alpha  = \frac{1}{{{\sigma ^2}}}\int_0^\infty  {xh(x)} {f_{\left| {{x_n}} \right|}}(x)dx.
+\label{eq23}
+\end{equation}
+
+By substituting~\eqref{eq2} and~\eqref{eq11} into~\eqref{eq23}, the attenuation factor $\alpha $ of the proposed scheme can be obtained. Generally, $\alpha $ is less than 1. And the larger $\alpha $ is, the smaller the distortion of companded signal will be, leading to better BER performance. Figure~\ref{fig6} shows the theoretical curve of $\alpha $ versus $A$. It can be seen that as $A$ increases, $\alpha $ is closer to 1, indicating the continuous decrease of companding distortion. When $A>1.58$, the attenuation factor of the proposed scheme is always larger than 0.99.
+
+\subsection{optimization~of~$\mathbf{x}$ for a fixed~$\mathbf{\Psi}$}
+\label{Design-of}
+The nonlinear companding function introduce some nonlinear distortion to original OFDM signal, which can be eliminated theoretically by the decompanding function. However, as the maximum amplitude of companded signals is limited, the input range of the decompanding function is also limited. In practical implementations, the transmitted signals are affected by noise and fading when passing through the wireless channel, which may cause the amplitudes of received signals exceeding the maximum limitation of decompanding function, and degrade the BER performance seriously. In order to solve this problem, we design an iterative receiving algorithm to replace the decompanding process and improve BER performance.
+
+The key point of the proposed receiving method is to estimate the overall noise and detect the received signal iteratively. According to~\eqref{eq22}, the received signal can be expressed by
+\begin{equation}
+{\gamma _n} = {y_n} + {\omega _n} = \alpha {x_n} + {b_n} + {\omega _n} = \alpha {x_n} + {\psi _n},
+\label{eq24}
+\end{equation}
+where ${\gamma _n}$ is the received signal, ${\omega _n}$ is the additive white Gaussian noise (AWGN), and ${\psi _n}$ is the overall noise.
+
+\begin{figure}[!b]
+\centering
+\subfloat[\label{fig:arm1}$Q^{*}$ values for arm 1]{\includegraphics[width=.5\linewidth]{1.eps}}%
+\subfloat[\label{fig:arm2}$Q^{*}$ values for arm 2]{\includegraphics[width=.5\linewidth]{1.eps}}\\
+\subfloat[\label{fig:arm3}$Q^{*}$ values for arm 3]{\includegraphics[width=.8\linewidth]{1.eps}}
+\end{figure}
+
+\begin{figure}[!ht]\ContinuedFloat
+\centering
+\subfloat[\label{fig:arm4}$Q^{*}$ values for arm 4]{\includegraphics[width=.8\linewidth]{1.eps}}\\
+\subfloat[\label{fig:arm5}$Q^{*}$ values for arm 5]{\includegraphics[width=.5\linewidth]{1.eps}}%
+\subfloat[\label{fig:arm6}$Q^{*}$ values for arm 6]{\includegraphics[width=.5\linewidth]{1.eps}}
+\caption{$Q^{*}$ values for different arms.}
+\label{fig:arms}
+\end{figure}
+
+The steps of the new receiving method are given as follows:
+
+\textbf{Step 1:} Demodulate ${\gamma _n}$ by OFDM demodulator and obtain the baseband signal $s_n$ by certain baseband detection scheme, e.g. quadrature amplitude modulation (QAM) detection, with minimum Euclidean distance criterion; 
+
+\textbf{Step 2:} Regenerate the OFDM signal ${x'_n}$ with $s_n$ by OFDM modulator;
+
+\textbf{Step 3:} Compand ${x'_n}$ with the proposed companding function $h(x)$ given by (14), to obtain the companded signal ${y'_n}$;
+
+\textbf{Step 4:} Calculate the overall noise ${\psi '_n}$ as follow
+\begin{equation}
+{\psi '_n} = {y'_n} - \alpha  \cdot {x'_n}.
+\label{eq25}
+\end{equation}
+
+\textbf{Step 5:} Remove the estimated overall noise from the received signal, and update the received signal by 
+\begin{equation}
+{\gamma '_n} = ({\gamma _n} - {\psi '_n})/\alpha .
+\label{eq26}
+\end{equation}
+
+\textbf{Step 6:} Return to Step $1$ and demodulate ${\gamma '_n}$ again.
+
+According to~\eqref{eq26}, the actual demodulated signal for recovering original information bits can be expressed by
+\begin{equation}
+x_n^ *  \approx {x_n} + ({b_n} + {\omega _n} - {\psi '_n})/\alpha .
+\label{eq27}
+\end{equation}
+
+It can be examined that only one iteration is enough for the proposed receiving method to effectively alleviate overall noise and reduce system BER, and further more improvement of BER performance with more iterations may be little. For better tradeoff between BER performance and implementation complexity, one iteration is suggested with the proposed receiving method for practical applications.
+
+\section{simulation results}
+\label{SIMULATION-RESULTS}
+
+In this section, simulation results are presented to verify the performance of the proposed NCT scheme, with respect to PAPR reduction, BER and OOB radiation. We consider an uncoded OFDM system with total 1024 subcarriers. The oversampling factor is set to be $L = 4$. The randomly generated bit streams are modulated by Quaternary Phase Shift Keying (QPSK) or 16-Quadrature Amplitude Modulation (16-QAM) throughout the simulations. A cyclic prefix with the length of 1/4 symbol duration is added to mitigate the inter-symbol interference (ISI). Both of AWGN channel model and multipath fading channel model of 5G NR standard (TDL-B model) \cite{29} are employed for performance evaluation. Four representative companding schemes are selected for performance comparisons, i.e. Hu's scheme \cite{12}, HCC scheme \cite{16}, Wang's scheme \cite{21} and Perturbed scheme \cite{23}. In order to make fair comparisons, we adjust the parameters of all schemes to make their PAPR performance as close as possible, then we compare their BER and OOB performance. Note that in PAPR calculations for different OFDM symbols, the average power is evaluated in a symbol-by-symbol way.
+
+\subsection{simulation results of PAPR reduction performance}
+\label{Simulation-results}
+
+Simulation results for CCDF of PAPR with different companding schemes are shown in Figure~\ref{fig7}. It can be seen that the proposed algorithm can effectively reduce the PAPR of OFDM signals. Given CCDF=10$^{-4}$, with $A$=1.42, 1.57, 1.78 and 2.085, the proposed algorithm can reduce PAPR from 12.2dB of original OFDM signals to about 3.2dB, 4.08dB, 5.14dB and 6.4dB, respectively. The smaller the value of A is, the better the PAPR reduction performance will be. Additionally, the PAPR reduction result of the proposed scheme with $A=1.57$ is nearly same to that of Hu's scheme (preset=4dB), HCC scheme ($\gamma =1.5$, $P=1$), Wang's scheme ($k =0.3$) and Perturbed scheme ($A_c=1.57$). When $A=2.085$, the PAPR reduction performance of the proposed scheme is very close to, but still a little better than that of Perturbed scheme with $A_c=2.085$. 
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.3\textwidth]{3.eps}
+\caption{CCDF of PAPR for original OFDM signals and companded signals with different companding schemes ($L=4$, QPSK).}
+\label{fig7}
+\end{figure}
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.3\textwidth]{4.eps}
+\caption{BER performance of original OFDM system and different companding schemes over AWGN channel (QPSK).}
+\label{fig8}
+\end{figure}
+
+\subsection{simulation results of BER performance}
+\label{Simulation-results}
+
+Figure~\ref{fig8} depict simulated BER performance of original OFDM system and different companding schemes over the AWGN channel with QPSK and 16-QAM modulation, respectively. Form Figure~\ref{fig8}, we can see that with QPSK, at $\text{BER}=10^{-4}$, the BER performance of the proposed scheme with $A=1.57$ surpasses that of Wang's scheme, Hu's scheme and Perturbed scheme ($A_c=1.57$) for about 0.24dB, 0.3dB and 0.54 dB, respectively, and is more than 2.5dB better than that of HCC scheme. Note that all of them have almost the same PAPR reduction performance. When the amplitude limitation is set to be 2.085 (i.e., $A=A_c=2.085$), the proposed scheme and Perturbed scheme can achieve almost the same BER level as low as that of original OFDM system. Additionally, when $A=1.57$, the proposed scheme combined with the new receiving method obtains about 1.1dB improvement in BER performance than that without decompanding, and achieves similar result to that of Perturbed scheme with $A_c=2.085$. These results indicate that the proposed new receiving method can effectively improve the BER performance further, at the cost of additional increase in algorithmic complexity. 
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.3\textwidth]{1.eps}
+\caption{BER performance of original OFDM system and different companding schemes over AWGN channel (16-QAM).}
+\label{fig9}
+\end{figure}
+
+When 16-QAM modulation is employed, similar results can be found in Figure~\ref{fig9}. The BER performance superiority of the proposed scheme to that of other companding schemes is en-larged. The BER result of Hu's scheme with decompanding is also presented (labeled with `Deco'), since decompanding can be employed to improve BER performance of Hu's scheme with 16-QAM modulation, as stated in \cite{12}. But it is still a little inferior to that of the proposed scheme without decompanding. At the BER level of 10$^{-4}$, the performance of the proposed scheme is about 1.1dB, 0.55dB and 2.95dB better than that of Wang's scheme, Hu's scheme (with decompanding) and Perturbed scheme ($A_c=1.57$) respectively, and is more than 4dB when compared with HCC scheme. The BER performance of proposed scheme is almost same to that of Perturbed scheme when $A=A_c=2.085$. On the other hand, by adopting the proposed new receiving method, the BER performance of the proposed scheme with 16-QAM can also be significantly reduced without any side information. 
+
+Figure~\ref{fig9} presents BER performance results with QPSK modulation over TDL-B channel model. It can be found that the proposed companding scheme and the new receiving scheme can still obtain a little better BER performance, which verifies the applicability of proposed schemes for practical multipath fading channels.
+
+To compare the BER performance among different schemes and confirm the superiority of the proposed scheme more clearly, some simulation results are summarized and listed in Table~\ref{tab1}.
+
+\begin{table}[!ht]
+\centering
+\caption{caption.}
+\label{tab1}
+\begin{tabular}{cccc}\toprule
+column A & column B &column C &column D\\\midrule
+column a & column b &column c & column d\\
+column a & column b &column c & column d\\
+column a & column b &column c & column d\\
+column a & column b &column c & column d\\\bottomrule
+\end{tabular}
+\end{table}
+
+\section{conclusion}
+\label{CONCLUSION}
+
+In this paper, a novel NCT scheme is proposed to reduce the PAPR of OFDM signals, based on continuously differentiable reshaping of the PDF of signal amplitudes. The original PDF is cut off for PAPR reduction, and lower and medium segments of original PDF are scaled and linearized respectively. The linearized segment is set to be the tangent of the scaled version at the inflexion point, so as to make the new PDF continuous and differentiable and reduce the OOB radiation as much as possible. Parameters are appropriately selected so as to maintain the constraint conditions of unity CDF and constant power. In addition, a new receiving method is proposed to reduce system BER, at the cost of a little increase in algorithmic complexity. Simulation results indicate that at the same PAPR reduction level, the proposed scheme without decompanding process can achieve similar or better BER performance, compared with other typical companding schemes, and when the new receiving method is employed, the BER performance can effectively be improved further. Additionally, simulation results confirm the superiority of the proposed scheme in terms of OOB radiation. 
+
+\section*{ACKNOWLEDGEMENT}
+\label{ACKNOWLEDGEMENT}
+
+This work was supported by National Natural Science Foundation of China (No.~61821001) and Science and Tech-nology Key Project of Guangdong Province, China (2019B010157001).
+
+\theendnotes
+
+\appendix
+
+Here we analyze the feasible range of cutoff point factor A.
+
+\begin{equation}\tag{App1}
+a{A^2} - 2{A^2}{t^2} + 4A{t^3}= 1.
+\label{eqa0}
+\end{equation}
+
+\subsection{My Appendix A title}
+\label{app:a}
+
+Here we analyze the feasible range of cutoff point factor~\ref{app:a}.
+
+By substituting~\eqref{eq7} and~\eqref{eq8} into~\eqref{eq6}, we can obtain
+\begin{equation}
+a{A^2} - 2{A^2}{t^2} + 4A{t^3}= 1.
+\label{eqa1}
+\end{equation}
+
+\subsection{My Appendix B title}
+
+Generally, the PDF should be larger than or equal to zero. According to the definition of $a$ and $t$, there should be $a > 0$ and $t > 0$, so we have
+\begin{equation}
+\frac{{2a}}{{{\sigma ^2}}} \cdot {e^{ - {t^2}}} \cdot \left( {1 - 2{t^2}} \right) \cdot A\sigma  + \frac{{4a{t^3}}}{\sigma } \cdot {e^{ - {t^2}}} \geqslant 0,
+\label{eqa2}
+\end{equation}
+which can be simplified as  
+\begin{equation}
+A \cdot \left( {1 - 2{t^2}} \right) + 2{t^3} \geqslant 0.
+\label{eqa3}
+\end{equation}
+
+The lower bound for companded amplitude is low enough for practical PAPR reduction applications. Although the upper bound for companded amplitude may be limited, compared with some of other companding schemes (e.g., Hu's scheme and Perturbed scheme, which nearly have none upper limit for companded amplitude), it still could provide an achievable PAPR level of more than 6dB, which is large enough for most of practical applications in terms of PAPR reduction.
+
+\bibliographystyle{gbt7714-numerical}
+\bibliography{myref}
+
+\biographies
+
+\begin{CCJNLbiography}{photo.eps}{Bei Liu}
+received the B.S. and Ph.D. degrees from Beijing University of Posts and Telecommunications (BUPT) in 2001 and 2006, respectively. He is currently an Associate Professor in School of Electronic Engineering, BUPT. His current research interests include wireless communication theory and technology, wireless mesh networks.
+\end{CCJNLbiography}
+
+\begin{CCJNLbiography}{photo.eps}{Fei Zhang}
+received the B.S. degree in electronic science and technology from Beijing University of Posts and Telecommunications (BUPT) in 2017. He is currently working towards the master degree in School of Electronic Engineering, BUPT. His current research is signal processing technology for wireless communications.
+\end{CCJNLbiography}
+
+
+
+\end{document}
