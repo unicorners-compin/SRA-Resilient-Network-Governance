@@ -287,13 +287,12 @@ This quantization is non-trivial; it renders the system dynamics \textit{piecewi
 \begin{equation}
     \label{eq:problem_formulation}
     \begin{aligned}
-    \min_{\{S^{(k)}, C^{(k)}\}} \quad & \limsup_{k \to \infty} \max_{i \in V} \widetilde{\kappa}_i(S^{(k)}; W, \mu) + \eta_{\text{sw}}\,\bar{f}_{\text{sw}} \\
-    \text{s.t.} \quad & S^{(k+1)} = (1-\alpha)S^{(k)} + \alpha\,q^{(k)},\quad S^{(0)} \in [0,1]^N, \\
-    & C^{(k)} = \mathbf{1} + \beta_I S^{(k)}, \quad \tau_{m+1} - \tau_m \ge T_d, \\
-    & \bar{f}_{\text{sw}} \le 1/T_d,
+    \min_{\{S^{(k)}, C^{(k)}\}}\; & \limsup_{k \to \infty} \max_{i \in V} \widetilde{\kappa}_i(S^{(k)}) + \eta_{\text{sw}}\bar{f}_{\text{sw}} \\
+    \text{s.t.}\; & S^{(k+1)} = (1-\alpha)S^{(k)} + \alpha q^{(k)},\ S^{(0)} \in [0,1]^N, \\
+    & C^{(k)} = \mathbf{1} + \beta_I S^{(k)},\ \tau_{m+1} - \tau_m \ge T_d,\ \bar{f}_{\text{sw}} \le 1/T_d,
     \end{aligned}
 \end{equation}
-where $\bar{f}_{\text{sw}} := \limsup_{K\to\infty}\frac{1}{K}\sum_{k=0}^{K-1}\mathbb{I}(\mathcal{P}^{(k+1)}\neq\mathcal{P}^{(k)})$ is the asymptotic switching frequency, $\mathcal{P}^{(k)}$ denotes the active shortest-path configuration at step $k$, $\{\tau_m\}$ are the route-switching epochs separated by at least the minimum dwell time $T_d \ge 1$.}
+where $\widetilde{\kappa}_i(S^{(k)}) \equiv \widetilde{\kappa}_i(S^{(k)}; W, \mu)$, $\bar{f}_{\text{sw}} := \limsup_{K\to\infty}\frac{1}{K}\sum_{k=0}^{K-1}\mathbb{I}(\mathcal{P}^{(k+1)}\neq\mathcal{P}^{(k)})$ is the asymptotic switching frequency, $\mathcal{P}^{(k)}$ denotes the active shortest-path configuration at step $k$, and $\{\tau_m\}$ are the route-switching epochs separated by at least the minimum dwell time $T_d \ge 1$.}
 
 % --- 这是 Fig. 2 的完整代码 ---
 \begin{figure*}[!t]
