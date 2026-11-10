@@ -32,17 +32,19 @@
 \def\publishmonth{5}
 \def\publishyear{2026}
 
-\usepackage{booktabs,enumitem}
+\usepackage{booktabs,enumitem,microtype}
 \AtBeginDocument{%
-\setlength{\abovedisplayskip}{5.5pt plus 2pt minus 2pt}%
-\setlength{\belowdisplayskip}{5.5pt plus 2pt minus 2pt}%
-\setlength{\abovedisplayshortskip}{3pt plus 1pt minus 1pt}%
-\setlength{\belowdisplayshortskip}{3pt plus 1pt minus 1pt}%
-\setlength{\textfloatsep}{8pt plus 2pt minus 2pt}%
-\setlength{\floatsep}{6pt plus 2pt minus 2pt}%
-\setlength{\intextsep}{6pt plus 2pt minus 2pt}%
-\setlength{\dbltextfloatsep}{8pt plus 2pt minus 2pt}%
-\setlength{\dblfloatsep}{6pt plus 2pt minus 2pt}%
+\raggedbottom
+\setlength{\abovedisplayskip}{6.5pt plus 2pt minus 2pt}%
+\setlength{\belowdisplayskip}{6.5pt plus 2pt minus 2pt}%
+\setlength{\abovedisplayshortskip}{3.5pt plus 1.5pt minus 1pt}%
+\setlength{\belowdisplayshortskip}{3.5pt plus 1.5pt minus 1pt}%
+\setlength{\textfloatsep}{8.5pt plus 2pt minus 2pt}%
+\setlength{\floatsep}{6.5pt plus 2pt minus 2pt}%
+\setlength{\intextsep}{6.5pt plus 2pt minus 2pt}%
+\setlength{\dbltextfloatsep}{8.5pt plus 2pt minus 2pt}%
+\setlength{\dblfloatsep}{6.5pt plus 2pt minus 2pt}%
+\setlength{\emergencystretch}{1.5em}%
 }
 \setlist[itemize]{leftmargin=1.4em,itemsep=1.5pt,topsep=2.5pt,parsep=0pt}
 \setlist[enumerate]{leftmargin=1.6em,itemsep=1.5pt,topsep=2.5pt,parsep=0pt}
@@ -54,15 +56,16 @@
   \def\beta{beta}%
 }
 
-\titlespacing*{\section}{0pt}{8pt plus 2pt minus 2pt}{4pt plus 1pt minus 1pt}
-\titlespacing*{\subsection}{0pt}{6pt plus 2pt minus 1pt}{3pt plus 1pt minus 1pt}
-\titlespacing*{\subsubsection}{0pt}{4pt plus 1pt minus 1pt}{2pt plus 1pt minus 1pt}
-\renewcommand{\topfraction}{0.92}
+\titlespacing*{\section}{0pt}{10pt plus 2pt minus 2pt}{5pt plus 1pt minus 1pt}
+\titlespacing*{\subsection}{0pt}{8pt plus 2pt minus 1pt}{4pt plus 1pt minus 1pt}
+\titlespacing*{\subsubsection}{0pt}{6pt plus 1pt minus 1pt}{3pt plus 1pt minus 1pt}
+
+\renewcommand{\topfraction}{0.90}
 \renewcommand{\bottomfraction}{0.85}
-\renewcommand{\textfraction}{0.08}
-\renewcommand{\floatpagefraction}{0.85}
-\renewcommand{\dbltopfraction}{0.92}
-\renewcommand{\dblfloatpagefraction}{0.85}
+\renewcommand{\textfraction}{0.10}
+\renewcommand{\floatpagefraction}{0.80}
+\renewcommand{\dbltopfraction}{0.90}
+\renewcommand{\dblfloatpagefraction}{0.80}
 \begin{document}
 \maketitle
 
@@ -87,9 +90,9 @@ This is not merely a transient congestion issue but a structural vulnerability: 
     \subfloat[Conventional Paradigm: Stress Concentration\label{fig:intro_before}]{%
     \begin{minipage}{0.46\columnwidth}
         \centering
-        \begin{tikzpicture}[scale=0.52]
-            \tikzstyle{node}=[circle, draw, thick, minimum size=6mm]
-            \tikzstyle{hub}=[node, fill=red!80, minimum size=10mm]
+        \begin{tikzpicture}[scale=0.62]
+            \tikzstyle{node}=[circle, draw, thick, minimum size=5.5mm]
+            \tikzstyle{hub}=[node, fill=red!80, minimum size=9mm]
             \tikzstyle{flow}=[-Latex, gray, thick, shorten <=1mm, shorten >=1mm]
             % Nodes
             \node[hub] (H) at (0,0) {};
@@ -108,7 +111,7 @@ This is not merely a transient congestion issue but a structural vulnerability: 
             \draw[flow, line width=1.2pt] (N4) to [bend right=10] (H);
             \draw[flow, line width=1.2pt] (H) to [bend left=10] (N1);
             \draw[flow, line width=1.2pt] (H) to [bend right=10] (N2);
-            \node[below=0.1cm of H, text=red!80!black, font=\scriptsize\bfseries] {Stress Singularity};
+            \node[below=0.22cm of H, text=red!80!black, font=\scriptsize\bfseries, fill=white, inner sep=1pt] {Stress Singularity};
         \end{tikzpicture}
     \end{minipage}
     }
@@ -117,9 +120,9 @@ This is not merely a transient congestion issue but a structural vulnerability: 
     \subfloat[SRA Control Paradigm: System Relaxation\label{fig:intro_after}]{%
     \begin{minipage}{0.46\columnwidth}
         \centering
-        \begin{tikzpicture}[scale=0.52]
-            \tikzstyle{node}=[circle, draw, thick, minimum size=6mm]
-            \tikzstyle{hub}=[node, fill=yellow!80, minimum size=8mm]
+        \begin{tikzpicture}[scale=0.62]
+            \tikzstyle{node}=[circle, draw, thick, minimum size=5.5mm]
+            \tikzstyle{hub}=[node, fill=yellow!80, minimum size=7.5mm]
             \tikzstyle{periph}=[node, fill=green!20]
             \tikzstyle{flow}=[-Latex, green!50!black, thick, shorten <=1mm, shorten >=1mm]
             % Nodes
@@ -138,7 +141,7 @@ This is not merely a transient congestion issue but a structural vulnerability: 
             \draw[flow, line width=1.2pt] (N3) to [bend left=40] (P1);
             \draw[flow, line width=1.2pt] (P1) to [bend left=40] (N1);
             \draw[flow, line width=1.2pt] (N1) to [bend right=40] (N2);
-            \node[below=0.1cm of H, text=green!60!black, font=\scriptsize\bfseries] {Stress Dispersed};
+            \node[below=0.22cm of H, text=green!60!black, font=\scriptsize\bfseries, fill=white, inner sep=1pt] {Stress Dispersed};
         \end{tikzpicture}
     \end{minipage}
     }
@@ -300,9 +303,9 @@ where $\widetilde{\kappa}_i(S^{(k)}) \equiv \widetilde{\kappa}_i(S^{(k)}; W, \mu
     \centering
     \begin{tikzpicture}[
         auto,
-        node distance=0.65cm and 1.2cm,
-        plant/.style={rectangle, draw, fill=blue!10, text width=10em, text centered, rounded corners, minimum height=2.4em},
-        module/.style={rectangle, draw, fill=green!10, rounded corners, text width=8em, text centered, minimum height=2.4em},
+        node distance=1.35cm and 1.9cm,
+        plant/.style={rectangle, draw, fill=blue!10, text width=11em, text centered, rounded corners, minimum height=2.6em, font=\small},
+        module/.style={rectangle, draw, fill=green!10, rounded corners, text width=8.5em, text centered, minimum height=2.6em, font=\small},
         line/.style={draw, -{Latex}},
         signal/.style={draw, -{Latex}, thick},
         feedback/.style={draw, -{Latex}, dashed}
@@ -314,16 +317,16 @@ where $\widetilde{\kappa}_i(S^{(k)}) \equiv \widetilde{\kappa}_i(S^{(k)}; W, \mu
     % Network Plant
     \node [plant, below=of law] (plant) {Network Plant \\ (\textit{Nodes, Links, Low-level Routing Protocol})};
     % Dashed container for the SRA controller
-    \node [draw, rounded corners, fit=(sensing) (law) (actuation), label={[yshift=0.2cm]above:\textbf{SRA Controller}}, inner sep=0.12cm, dashed] (controller_box) {};
+    \node [draw, rounded corners, fit=(sensing) (law) (actuation), label={[yshift=0.15cm,font=\small\bfseries]above:SRA Controller}, inner sep=0.22cm, dashed] (controller_box) {};
     % Connections
-    \path [signal] (actuation.south) -- node [right, pos=0.25, align=center] {Control Signal \\ $C^{(k+1)}$ (Node Costs)} (plant.east);
-    \path [feedback] (plant.west) -| node [left, pos=0.25, align=center] {State Feedback \\ (Topology, Paths)} (sensing.south);
+    \path [signal] (actuation.south) |- ([yshift=0.18cm]plant.east) node [pos=0.28, right, align=left, font=\footnotesize] {Control Signal $C^{(k+1)}$\\(Node Costs)};
+    \path [feedback] (plant.west) -| (sensing.south) node [pos=0.72, left, align=right, font=\footnotesize] {State Feedback\\(Topology, Paths)};
     % Internal Controller Connections
-    \path [line] (sensing.east) -- node [above, align=center] {Stress \\ $\kappa^{(k)}$} (law.west);
-    \path [line] (law.east) -- node [above, align=center] {Pressure \\ $S^{(k+1)}$} (actuation.west);
+    \path [line] (sensing.east) -- node [above, align=center, font=\footnotesize] {Stress\\$\kappa^{(k)}$} (law.west);
+    \path [line] (law.east) -- node [above, align=center, font=\footnotesize] {Pressure\\$S^{(k+1)}$} (actuation.west);
     % System Performance Output
-    \coordinate[right=of plant] (output_coord);
-    \path [signal] (plant.east) -- node [right, pos=0.8, align=center] {System Performance \\ (Throughput, Latency, etc.)} (output_coord);
+    \coordinate[right=2.8cm of plant.east] (output_coord);
+    \path [signal] ([yshift=-0.18cm]plant.east) -- ([yshift=-0.18cm]output_coord) node [midway, below, align=center, font=\footnotesize] {System Performance\\(Throughput, Latency, etc.)};
     \end{tikzpicture}
     \caption{The architecture of the SRA as a closed-loop control system. The SRA controller acts as a supervisory layer that governs the underlying network plant by dynamically adjusting the cost landscape.}
     \label{fig:sra_architecture}
@@ -355,7 +358,7 @@ where $1$ is the base physical cost and $\beta_I > 0$ is the pressure-to-cost ga
 % --- Fig. 3 Code Remains Unchanged ---
 \begin{figure}[!t]
     \centering
-    \includegraphics[width=0.68\columnwidth]{fig3xunhuan.eps}
+    \includegraphics[width=0.86\columnwidth]{fig3xunhuan.eps}
     \caption{The iterative workflow of the SRA control loop, illustrating the four key phases of sensing, decision-making, actuation, and system influence that drive the network toward a state of dispersed structural stress.}
     \label{fig:sra_workflow}
 \end{figure}
@@ -363,7 +366,7 @@ where $1$ is the base physical cost and $\beta_I > 0$ is the pressure-to-cost ga
 The complete procedure is formalized in Algorithm~\ref{alg:sra} (Fig.~\ref{fig:sra_workflow}), which incorporates a minimum dwell time $T_d \ge 1$ to prevent immediate self-perturbation and diverts flows from congested hubs to peripheral detours (Fig.~\ref{fig:sra_mechanism_visualization}).
 
 % --- 这是 Algorithm 1 的完整代码 ---
-\begin{breakablealgorithm}
+\begin{algorithm}[!t]
 \caption{System Relaxation Algorithm (SRA)}
 \label{alg:sra}
 {\footnotesize
@@ -386,12 +389,12 @@ The complete procedure is formalized in Algorithm~\ref{alg:sra} (Fig.~\ref{fig:s
 \RETURN \rev{$C^{(k)}, \mathcal{P}^{(k)}$}
 \end{algorithmic}
 }
-\end{breakablealgorithm}
+\end{algorithm}
 
 % --- 这是 Fig. 4 (原文fig 7) 的代码 ---
 \begin{figure}[!t]
     \centering
-    \includegraphics[width=0.68\columnwidth]{figure_7_microscopic_path_change.eps}
+    \includegraphics[width=0.86\columnwidth]{figure_7_microscopic_path_change.eps}
     \caption{A conceptual visualization of SRA's path reshaping mechanism. The algorithm diverts traffic from the efficient but congested 2-hop path (red dashed) through the central hub to a longer but more stable 4-hop peripheral path (green solid).}
     \label{fig:sra_mechanism_visualization}
 \end{figure}
@@ -677,7 +680,7 @@ Proc. / Queue Cap. & $10$ packets/timestep; Queue buffer $B_{\max} = 50$ packets
 
 \begin{figure}[!t]
     \centering
-    \includegraphics[width=0.76\columnwidth]{ren_fig1_validation.eps}
+    \includegraphics[width=0.90\columnwidth]{ren_fig1_validation.eps}
     \caption{Independently Measured Network Capacity Gain vs. Structural Optimization Ratio. The empirical data clusters tightly around the theoretical $y=x$ prediction, confirming that performance gains are deterministically driven by structural stress dispersion. ($R^2=0.951$, Sample size $N=100$).}
     \label{fig:peak_validation}
 \end{figure}
@@ -690,14 +693,14 @@ Figs.~\ref{fig:lyapunov_dynamics} and~\ref{fig:dwell_cooling} track the piecewis
 
 \begin{figure}[!t]
     \centering
-    \includegraphics[width=0.76\columnwidth]{ren_fig2_lyapunov.pdf}
+    \includegraphics[width=0.90\columnwidth]{ren_fig2_lyapunov.pdf}
     \caption{\rev{Empirical verification of the Dissipation-Injection Law (Theorem~\ref{thm:drop_jump}). (a) Macroscopic convergence of the piecewise Lyapunov energy $V(S^{(k)})$ into the bounded attracting set $\Omega$. (b) Microscopic steady-state trajectory exhibiting exponential intra-partition dissipation (smooth drops) punctuated by bounded path-switching injections (vertical jumps).}}
     \label{fig:lyapunov_dynamics}
 \end{figure}
 
 \begin{figure}[!t]
     \centering
-    \includegraphics[width=0.76\columnwidth]{ren_fig3_dwell_time.pdf}
+    \includegraphics[width=0.90\columnwidth]{ren_fig3_dwell_time.pdf}
     \caption{\rev{Empirical verification of Block-wise Dissipation Dynamics (Proposition~\ref{prop:block_dynamics} and Theorem~\ref{thm:epsilon_tube}). (a) Unregularized switching ($T_d=1$) exhibits persistent high-frequency chattering. (b) Temporal regularization ($T_d=5$) enforces multi-step exponential cooling within each dwell block, substantially suppressing switching frequency and residual energy.}}
     \label{fig:dwell_cooling}
 \end{figure}
@@ -744,21 +747,21 @@ Table~\ref{tab:structural_benefits_stats} reports the macroscopic equilibrium pr
 \begin{figure*}[!t]
     \centering
     \subfloat[BA network: SRA acts as a proactive performance optimizer.\label{fig:perf_ba_stacked}]{%
-    \begin{minipage}{0.72\textwidth}
+    \begin{minipage}{0.88\textwidth}
         \centering
-        \includegraphics[width=\textwidth,height=0.18\textheight,keepaspectratio]{performance_comparison_ba.eps}
+        \includegraphics[width=\textwidth,height=0.22\textheight,keepaspectratio]{performance_comparison_ba.eps}
     \end{minipage}
     }\\[-2pt]
     \subfloat[WS network: SRA maintains stability beyond the congestion knee.\label{fig:perf_ws_stacked}]{%
-    \begin{minipage}{0.72\textwidth}
+    \begin{minipage}{0.88\textwidth}
         \centering
-        \includegraphics[width=\textwidth,height=0.18\textheight,keepaspectratio]{performance_comparison_ws.eps}
+        \includegraphics[width=\textwidth,height=0.22\textheight,keepaspectratio]{performance_comparison_ws.eps}
     \end{minipage}
     }\\[-2pt]
     \subfloat[ER network: SRA trades latency for reliability under structural limits.\label{fig:perf_er_stacked}]{%
-    \begin{minipage}{0.72\textwidth}
+    \begin{minipage}{0.88\textwidth}
         \centering
-        \includegraphics[width=\textwidth,height=0.18\textheight,keepaspectratio]{performance_comparison_er.eps}
+        \includegraphics[width=\textwidth,height=0.22\textheight,keepaspectratio]{performance_comparison_er.eps}
     \end{minipage}
     }
     \caption{Comparative dynamic traffic performance across the topological spectrum. The results confirm SRA's ability to transition its control strategy based on the underlying network structure.}
@@ -777,7 +780,7 @@ As shown in Fig.~\ref{fig:robustness_summary_stats}, SRA sustains a $>60\%$ PDR 
 
 \begin{figure}[!t]
     \centering
-    \includegraphics[width=0.76\columnwidth]{robustness_advantage_summary_stats.eps}
+    \includegraphics[width=0.90\columnwidth]{robustness_advantage_summary_stats.eps}
     \caption{The SRA PDR advantage over Dijkstra under a targeted hub-removal attack. The results validate SRA's capacity to provide topological hardening in vulnerable networks (BA) and adaptive survival in hybrid ones (WS).}
     \label{fig:robustness_summary_stats}
 \end{figure}
@@ -796,13 +799,6 @@ To scientifically isolate the contribution of each architectural component in SR
     \item \textbf{SRA w/o Dwell ($T_d = 1$):} Ablation variant with leaky integrator ($\alpha=0.1$) and normalization, but without temporal dwell regularization.
     \item \textbf{Full SRA ($\alpha=0.1, \beta_I=10, T_d=5$):} The complete closed-loop governance mechanism.
 \end{enumerate}
-
-The quantitative results at heavy load ($\rho = 0.9$, 30 independent trials with normal-approximation 95\% confidence intervals $\bar{x} \pm 1.96\,s/\sqrt{30}$) are summarized in Table~\ref{tab:ablation_results} and visualized across the full load spectrum in Fig.~\ref{fig:ablation_baselines}. Three key scientific insights emerge:
-\begin{itemize}
-    \item \textbf{Necessity of the Leaky Integrator ($\alpha=0.1$ vs. $\alpha=1$):} Removing the leaky integrator (\textit{Memoryless Reactive BC}, $\alpha=1, T_d=1$) causes catastrophic route flapping ($\bar{f}_{\text{sw}} = 98.3\%$) and severe peak amplification ($\Delta \kappa_{\max} = -31.04\%$), degrading BA throughput to $53.39 \pm 5.88$ pkts/step (even worse than static Dijkstra at $68.88 \pm 5.57$ pkts/step). Adding the leaky integrator alone (\textit{SRA w/o Dwell}, $\alpha=0.1, T_d=1$) restores throughput to $90.08 \pm 0.38$ pkts/step (+68.7\% over $\alpha=1$), while \textbf{Full SRA} ($\alpha=0.1, T_d=5$) achieves $89.76 \pm 0.76$ pkts/step (+68.1\% over $\alpha=1$) and reduces P95 latency from $12.27$ to $5.50$ steps.
-    \item \textbf{Role of Minimum Dwell Time ($T_d=5$ vs. $T_d=1$ and IGP Weight Tuning):} While \textit{IGP Weight Tuning} and \textit{SRA w/o Dwell ($T_d=1$)} achieve high throughput under stationary load, both suffer from continuous control-plane route oscillation ($\bar{f}_{\text{sw}} = 98.3\%$, switching paths at almost every control epoch). Incorporating $T_d=5$ in \textbf{Full SRA} slashes the control-plane route switching frequency by \textbf{79.7\%} (down to $\bar{f}_{\text{sw}} = 20.0\% = 1/T_d$) while preserving $99.65\%$ packet delivery and $69.20\%$ peak stress reduction.
-    \item \textbf{Role of Max-Normalization across Topologies:} While \textit{Unnormalized SRA} (scaling by a fixed $1/N^2$) achieves $71.99\%$ peak reduction on $N=100$ BA networks where initial $\kappa_{\max} \approx 2657$ happens to be on the order of $0.27 N^2$, its effective loop gain $\beta_I \kappa_{\max}/N^2$ varies by orders of magnitude as network size $N$ or topological density changes, whereas max-normalization guarantees a scale-invariant state space $X=[0,1]^N$ across all network sizes and topologies (Lemma~\ref{lemma:invariance}).
-\end{itemize}}
 
 \begin{table*}[t!]
 \centering
@@ -826,9 +822,16 @@ SRA w/o Dwell ($T_d=1$) & $90.08 \pm 0.38$ & $[89.94, 90.22]$ & $100.00 \pm 0.06
 \end{tabular*}
 \end{table*}
 
+The quantitative results at heavy load ($\rho = 0.9$, 30 independent trials with normal-approximation 95\% confidence intervals $\bar{x} \pm 1.96\,s/\sqrt{30}$) are summarized in Table~\ref{tab:ablation_results} and visualized across the full load spectrum in Fig.~\ref{fig:ablation_baselines}. Three key scientific insights emerge:
+\begin{itemize}
+    \item \textbf{Necessity of the Leaky Integrator ($\alpha=0.1$ vs. $\alpha=1$):} Removing the leaky integrator (\textit{Memoryless Reactive BC}, $\alpha=1, T_d=1$) causes catastrophic route flapping ($\bar{f}_{\text{sw}} = 98.3\%$) and severe peak amplification ($\Delta \kappa_{\max} = -31.04\%$), degrading BA throughput to $53.39 \pm 5.88$ pkts/step (even worse than static Dijkstra at $68.88 \pm 5.57$ pkts/step). Adding the leaky integrator alone (\textit{SRA w/o Dwell}, $\alpha=0.1, T_d=1$) restores throughput to $90.08 \pm 0.38$ pkts/step (+68.7\% over $\alpha=1$), while \textbf{Full SRA} ($\alpha=0.1, T_d=5$) achieves $89.76 \pm 0.76$ pkts/step (+68.1\% over $\alpha=1$) and reduces P95 latency from $12.27$ to $5.50$ steps.
+    \item \textbf{Role of Minimum Dwell Time ($T_d=5$ vs. $T_d=1$ and IGP Weight Tuning):} While \textit{IGP Weight Tuning} and \textit{SRA w/o Dwell ($T_d=1$)} achieve high throughput under stationary load, both suffer from continuous control-plane route oscillation ($\bar{f}_{\text{sw}} = 98.3\%$, switching paths at almost every control epoch). Incorporating $T_d=5$ in \textbf{Full SRA} slashes the control-plane route switching frequency by \textbf{79.7\%} (down to $\bar{f}_{\text{sw}} = 20.0\% = 1/T_d$) while preserving $99.65\%$ packet delivery and $69.20\%$ peak stress reduction.
+    \item \textbf{Role of Max-Normalization across Topologies:} While \textit{Unnormalized SRA} (scaling by a fixed $1/N^2$) achieves $71.99\%$ peak reduction on $N=100$ BA networks where initial $\kappa_{\max} \approx 2657$ happens to be on the order of $0.27 N^2$, its effective loop gain $\beta_I \kappa_{\max}/N^2$ varies by orders of magnitude as network size $N$ or topological density changes, whereas max-normalization guarantees a scale-invariant state space $X=[0,1]^N$ across all network sizes and topologies (Lemma~\ref{lemma:invariance}).
+\end{itemize}}
+
 \begin{figure*}[!t]
     \centering
-    \includegraphics[width=0.80\textwidth]{fig_revision_ablation_baselines.pdf}
+    \includegraphics[width=0.92\textwidth]{fig_revision_ablation_baselines.pdf}
     \caption{\rev{Component ablation and stronger baseline comparison across 30 trials (shaded bands and error bars denote 95\% confidence intervals). (a) Throughput vs. offered load on BA networks ($N=100$). (b) Packet loss rate and control-plane route switching frequency at $\rho=0.9$, demonstrating that Full SRA ($T_d=5$) eliminates the $98.3\%$ route flapping of memoryless ($\alpha=1$), $T_d=1$, and IGP Weight Tuning baselines. (c) Cross-topology throughput comparison at $\rho=0.9$ across BA, WS, and ER networks.}}
     \label{fig:ablation_baselines}
 \end{figure*}
@@ -845,7 +848,7 @@ To address realistic operational environments where traffic is non-uniform, node
 
 \begin{figure*}[!t]
     \centering
-    \includegraphics[width=0.80\textwidth]{fig_revision_hetero_timevarying_noise.pdf}
+    \includegraphics[width=0.95\textwidth]{fig_revision_hetero_timevarying_noise.pdf}
     \caption{\rev{Robustness under non-uniform traffic, heterogeneous capacities, time-varying surges, and sensing noise (30 trials, 95\% CI). (a) Skewed Pareto gravity traffic $W_{st}$ and heterogeneous node capacities $\mu_i$: Generalized Weighted SRA ($\widetilde{\kappa}_i$) and Topology-Only SRA ($\kappa_i$) substantially reduce peak stress and boost PDR by $>13.7\%$ over Dijkstra. (b) Real-time throughput response under a $2\times$ mid-run traffic surge ($t \in [500, 1100)$). (c) Sensitivity to multiplicative sensing noise $\sigma \in [0\%, 20\%]$, demonstrating the low-pass filtering advantage of SRA's leaky integrator.}}
     \label{fig:hetero_timevarying_noise}
 \end{figure*}
@@ -858,6 +861,13 @@ Finally, we justify the selection of the controller hyperparameters $(\alpha, \b
 \paragraph{1) Joint $(\alpha, \beta_I)$ and Dwell-Time $T_d$ Sensitivity}
 Fig.~\ref{fig:sensitivity_3d} displays the 3D response surfaces of Peak Centrality Reduction, Average Path Length Increase, and Convergence Iterations across the parameter space $\alpha \in [0.05, 0.50] \times \beta_I \in [2.0, 20.0]$. From a control-theoretic standpoint, $\alpha$ sets the discrete relaxation time constant $\tau_{\text{relax}} = -1/\ln(1-\alpha) \approx 1/\alpha$ epochs, while $\beta_I$ scales the maximum node-cost penalty $1+\beta_I$ relative to the network's shortest-path hop diameter. The surfaces exhibit a broad, flat plateau of near-optimal structural relaxation (>80\% peak reduction with <6\% path stretch) across $\alpha \in [0.08, 0.25]$ and $\beta_I \in [8.0, 20.0]$, confirming that SRA does not require fragile hyperparameter tuning. Furthermore, Fig.~\ref{fig:dwell_scalability}(a) quantifies the empirical effect of $T_d \in \{1, 2, 3, 5, 8, 10\}$: increasing $T_d$ from $1$ to $5$ reduces the route-switching frequency from $98.3\%$ to $20.0\%$ while maintaining $99.07\%$--$99.99\%$ PDR across $T_d \in [1, 8]$; only when $T_d \ge 10$ does the controller become overly sluggish during initial transient adaptation (PDR $86.46\%$). Thus, $\alpha=0.1, \beta_I=10, T_d=5$ represents a principled operating point balancing damping, responsiveness, and routing stability.
 
+\begin{figure*}[!t]
+    \centering
+    \includegraphics[width=0.92\textwidth]{sensitivity_3d_surfaces_full.pdf}
+    \caption{\rev{Three-dimensional hyperparameter sensitivity surfaces across learning rate $\alpha$ and pressure-cost gain $\beta_I$ on BA networks ($N=100$), showing (left) Peak Centrality Reduction (\%), (center) Average Path Length Increase (\%), and (right) Convergence Iterations. The wide, flat performance plateau around $(\alpha=0.1, \beta_I=10)$ demonstrates high parameter robustness without overfitting.}}
+    \label{fig:sensitivity_3d}
+\end{figure*}
+
 \paragraph{2) Computational Scalability and Real-World Carrier/AS Topologies}
 Table~\ref{tab:scalability_table} and Fig.~\ref{fig:dwell_scalability}(b) report the per-evaluation wall-clock execution time of Brandes' centrality step (benchmarked on an Intel Xeon Gold 6248R 3.0~GHz processor) and throughput gains from $N=50$ up to $N=500$ nodes, alongside three realistic carrier and autonomous-system backbones: \textbf{Internet AS} ($N=60, E=85$), \textbf{Deltacom} ($N=113, E=254$), and \textbf{UsCarrier} ($N=158, E=536$). Three findings stand out:
 \begin{itemize}
@@ -868,14 +878,7 @@ Table~\ref{tab:scalability_table} and Fig.~\ref{fig:dwell_scalability}(b) report
 
 \begin{figure*}[!t]
     \centering
-    \includegraphics[width=0.80\textwidth]{sensitivity_3d_surfaces_full.pdf}
-    \caption{\rev{Three-dimensional hyperparameter sensitivity surfaces across learning rate $\alpha$ and pressure-cost gain $\beta_I$ on BA networks ($N=100$), showing (left) Peak Centrality Reduction (\%), (center) Average Path Length Increase (\%), and (right) Convergence Iterations. The wide, flat performance plateau around $(\alpha=0.1, \beta_I=10)$ demonstrates high parameter robustness without overfitting.}}
-    \label{fig:sensitivity_3d}
-\end{figure*}
-
-\begin{figure*}[!t]
-    \centering
-    \includegraphics[width=0.80\textwidth]{fig_revision_dwell_scalability.pdf}
+    \includegraphics[width=0.92\textwidth]{fig_revision_dwell_scalability.pdf}
     \caption{\rev{Dwell-time sensitivity and network scalability analysis (30 trials, 95\% CI). (a) Minimum dwell time $T_d \in \{1..10\}$ trade-off between packet delivery ratio and route-switching frequency $\bar{f}_{\text{sw}}$. (b) Per-evaluation computation time (ms) vs. network size $N \in [50, 500]$ across BA and WS networks, closely matching the theoretical $O(N(E+N\log N))$ curve.}}
     \label{fig:dwell_scalability}
 \end{figure*}

@@ -89,18 +89,18 @@ This is not merely a transient congestion issue but a structural vulnerability: 
 \begin{figure}[t!]
     \centering
     % ---- (a) Before SRA ----
-    \begin{subfigure}[b]{0.47\columnwidth}
+    \begin{subfigure}[b]{0.48\columnwidth}
         \centering
-        \begin{tikzpicture}[scale=0.85]
-            \tikzstyle{node}=[circle, draw, thick, minimum size=6mm]
-            \tikzstyle{hub}=[node, fill=red!80, minimum size=10mm]
+        \begin{tikzpicture}[scale=0.65, transform shape]
+            \tikzstyle{node}=[circle, draw, thick, minimum size=5.5mm]
+            \tikzstyle{hub}=[node, fill=red!80, minimum size=9mm]
             \tikzstyle{flow}=[-Latex, gray, thick, shorten <=1mm, shorten >=1mm]
             % Nodes
             \node[hub] (H) at (0,0) {};
-            \node[node] (N1) at (2,1) {};
-            \node[node] (N2) at (2,-1) {};
-            \node[node] (N3) at (-2,1.5) {};
-            \node[node] (N4) at (-2,-1.5) {};
+            \node[node] (N1) at (2,1.1) {};
+            \node[node] (N2) at (2,-1.1) {};
+            \node[node] (N3) at (-2,1.4) {};
+            \node[node] (N4) at (-2,-1.4) {};
             \node[node] (P1) at (0, 2.2) {};
             \node[node] (P2) at (0, -2.2) {};
             % Edges
@@ -112,26 +112,26 @@ This is not merely a transient congestion issue but a structural vulnerability: 
             \draw[flow, line width=1.2pt] (N4) to [bend right=10] (H);
             \draw[flow, line width=1.2pt] (H) to [bend left=10] (N1);
             \draw[flow, line width=1.2pt] (H) to [bend right=10] (N2);
-            \node[below=0.1cm of H, text=red!80!black, font=\bfseries] {Stress Singularity};
+            \node[below=0.22cm of H, fill=white, inner sep=1pt, text=red!80!black, font=\small\bfseries] {Stress Singularity};
         \end{tikzpicture}
-        \caption{Conventional Paradigm: Stress Concentration}
+        \caption{Conventional Paradigm}
         \label{fig:intro_before}
     \end{subfigure}
     \hfill
     % ---- (b) After SRA ----
-    \begin{subfigure}[b]{0.47\columnwidth}
+    \begin{subfigure}[b]{0.48\columnwidth}
         \centering
-        \begin{tikzpicture}[scale=0.85]
-            \tikzstyle{node}=[circle, draw, thick, minimum size=6mm]
-            \tikzstyle{hub}=[node, fill=yellow!80, minimum size=8mm]
+        \begin{tikzpicture}[scale=0.65, transform shape]
+            \tikzstyle{node}=[circle, draw, thick, minimum size=5.5mm]
+            \tikzstyle{hub}=[node, fill=yellow!80, minimum size=7.5mm]
             \tikzstyle{periph}=[node, fill=green!20]
             \tikzstyle{flow}=[-Latex, green!50!black, thick, shorten <=1mm, shorten >=1mm]
             % Nodes
             \node[hub] (H) at (0,0) {};
-            \node[periph] (N1) at (2,1) {};
-            \node[node] (N2) at (2,-1) {};
-            \node[periph] (N3) at (-2,1.5) {};
-            \node[node] (N4) at (-2,-1.5) {};
+            \node[periph] (N1) at (2,1.1) {};
+            \node[node] (N2) at (2,-1.1) {};
+            \node[periph] (N3) at (-2,1.4) {};
+            \node[node] (N4) at (-2,-1.4) {};
             \node[periph] (P1) at (0, 2.2) {};
             \node[node] (P2) at (0, -2.2) {};
             % Edges
@@ -142,14 +142,13 @@ This is not merely a transient congestion issue but a structural vulnerability: 
             \draw[flow, line width=1.2pt] (N3) to [bend left=40] (P1);
             \draw[flow, line width=1.2pt] (P1) to [bend left=40] (N1);
             \draw[flow, line width=1.2pt] (N1) to [bend right=40] (N2);
-            \node[below=0.1cm of H, text=green!60!black, font=\bfseries] {Stress Dispersed};
+            \node[below=0.22cm of H, fill=white, inner sep=1pt, text=green!60!black, font=\small\bfseries] {Stress Dispersed};
         \end{tikzpicture}
-        \caption{SRA Control Paradigm: System Relaxation}
+        \caption{SRA Control Paradigm}
         \label{fig:intro_after}
     \end{subfigure}
     
     \caption{Conceptual illustration of the core problem and the proposed SRA paradigm. SRA mitigates the ``stress concentration'' inherent in conventional network control by guiding the system to a ``relaxed'' state of balanced load.}
-    \vspace{-4mm}
     \label{fig:intro_scenario}
 \end{figure}
 
@@ -310,9 +309,9 @@ where $\bar{f}_{\text{sw}} := \limsup_{K\to\infty}\frac{1}{K}\sum_{k=0}^{K-1}\ma
     \centering
     \begin{tikzpicture}[
         auto,
-        node distance=1.5cm and 2.5cm,
-        plant/.style={rectangle, draw, fill=blue!10, text width=10em, text centered, rounded corners, minimum height=5em},
-        module/.style={rectangle, draw, fill=green!10, rounded corners, text width=8em, text centered, minimum height=4em},
+        node distance=1.3cm and 2.2cm,
+        plant/.style={rectangle, draw, fill=blue!10, text width=11em, text centered, rounded corners, minimum height=4.2em},
+        module/.style={rectangle, draw, fill=green!10, rounded corners, text width=8.5em, text centered, minimum height=3.8em},
         line/.style={draw, -{Latex}},
         signal/.style={draw, -{Latex}, thick},
         feedback/.style={draw, -{Latex}, dashed}
@@ -322,18 +321,18 @@ where $\bar{f}_{\text{sw}} := \limsup_{K\to\infty}\frac{1}{K}\sum_{k=0}^{K-1}\ma
     \node [module, right=of sensing] (law) {Control Law \\ (\textit{Leaky Integrator})};
     \node [module, right=of law] (actuation) {Actuation Signal Generator};
     % Network Plant
-    \node [plant, below=of law] (plant) {Network Plant \\ (\textit{Nodes, Links, Low-level Routing Protocol})};
+    \node [plant, below=1.4cm of law] (plant) {Network Plant \\ (\textit{Nodes, Links, Low-level Routing Protocol})};
     % Dashed container for the SRA controller
-    \node [draw, rounded corners, fit=(sensing) (law) (actuation), label={[yshift=0.2cm]above:\textbf{SRA Controller}}, inner sep=0.6cm, dashed] (controller_box) {};
+    \node [draw, rounded corners, fit=(sensing) (law) (actuation), label={[yshift=0.1cm]above:\textbf{SRA Controller}}, inner sep=0.45cm, dashed] (controller_box) {};
     % Connections
-    \path [signal] (actuation.south) -- node [right, pos=0.25, align=center] {Control Signal \\ $C^{(k+1)}$ (Node Costs)} (plant.east);
-    \path [feedback] (plant.west) -| node [left, pos=0.25, align=center] {State Feedback \\ (Topology, Paths)} (sensing.south);
+    \path [signal] (actuation.south) |- node [right, pos=0.25, align=left] {Control Signal $C^{(k+1)}$ \\ (Node Costs)} ([yshift=0.18cm]plant.east);
+    \path [feedback] (plant.west) -| node [left, pos=0.75, align=right] {State Feedback \\ (Topology, Paths)} (sensing.south);
     % Internal Controller Connections
     \path [line] (sensing.east) -- node [above, align=center] {Stress \\ $\kappa^{(k)}$} (law.west);
     \path [line] (law.east) -- node [above, align=center] {Pressure \\ $S^{(k+1)}$} (actuation.west);
     % System Performance Output
-    \coordinate[right=of plant] (output_coord);
-    \path [signal] (plant.east) -- node [right, pos=0.8, align=center] {System Performance \\ (Throughput, Latency, etc.)} (output_coord);
+    \coordinate[right=2.8cm of plant] (output_coord);
+    \path [signal] ([yshift=-0.18cm]plant.east) -- node [below, pos=0.55, align=center] {System Performance \\ (Throughput, Latency)} ([yshift=-0.18cm]output_coord);
     \end{tikzpicture}
     \caption{The architecture of the SRA as a closed-loop control system. The SRA controller acts as a supervisory layer that governs the underlying network plant by dynamically adjusting the cost landscape.}
     \label{fig:sra_architecture}
