@@ -242,8 +242,9 @@ def run_control_plane_relaxation(
         max_s = max(sensed.values()) or 1.0
 
         if variant == "Unnormalized_SRA":
-            # Use fixed initial scale rather than adaptive max-normalization
-            q = {u: sensed[u] / ref_scale for u in nodes}
+            # Feed raw kappa^{(k)} / N^2 directly without dynamic max-normalization norm(.)
+            n_sq = max(float(len(nodes) ** 2), 1.0)
+            q = {u: sensed[u] / n_sq for u in nodes}
         else:
             q = {u: sensed[u] / max_s for u in nodes}
 
@@ -883,16 +884,16 @@ def main() -> None:
     df_exp2.to_csv(out_dir / "exp2_hetero_noise.csv", index=False)
     print(f"[Campaign] Exp-2 (hetero/noise) finished ({len(df_exp2)} rows).")
 
-    # Time-varying step shock trace (averaged over 10 seeds)
+    # Time-varying step shock trace (averaged over args.num_seeds seeds)
     tv_accum: Dict[str, List[List[Tuple[int, float, float]]]] = {"Full_SRA": [], "Reactive_BC": [], "Dijkstra": []}
-    for s in range(10):
+    for s in range(args.num_seeds):
         g_tv = nx.barabasi_albert_graph(100, m=4, seed=500 + s)
         cp_sra = run_control_plane_relaxation(g_tv.copy(), variant="Full_SRA", alpha=0.1, beta_I=10.0, dwell_time=5, max_iters=40, seed=500 + s)
         cp_dijk = run_control_plane_relaxation(g_tv.copy(), variant="Dijkstra", max_iters=1, seed=500 + s)
         sched = {0: 0.60, 300: 1.10, 600: 0.70}
         res_sra = run_packet_simulation(
             g_tv.copy(), cp_sra["routing_tables"], load_per_node=0.60, total_steps=850, warmup_steps=100,
-            sra_online_params={"mode": "SRA", "alpha": 0.15, "beta_I": 10.0}, load_schedule=sched, seed=600 + s
+            sra_online_params={"mode": "SRA", "alpha": 0.10, "beta_I": 10.0}, load_schedule=sched, seed=600 + s
         )
         res_reac = run_packet_simulation(
             g_tv.copy(), cp_dijk["routing_tables"], load_per_node=0.60, total_steps=850, warmup_steps=100,
@@ -937,16 +938,16 @@ def main() -> None:
     df_exp3.to_csv(out_dir / "exp3_dwell_sensitivity.csv", index=False)
     print(f"[Campaign] Exp-3 finished ({len(df_exp3)} rows).")
 
-    # 4. Exp-4 Tasks (Scalability & Real-World Topologies)
+    # 4. Exp-4 Tasks (Scalability & Real-World Topologies, 30 seeds)
     exp4_tasks = [
         (topo, n_sz, 400 + s)
         for topo in ["BA", "WS"]
         for n_sz in [50, 100, 200, 300, 500]
-        for s in range(10)
+        for s in range(args.num_seeds)
     ] + [
         (rw_topo, 0, 450 + s)
         for rw_topo in ["NSFNET", "GEANT"]
-        for s in range(20)
+        for s in range(args.num_seeds)
     ]
     exp4_rows: List[Dict[str, Any]] = []
     with ProcessPoolExecutor(max_workers=args.max_workers) as ex:
