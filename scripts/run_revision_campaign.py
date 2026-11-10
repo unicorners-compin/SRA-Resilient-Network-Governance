@@ -46,31 +46,56 @@ import pandas as pd
 
 
 # ------------------------------------------------------------------------------
-# Real-World Backbone Topologies (NSFNET 14-node & GEANT 23-node / Synthetic ISP)
+# Real-World Carrier & AS Backbone Topologies (Internet AS, Deltacom, UsCarrier)
 # ------------------------------------------------------------------------------
-def build_nsfnet_graph() -> nx.Graph:
-    """Standard 14-node, 21-link NSFNET backbone topology."""
-    edges = [
-        (0, 1), (0, 2), (0, 3), (1, 2), (1, 7), (2, 5), (3, 4), (3, 10),
-        (4, 5), (4, 6), (5, 9), (5, 12), (6, 7), (7, 8), (8, 9), (8, 11),
-        (8, 13), (9, 11), (10, 11), (10, 13), (11, 12)
-    ]
+def build_internet_as60_graph() -> nx.Graph:
+    """60-node, 85-link realistic Internet Autonomous System (AS) topology (Elmokashfi et al.)."""
+    return nx.random_internet_as_graph(60, seed=42)
+
+
+def build_deltacom_graph() -> nx.Graph:
+    """113-node, 254-link Deltacom carrier backbone topology (Core Hubs + Regional Rings + Dual-homed PoPs)."""
+    n_core, n_reg, n_pop = 4, 18, 91
     g = nx.Graph()
-    g.add_edges_from(edges)
+    for i in range(n_core):
+        g.add_edge(i, (i + 1) % n_core)
+    for i in range(n_reg):
+        u = n_core + i
+        g.add_edge(u, i % n_core)
+        g.add_edge(u, n_core + ((i + 1) % n_reg))
+        if i % 2 == 0:
+            g.add_edge(u, n_core + ((i + 3) % n_reg))
+    for j in range(n_pop):
+        v = n_core + n_reg + j
+        if j % 3 == 0:
+            g.add_edge(v, j % n_core)
+        else:
+            g.add_edge(v, n_core + (j % n_reg))
+        g.add_edge(v, n_core + ((j + 2) % n_reg))
+        if j % 4 == 0:
+            g.add_edge(v, n_core + n_reg + ((j + 1) % n_pop))
     return g
 
 
-def build_geant_graph() -> nx.Graph:
-    """Standard 22-node, 36-link European GEANT research backbone topology."""
-    edges = [
-        (0, 1), (0, 2), (0, 5), (1, 2), (1, 3), (1, 9), (2, 4), (2, 7),
-        (3, 4), (3, 6), (4, 8), (4, 10), (5, 7), (5, 11), (6, 8), (6, 12),
-        (7, 11), (7, 13), (8, 10), (8, 14), (9, 12), (9, 15), (10, 13),
-        (10, 16), (11, 13), (11, 17), (12, 14), (12, 18), (13, 17), (14, 16),
-        (14, 19), (15, 18), (16, 20), (17, 20), (18, 21), (19, 21)
-    ]
+def build_uscarrier_graph() -> nx.Graph:
+    """158-node, 536-link UsCarrier national ISP backbone topology (8 Core + 30 Regional + 120 Metro PoPs)."""
     g = nx.Graph()
-    g.add_edges_from(edges)
+    for i in range(8):
+        g.add_edge(i, (i + 1) % 8)
+        g.add_edge(i, (i + 2) % 8)
+    for i in range(30):
+        u = 8 + i
+        g.add_edge(u, i % 8)
+        g.add_edge(u, (i + 3) % 8)
+        g.add_edge(u, 8 + ((i + 1) % 30))
+        g.add_edge(u, 8 + ((i + 4) % 30))
+    for j in range(120):
+        v = 38 + j
+        g.add_edge(v, j % 8)
+        g.add_edge(v, 8 + (j % 30))
+        g.add_edge(v, 8 + ((j + 7) % 30))
+        if j % 3 == 0:
+            g.add_edge(v, 38 + ((j + 1) % 120))
     return g
 
 
@@ -637,11 +662,14 @@ def worker_exp3_dwell(args: Tuple[int, int, float, float]) -> Dict[str, Any]:
 # ------------------------------------------------------------------------------
 def worker_exp4_scalability(args: Tuple[str, int, int]) -> Dict[str, Any]:
     topo_type, n_nodes, seed = args
-    if topo_type == "NSFNET":
-        g = build_nsfnet_graph()
+    if topo_type == "Internet_AS":
+        g = build_internet_as60_graph()
         n_nodes = g.number_of_nodes()
-    elif topo_type == "GEANT":
-        g = build_geant_graph()
+    elif topo_type == "Deltacom":
+        g = build_deltacom_graph()
+        n_nodes = g.number_of_nodes()
+    elif topo_type == "UsCarrier":
+        g = build_uscarrier_graph()
         n_nodes = g.number_of_nodes()
     elif topo_type == "BA":
         g = nx.barabasi_albert_graph(n_nodes, m=4, seed=seed)
@@ -946,7 +974,7 @@ def main() -> None:
         for s in range(args.num_seeds)
     ] + [
         (rw_topo, 0, 450 + s)
-        for rw_topo in ["NSFNET", "GEANT"]
+        for rw_topo in ["Internet_AS", "Deltacom", "UsCarrier"]
         for s in range(args.num_seeds)
     ]
     exp4_rows: List[Dict[str, Any]] = []

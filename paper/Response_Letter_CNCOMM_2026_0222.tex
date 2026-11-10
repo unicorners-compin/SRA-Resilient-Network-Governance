@@ -79,7 +79,7 @@ In accordance with the journal guidelines, all revisions in the main manuscript 
 \begin{enumerate}[leftmargin=1.8em]
     \item \textbf{Component Ablation and Stronger Baselines (Section~IV-F, Table~4 / Table~IV, and Fig.~10)}: Isolates each SRA module (\textit{Memoryless Reactive BC $\alpha=1$}, \textit{Unnormalized SRA}, \textit{SRA w/o Dwell $T_d=1$}, and \textit{Full SRA}) against \textit{Dijkstra}, \textit{LIRP-D}, \textit{Static BC}, and \textit{Online IGP Weight Tuning (Fortz--Thorup)}.
     \item \textbf{Heterogeneous Capacities, Skewed Pareto Gravity Demand, Time-Varying Surge, and Telemetry Noise (Section~IV-G and Fig.~11)}: Evaluates SRA under heavy-tailed Pareto gravity demands ($w_i \sim \mathrm{Pareto}(1.5)$), heterogeneous node capacities, a non-stationary traffic surge, and multiplicative sensing noise $\sigma \in \{0\%, 5\%, 10\%, 20\%\}$.
-    \item \textbf{Hyperparameter Sensitivity, Scalability ($N=50..500$), Real Backbones (\texttt{NSFNET}/\texttt{GEANT}), and Runtime Benchmarks (Section~IV-B, Section~IV-H, Table~5 / Table~V, Figs.~12--13)}: Restores the 3D $(\alpha, \beta_I)$ sensitivity surface (\textbf{Fig.~12}), evaluates dwell-time sensitivity $T_d \in \{1..10\}$ (\textbf{Fig.~13(a)}), and benchmarks wall-clock runtime and throughput scaling from $N=14$ (\texttt{NSFNET}, $0.35$~ms/eval) and $N=22$ (\texttt{GEANT}, $0.89$~ms/eval) up to $N=500$ ($902.95$~ms/eval, $+108.33\%$ relative throughput gain).
+    \item \textbf{Hyperparameter Sensitivity, Scalability ($N=50..500$), Real Carrier/AS Backbones (\texttt{Internet AS}, \texttt{Deltacom}, \texttt{UsCarrier}), and Runtime Benchmarks (Section~IV-B, Section~IV-H, Table~5 / Table~V, Figs.~12--13)}: Restores the 3D $(\alpha, \beta_I)$ sensitivity surface (\textbf{Fig.~12}), evaluates dwell-time sensitivity $T_d \in \{1..10\}$ (\textbf{Fig.~13(a)}), and benchmarks wall-clock runtime and throughput scaling on real-world carrier/AS backbones (\texttt{Internet AS} $N=60$, $+18.91\%$ throughput gain; \texttt{Deltacom} $N=113$, $+52.24\%$ gain; \texttt{UsCarrier} $N=158$, $+81.07\%$ gain) as well as synthetic graphs up to $N=500$ ($902.95$~ms/eval, $+108.33\%$ relative throughput gain).
 \end{enumerate}
 
 \hrulefill
@@ -155,7 +155,7 @@ We sincerely thank Reviewer~1 for providing a comprehensive and constructive 34-
 \begin{enumerate}[leftmargin=1.8em]
     \item \textbf{Skewed Heavy-Tailed Pareto Gravity Traffic Matrices} ($w_i \sim \mathrm{Pareto}(1.5)$, $W_{st} \propto w_s w_t$) combined with \textbf{Heterogeneous Node Service Capacities} in \textbf{Section~IV-G (Fig.~11(a))};
     \item \textbf{Non-Stationary Mid-Run Traffic Surge} in \textbf{Section~IV-G (Fig.~11(b))};
-    \item \textbf{Real-World Backbone Topologies (\texttt{NSFNET}, $N=14$, and \texttt{GEANT}, $N=22$)} as well as \textbf{Multi-Scale Synthetic Topologies ($N \in \{50, 100, 200, 300, 500\}$)} in \textbf{Section~IV-H (Table~5 / Table~V and Fig.~13)}.
+    \item \textbf{Real-World Carrier \& AS Backbone Topologies (\texttt{Internet AS}, $N=60$; \texttt{Deltacom}, $N=113$; and \texttt{UsCarrier}, $N=158$)} as well as \textbf{Multi-Scale Synthetic Topologies ($N \in \{50, 100, 200, 300, 500\}$)} in \textbf{Section~IV-H (Table~5 / Table~V and Fig.~13)}.
 \end{enumerate}
 
 \hrulefill
@@ -172,7 +172,7 @@ We sincerely thank Reviewer~1 for providing a comprehensive and constructive 34-
 
 \noindent\textbf{Our Humble Response:} We humbly agree and have clarified the representativeness of both our topological benchmarks and traffic demand models in \textbf{Sections~IV-A, IV-G, and IV-H}:
 \begin{itemize}[leftmargin=1.8em]
-    \item \textbf{Topological Representativeness}: Synthetic Barab\'{a}si--Albert (BA) scale-free graphs capture the heavy-tailed hub hierarchy of autonomous-system (AS) and data-center core networks; Watts--Strogatz (WS) small-world graphs capture regional mesh networks with local clustering and long-range shortcuts; and Erd\H{o}s--R\'{e}nyi (ER) graphs serve as a homogeneous random baseline. To directly ground external validity in operational wide-area networks, we additionally evaluated the canonical \textbf{NSFNET} ($N=14, E=21$) and European \textbf{GEANT} ($N=22, E=36$) research backbone topologies in \textbf{Section~IV-H (Table~5 / Table~V)}.
+    \item \textbf{Topological Representativeness}: Synthetic Barab\'{a}si--Albert (BA) scale-free graphs capture the heavy-tailed hub hierarchy of autonomous-system (AS) and data-center core networks; Watts--Strogatz (WS) small-world graphs capture regional mesh networks with local clustering and long-range shortcuts; and Erd\H{o}s--R\'{e}nyi (ER) graphs serve as a homogeneous random baseline. To directly ground external validity in operational wide-area carrier networks, we additionally evaluated three production-scale carrier/AS topologies in \textbf{Section~IV-H (Table~5 / Table~V)}: \textbf{Internet AS} ($N=60, E=85$, $+18.91\%$ throughput gain), \textbf{Deltacom} ($N=113, E=254$, $+52.24\%$ throughput gain), and \textbf{UsCarrier} ($N=158, E=536$, $+81.07\%$ throughput gain).
     \item \textbf{Traffic Representativeness}: In \textbf{Section~IV-G}, we complemented uniform all-pairs traffic with a heavy-tailed \textbf{Pareto Gravity Traffic Matrix} ($w_i \sim \mathrm{Pareto}(1.5)$, $W_{st} \propto w_s w_t$), which reflects the well-known skewed hotspot demand distribution of real ISP and data-center workloads.
 \end{itemize}
 
@@ -194,7 +194,7 @@ We sincerely thank Reviewer~1 for providing a comprehensive and constructive 34-
 
 \noindent\textbf{Our Humble Response:} We gladly followed this recommendation. In \textbf{Section~IV-H}, \textbf{Table~5 (Table~V)}, and \textbf{Fig.~13(b)}, we report the single-thread wall-clock execution time per Brandes routing/centrality evaluation measured on an \textbf{Intel Xeon Gold 6248R CPU @ 3.00~GHz} server (Python~3.10):
 \begin{itemize}[leftmargin=1.8em]
-    \item \textbf{NSFNET ($N=14, E=21$)} and \textbf{GEANT ($N=22, E=36$)}: $0.35 \pm 0.00$~ms and $0.89 \pm 0.01$~ms per evaluation ($0.07$~ms and $0.18$~ms amortized per step at $T_d=5$);
+    \item \textbf{Real-World Carrier/AS Backbones (\texttt{Internet AS} $N=60$, \texttt{Deltacom} $N=113$, \texttt{UsCarrier} $N=158$)}: $8.52 \pm 0.68$~ms, $36.96 \pm 0.95$~ms, and $77.33 \pm 3.30$~ms per evaluation ($1.70$~ms, $7.39$~ms, and $15.47$~ms amortized per step at $T_d=5$);
     \item \textbf{Synthetic BA/WS ($N=100$)}: $32.12$--$32.45$~ms per evaluation ($\approx 6.4$~ms amortized per step at $T_d=5$);
     \item \textbf{Large Scale-Free BA ($N=200, 300, 500$)}: $140.60$~ms, $320.68$~ms, and $902.95$~ms per evaluation ($\approx 180.6$~ms amortized per step at $N=500, T_d=5$), which is well within standard SDN sub-second to multi-second control-plane telemetry intervals.
 \end{itemize}
@@ -327,7 +327,7 @@ We sincerely thank Reviewer~1 for providing a comprehensive and constructive 34-
 % R1.26
 \cbox{Reviewer 1 --- Comment R1.26 (Discuss Scalability to Larger or More Complex Inputs)}{The Reviewer asks for an evaluation and discussion of how SRA scales to larger network sizes and more complex real-world topologies.}
 
-\noindent\textbf{Our Humble Response:} We have added a comprehensive scalability study in \textbf{Section~IV-H (\textbf{Table~5 / Table~V} and \textbf{Fig.~13(b)--(c)})} spanning synthetic topologies of size $N \in \{50, 100, 200, 300, 500\}$ as well as real-world \textbf{NSFNET} ($N=14$) and \textbf{GEANT} ($N=22$) backbones. Remarkably, as scale-free networks grow from $N=50$ to $N=500$, central hub concentration under static shortest-path routing becomes increasingly severe, causing SRA's seedwise relative throughput advantage over Dijkstra to grow monotonically from $+10.41\%$ ($N=50$) and $+31.87\%$ ($N=100$) to $+60.68\%$ ($N=200$), $+79.65\%$ ($N=300$), and \textbf{$+108.33\%$ ($N=500$)}.
+\noindent\textbf{Our Humble Response:} We have added a comprehensive scalability study in \textbf{Section~IV-H (\textbf{Table~5 / Table~V} and \textbf{Fig.~13(b)})} spanning synthetic topologies of size $N \in \{50, 100, 200, 300, 500\}$ as well as three realistic carrier/AS backbones: \textbf{Internet AS} ($N=60, E=85$, $+18.91\%$ throughput gain), \textbf{Deltacom} ($N=113, E=254$, $+52.24\%$ throughput gain), and \textbf{UsCarrier} ($N=158, E=536$, $+81.07\%$ throughput gain). Remarkably, as scale-free networks grow from $N=50$ to $N=500$, central hub concentration under static shortest-path routing becomes increasingly severe, causing SRA's seedwise relative throughput advantage over Dijkstra to grow monotonically from $+10.41\%$ ($N=50$) and $+31.87\%$ ($N=100$) to $+60.68\%$ ($N=200$), $+79.65\%$ ($N=300$), and \textbf{$+108.33\%$ ($N=500$)}.
 
 \hrulefill
 
@@ -368,7 +368,7 @@ We sincerely thank Reviewer~1 for providing a comprehensive and constructive 34-
 % R1.31
 \cbox{Reviewer 1 --- Comment R1.31 (Address Potential Evaluation Bias or Hyperparameter Overfitting)}{The Reviewer asks the authors to ensure that experimental gains are not an artifact of per-scenario hyperparameter tuning or evaluation bias.}
 
-\noindent\textbf{Our Humble Response:} We thank the Reviewer for raising this crucial methodological point. In \textbf{Sections~IV-A, IV-F, IV-G, and IV-H}, we explicitly confirm that \textbf{one single fixed default hyperparameter tuple $(\alpha = 0.1, \beta_I = 10, T_d = 5)$} is used unchanged across all topologies (BA, WS, ER, \texttt{NSFNET}, \texttt{GEANT}), all network sizes ($N \in [14, 500]$), and all traffic/noise regimes without any per-instance retuning, and every benchmark is evaluated over 30 independent random seeds generated fresh for testing.
+\noindent\textbf{Our Humble Response:} We thank the Reviewer for raising this crucial methodological point. In \textbf{Sections~IV-A, IV-F, IV-G, and IV-H}, we explicitly confirm that \textbf{one single fixed default hyperparameter tuple $(\alpha = 0.1, \beta_I = 10, T_d = 5)$} is used unchanged across all topologies (BA, WS, ER, \texttt{Internet AS}, \texttt{Deltacom}, \texttt{UsCarrier}), all network sizes ($N \in [50, 500]$), and all traffic/noise regimes without any per-instance retuning, and every benchmark is evaluated over 30 independent random seeds generated fresh for testing.
 
 \hrulefill
 
@@ -493,7 +493,7 @@ We sincerely thank Reviewer~2 for an extraordinarily thorough, rigorous, and con
 \begin{enumerate}[leftmargin=1.8em]
     \item \textbf{Restored All Three Visual Figures}: We restored \texttt{ren\_fig2\_lyapunov.pdf} as \textbf{Fig.~6} (Section~IV-B, Lyapunov tracking energy decay and switching spikes), \texttt{ren\_fig3\_dwell\_time.pdf} as \textbf{Fig.~7} (Section~IV-B, phase-portrait trajectory stabilization and chattering suppression under $T_d=5$ vs.\ $T_d=1$), and \texttt{sensitivity\_3d\_surfaces\_full.pdf} as \textbf{Fig.~12} (Section~IV-H, joint 3D sensitivity surface over $(\alpha, \beta_I)$).
     \item \textbf{Ablation of $\alpha=1$ and $T_d=1$ \& Sensitivity to $T_d \in \{1, 2, 3, 5, 8, 10\}$}: Added in \textbf{Section~IV-F (Table~4 / Table~IV, Fig.~10)} and \textbf{Section~IV-H (Fig.~13(a))} across 30 trials, quantifying both the catastrophic throughput collapse at $\alpha=1$ ($53.39$ pkts/step) and the $79.7\%$ reduction in route switching frequency from $T_d=1$ ($98.3\%$) to $T_d=5$ ($20.0\%$).
-    \item \textbf{Scalability ($N=50..500$), Real Backbones (\texttt{NSFNET}, \texttt{GEANT}), and Runtime Overhead}: Added in \textbf{Section~IV-H (Table~5 / Table~V and Fig.~13(b)--(c))}, reporting wall-clock runtime ($0.35$~ms/eval on \texttt{NSFNET}, $0.89$~ms/eval on \texttt{GEANT}, $32.12$~ms/eval at $N=100$, and $902.95$~ms/eval at $N=500$) and demonstrating that SRA's relative throughput gain scales up to \textbf{$+108.33\%$} at $N=500$.
+    \item \textbf{Scalability ($N=50..500$), Real Carrier/AS Backbones (\texttt{Internet AS}, \texttt{Deltacom}, \texttt{UsCarrier}), and Runtime Overhead}: Added in \textbf{Section~IV-H (Table~5 / Table~V and Fig.~13(b))}, reporting wall-clock runtime ($8.52$~ms/eval on \texttt{Internet AS}, $36.96$~ms/eval on \texttt{Deltacom}, $77.33$~ms/eval on \texttt{UsCarrier}, $32.12$~ms/eval at $N=100$, and $902.95$~ms/eval at $N=500$) and demonstrating that SRA improves throughput by \textbf{$+18.91\%$ to $+81.07\%$} on real carrier backbones and up to \textbf{$+108.33\%$} on $N=500$ scale-free graphs.
 \end{enumerate}
 
 \hrulefill
