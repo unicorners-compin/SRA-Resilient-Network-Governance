@@ -11,18 +11,21 @@ Official repository for the manuscript:
 ## Repository Structure
 
 - `paper/`
-  - `sra_CC/main_ccjnl.tex`: Revised manuscript formatted in the official *China Communications* (`ccjnl`) template, with all first-round revision changes highlighted in blue (`\rev{...}`).
-  - `main.tex`: Revised manuscript in the IEEE Transactions (`IEEEtran`) format, synchronized with `main_ccjnl.tex` and highlighted in blue (`\rev{...}`).
-  - `Response_Letter_CNCOMM_2026_0222.md` & `Response_Letter_CNCOMM_2026_0222.tex`: Point-to-Point Response Letter addressing all comments from the Associate Editor, Reviewer 1 (34 points), and Reviewer 2 (5 major concerns).
-  - `references.bib` / `sra_CC/references.bib`: Updated BibTeX bibliography.
-  - Figures (`*.pdf`, `*.png`): All vector figures including restored stability/sensitivity plots (`ren_fig2_lyapunov.pdf`, `ren_fig3_dwell_time.pdf`, `sensitivity_3d_surfaces_full.pdf`) and new revision experiment figures (`fig_revision_ablation_baselines.pdf`, `fig_revision_hetero_timevarying_noise.pdf`, `fig_revision_dwell_scalability.pdf`).
+  - `sra_CC/main_ccjnl.tex` & `sra_CC/main_ccjnl.pdf`: Revised manuscript formatted in the official *China Communications* (`ccjnl`) template, with all first-round revision changes highlighted in blue (`\rev{...}`).
+  - `sra_CC/main_ccjnl_clean.tex` & `sra_CC/main_ccjnl_clean.pdf`: Clean (unmarked) *China Communications* manuscript compiled from the synchronized source.
+  - `main.tex` & `main.pdf`: Revised manuscript in the IEEE Transactions (`IEEEtran`) format, synchronized with `main_ccjnl.tex` and highlighted in blue (`\rev{...}`).
+  - `sm.tex` & `sm.pdf`: Standalone Supplementary Material containing complete formal mathematical proofs (Sections S-A through S-J).
+  - `sra_CC/Response_Letter_CNCOMM_2026_0222.tex` & `Response_Letter_CNCOMM_2026_0222.pdf` (`Response_Letter_CNCOMM_2026_0222.md`): Point-to-Point Response Letter addressing all comments from the Associate Editor, Reviewer 1 (34 points), and Reviewer 2 (5 major concerns).
+  - `refs.bib` / `references.bib` / `sra_CC/refs.bib`: Synchronized BibTeX bibliography.
+  - Figures (`*.pdf`, `*.eps`): Vector figures including stability/sensitivity plots (`ren_fig2_lyapunov.pdf`, `ren_fig3_dwell_time.pdf`, `sensitivity_3d_surfaces_full.pdf`) and revision experiment figures (`fig_revision_ablation_baselines.pdf`, `fig_revision_hetero_timevarying_noise.pdf`, `fig_revision_dwell_scalability.pdf`).
+- `data/topologies/`
+  - Official Internet Topology Zoo GML carrier topologies (`Geant2012.gml`, `Deltacom.gml`, `UsCarrier.gml`).
 - `scripts/`
-  - `run_revision_campaign.py`: Multi-seed parallel simulation campaign runner implementing all 4 revision experiment suites (Exp-1: Component Ablation & Stronger Baselines including Fortz–Thorup IGP Weight Tuning and Static Centrality; Exp-2: Skewed Pareto Gravity Demand, Heterogeneous Capacities, Time-Varying Traffic Surge, and Telemetry Noise Injection; Exp-3: Dwell-Time $T_d$ and $(\alpha, \beta_I)$ Sensitivity; Exp-4: Computational Complexity, Runtime Overhead, and Scalability across $N=50..500$ + Real-World `NSFNET` & `GEANT` Backbones).
+  - `run_revision_campaign.py`: Multi-seed parallel simulation campaign runner implementing all 4 revision experiment suites (Exp-1: Component Ablation & Stronger Baselines including Fortz–Thorup IGP Weight Tuning and Static Centrality; Exp-2: Skewed Pareto Gravity Demand, Heterogeneous Capacities, Time-Varying Traffic Surge, and Telemetry Noise Injection; Exp-3: Dwell-Time $T_d$ and $(\alpha, \beta_I)$ Sensitivity; Exp-4: Computational Complexity, Runtime Overhead, and Scalability across $N=50..500$ + Real-World Internet Topology Zoo `Geant2012`, `Deltacom`, and `UsCarrier` backbones).
 - `src/`
-  - Original simulation notebook (`SRA算法.ipynb`).
+  - Discrete-event simulator components (`base_simulator.py`, `dijkstra_final.py`, `lirp_d_final.py`, `qroute_final.py`, `sra_final.py`).
 - `results/cncomm-revision/`
-  - `summary_metrics.json`: Complete 30-seed statistical results (mean, SD, 95% CI).
-  - `manifest.json` & `README.md`: Execution provenance and Tencent Cloud COS archive index (`users/rzy/simulation-results/SRA-Resilient-Network-Governance/cncomm-2026-0222-rev-20261109T113518Z/`).
+  - `summary_metrics.json`, `exp1_ablation_baselines.csv`, `exp2_hetero_noise.csv`, `exp3_dwell_sensitivity.csv`, `exp4_scalability_realworld.csv`, `manifest.json`, and `README.md`: Complete 30-seed statistical results (mean, SD, 95% CI) and SHA256 verification manifest.
 
 ---
 

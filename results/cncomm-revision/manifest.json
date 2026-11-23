@@ -1,23 +1,55 @@
 {
   "project": "SRA-Resilient-Network-Governance",
-  "run_id": "cncomm-2026-0222-rev-20261109T113518Z",
-  "created_at_utc": "2026-11-09T11:48:49Z",
-  "host": "node09",
-  "user": "rzy",
-  "command": "python3 scripts/run_revision_campaign.py --max-workers 20 --seeds 30 --output-dir /home/rzy/research/sra-revision/cncomm-2026-0222-rev-20261109T113518Z",
-  "slots": 20,
-  "git_repo": "unicorners-compin/SRA-Resilient-Network-Governance",
-  "git_branch": "main",
-  "git_commit": "b7563b5ee18bd4a3998916fa361c32741157bf2c",
-  "cos_bucket": "compin-team-docs-1326842184",
-  "cos_region": "ap-chengdu",
-  "cos_prefix": "users/rzy/simulation-results/SRA-Resilient-Network-Governance/cncomm-2026-0222-rev-20261109T113518Z",
+  "manuscript_id": "CNCOMM-2026-0222",
+  "generated_at_utc": "2026-11-23T07:54:45Z",
+  "hardware": "Intel Xeon Gold 6248R CPU @ 3.00GHz",
+  "command": "python3 scripts/run_revision_campaign.py --max-workers 20 --num-seeds 30 --out-dir results/cncomm-revision",
+  "topology_zoo_sources": [
+    "data/topologies/Geant2012.gml",
+    "data/topologies/Deltacom.gml",
+    "data/topologies/UsCarrier.gml"
+  ],
+  "num_seeds": 30,
   "files": [
     {
-      "relative_path": "cncomm-2026-0222-rev-20261109T113518Z.tar.gz",
-      "cos_key": "users/rzy/simulation-results/SRA-Resilient-Network-Governance/cncomm-2026-0222-rev-20261109T113518Z/cncomm-2026-0222-rev-20261109T113518Z.tar.gz",
-      "size_bytes": 115219,
-      "sha256": "8492bb00259101d6a7afecac054bdc9a540488d48b9e5d99603c40bc970411eb"
+      "relative_path": "exp1_ablation_baselines.csv",
+      "size_bytes": 383768,
+      "sha256": "44082c6c6b0ad31f8c262bf9907be8c48c3cf0647cda49b7ad68ca6f86ab7482"
+    },
+    {
+      "relative_path": "exp2_hetero_noise.csv",
+      "size_bytes": 83128,
+      "sha256": "03c7dbd30f1a2f727a858451923c076e27edf243c8b282676cf6f706d30a8c09"
+    },
+    {
+      "relative_path": "exp3_dwell_sensitivity.csv",
+      "size_bytes": 71839,
+      "sha256": "66d2f76cb98d86089bac7e3eed9e958c8d935cda24067614fbf6ad52f9181e95"
+    },
+    {
+      "relative_path": "exp4_scalability_realworld.csv",
+      "size_bytes": 69379,
+      "sha256": "ba18c85d317e960ad48a2a8e1b0aca0ee1ed7b33a2568aaa66660ccfed0c3ed1"
+    },
+    {
+      "relative_path": "summary_metrics.json",
+      "size_bytes": 25168,
+      "sha256": "3ac88d69486d02000b84dad33637bc4216cd94ee48bb6babdf8e63e8059b6502"
+    },
+    {
+      "relative_path": "fig_revision_ablation_baselines.pdf",
+      "size_bytes": 34343,
+      "sha256": "6cedc4db2c032f0a93077d8ee760825d6a4ffd9b508e56e101f1b6fe85cf5475"
+    },
+    {
+      "relative_path": "fig_revision_hetero_timevarying_noise.pdf",
+      "size_bytes": 37513,
+      "sha256": "0d1aad4f4a0c822e35f885eb04bd4e4b903828c170ccd5d4cf743eb74835ba93"
+    },
+    {
+      "relative_path": "fig_revision_dwell_scalability.pdf",
+      "size_bytes": 30584,
+      "sha256": "910981d0cd9449d022b2f9c200a84d19c791ddfe729f9ef0515d404c0c267a58"
     }
   ]
 }
