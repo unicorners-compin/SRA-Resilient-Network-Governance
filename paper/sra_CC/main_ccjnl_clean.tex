@@ -60,12 +60,12 @@
 \titlespacing*{\subsection}{0pt}{8pt plus 2pt minus 1pt}{4pt plus 1pt minus 1pt}
 \titlespacing*{\subsubsection}{0pt}{6pt plus 1pt minus 1pt}{3pt plus 1pt minus 1pt}
 
-\renewcommand{\topfraction}{0.90}
-\renewcommand{\bottomfraction}{0.85}
-\renewcommand{\textfraction}{0.10}
-\renewcommand{\floatpagefraction}{0.80}
-\renewcommand{\dbltopfraction}{0.90}
-\renewcommand{\dblfloatpagefraction}{0.80}
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\bottomfraction}{0.75}
+\renewcommand{\textfraction}{0.15}
+\renewcommand{\floatpagefraction}{0.75}
+\renewcommand{\dbltopfraction}{0.75}
+\renewcommand{\dblfloatpagefraction}{0.75}
 \begin{document}
 \maketitle
 
@@ -167,7 +167,7 @@ We introduce the System Relaxation Algorithm (SRA), a model-driven control syste
 Unlike black-box approaches, SRA operates as an interpretable, white-box dynamical system: it employs a ``leaky integrator'' mechanism \rev{coupled with a minimum dwell-time constraint} to accumulate historical stress into a controllable state variable, thereby guiding the network toward an emergent equilibrium of load balance (as conceptually illustrated in Fig.~\ref{fig:intro_scenario}).
 Crucially, this control paradigm aligns perfectly with Software-Defined Networking (SDN) architectures, leveraging the controller's global view to calculate stress and its centralized authority to enforce the resulting cost policies \cite{hou2020reliable}.
 
-\begin{table*}[t!]
+\begin{table*}[t]
 \centering
 \scriptsize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.12}
 \caption{\rev{Systematic Feature-by-Feature Comparison of Network Routing and Traffic Governance Paradigms}}
@@ -298,7 +298,7 @@ This quantization is non-trivial; it renders the system dynamics \textit{piecewi
 where $\widetilde{\kappa}_i(S^{(k)}) \equiv \widetilde{\kappa}_i(S^{(k)}; W, \mu)$, $\bar{f}_{\text{sw}} := \limsup_{K\to\infty}\frac{1}{K}\sum_{k=0}^{K-1}\mathbb{I}(\mathcal{P}^{(k+1)}\neq\mathcal{P}^{(k)})$ is the asymptotic switching frequency, $\mathcal{P}^{(k)}$ denotes the active shortest-path configuration at step $k$, and $\{\tau_m\}$ are the route-switching epochs separated by at least the minimum dwell time $T_d \ge 1$.}
 
 % --- 这是 Fig. 2 的完整代码 ---
-\begin{figure*}[!t]
+\begin{figure*}[t]
     \centering
     \begin{tikzpicture}[
         auto,
@@ -759,7 +759,7 @@ Table~\ref{tab:structural_benefits_stats} reports the macroscopic equilibrium pr
     \item \textbf{Homogeneous Regime (ER, Fig.~\ref{fig:perf_comparison_stacked}(c)):} Where absence of dominant hubs caps throughput expansion, SRA acts as a \textit{resilience enhancer}, suppressing packet loss from $\sim 7\%$ to $\sim 2\%$ via a modest latency-for-reliability trade-off.
 \end{itemize}
 
-\begin{figure*}[!t]
+\begin{figure*}[t]
     \centering
     \subfloat[BA network: SRA acts as a proactive performance optimizer.\label{fig:perf_ba_stacked}]{%
     \begin{minipage}{0.88\textwidth}
@@ -815,7 +815,7 @@ To scientifically isolate the contribution of each architectural component in SR
     \item \textbf{Full SRA ($\alpha=0.1, \beta_I=10, T_d=5$):} The complete closed-loop governance mechanism.
 \end{enumerate}
 
-\begin{table*}[t!]
+\begin{table*}[t]
 \centering
 \scriptsize\setlength{\tabcolsep}{2.2pt}\renewcommand{\arraystretch}{1.12}
 \caption{\rev{Component Ablation Study and Comparison Against Stronger Baselines on BA Scale-Free Networks ($N=100$, Heavy Load $\rho=0.9$, Mean $\pm$ Std and 95\% CI $[\bar{x} \pm 1.96\,s/\sqrt{30}]$ across 30 Independent Trials).}}
@@ -844,7 +844,7 @@ The quantitative results at heavy load ($\rho = 0.9$, 30 independent trials with
     \item \textbf{Role of Max-Normalization across Topologies:} While \textit{Unnormalized SRA} (scaling by a fixed $1/N^2$) achieves $71.99\%$ peak reduction on $N=100$ BA networks where initial $\kappa_{\max} \approx 2657$ happens to be on the order of $0.27 N^2$, its effective loop gain $\beta_I \kappa_{\max}/N^2$ varies by orders of magnitude as network size $N$ or topological density changes, whereas max-normalization guarantees a scale-invariant state space $X=[0,1]^N$ across all network sizes and topologies (Lemma~\ref{lemma:invariance}).
 \end{itemize}}
 
-\begin{figure*}[!t]
+\begin{figure*}[t]
     \centering
     \includegraphics[width=0.92\textwidth]{fig_revision_ablation_baselines.pdf}
     \caption{\rev{Component ablation and stronger baseline comparison across 30 trials (shaded bands and error bars denote 95\% confidence intervals). (a) Throughput vs. offered load on BA networks ($N=100$). (b) Packet loss rate and control-plane route switching frequency at $\rho=0.9$, demonstrating that Full SRA ($T_d=5$) eliminates the $98.3\%$ route flapping of memoryless ($\alpha=1$), $T_d=1$, and IGP Weight Tuning baselines. (c) Cross-topology throughput comparison at $\rho=0.9$ across BA, WS, and ER networks.}}
@@ -861,7 +861,7 @@ To address realistic operational environments where traffic is non-uniform, node
     \item \textbf{Controlled Sensing Noise Injection (Fig.~\ref{fig:hetero_timevarying_noise}(c)):} To test robustness against imperfect telemetry or approximate distributed centrality estimation, we inject multiplicative Gaussian noise into the sensed stress vector at every step: $\hat{\kappa}_i^{(k)} = \max\{0, \kappa_i^{(k)}(1 + \mathcal{N}(0, \sigma^2))\}$ for $\sigma \in \{0\%, 5\%, 10\%, 20\%, 30\%\}$. Because the leaky integrator in Eq.~\eqref{eq:pressure_update} acts as a first-order low-pass filter with cutoff determined by $\alpha=0.1$, high-frequency sensing noise is strongly attenuated: across $\sigma \in [0\%, 30\%]$ telemetry degradation, Generalized Weighted SRA maintains a stable throughput of $69.34$--$69.64 \pm 12.32$~pkts/step and PDR of $81.54\%$--$81.88\%$ ($69.62 \pm 12.28$~pkts/step and $81.86\%$ even at $\sigma=30\%$), confirming high practical reliability.
 \end{enumerate}}
 
-\begin{figure*}[!t]
+\begin{figure*}[t]
     \centering
     \includegraphics[width=0.95\textwidth]{fig_revision_hetero_timevarying_noise.pdf}
     \caption{\rev{Robustness under non-uniform traffic, heterogeneous capacities, time-varying surges, and sensing noise (30 trials, 95\% CI). (a) Skewed Pareto gravity traffic $W_{st}$ and heterogeneous node capacities $\mu_i \sim \mathrm{Uniform}[0.6, 1.6]\,\mu$: Generalized Weighted SRA ($\widetilde{\kappa}_i$) and Topology-Only SRA ($\kappa_i$) substantially reduce peak stress and boost throughput/PDR over Dijkstra and Reactive BC ($\alpha=1$). (b) Real-time delivered throughput response (packets/timestep) under a mid-run traffic surge ($t \in [300, 600)$, $\rho: 0.6 \to 1.1 \to 0.7$). (c) Sensitivity to multiplicative sensing noise $\sigma \in [0\%, 30\%]$, demonstrating the low-pass filtering advantage of SRA's leaky integrator.}}
@@ -876,7 +876,7 @@ Finally, we justify the selection of the controller hyperparameters $(\alpha, \b
 \paragraph{1) Joint $(\alpha, \beta_I)$ and Dwell-Time $T_d$ Sensitivity}
 Fig.~\ref{fig:sensitivity_3d} displays the 3D response surfaces of Throughput (packets/timestep), Packet Loss Rate, and Average Latency (timesteps) across the parameter grid $\alpha \in [0.05, 0.50] \times \beta_I \in [5.0, 50.0]$ at $\rho = 0.8$ on BA scale-free networks ($N=100$). From a control-theoretic standpoint, $\alpha$ sets the discrete relaxation time constant $\tau_{\text{relax}} = -1/\ln(1-\alpha) \approx 1/\alpha$ epochs, while $\beta_I$ scales the maximum node-cost penalty $1+\beta_I$ relative to the network's shortest-path hop diameter. The surfaces exhibit a broad, flat plateau of high throughput ($\sim 74$--$75$~pkts/step), low packet loss ($\sim 0.06$), and minimal average latency ($\sim 0.5$--$0.6$~steps) across $\alpha \in [0.05, 0.30]$ and $\beta_I \in [10.0, 40.0]$, confirming that SRA does not require fragile hyperparameter tuning. Furthermore, Fig.~\ref{fig:dwell_scalability}(a) quantifies the empirical effect of $T_d \in \{1, 2, 3, 5, 8, 10\}$: increasing $T_d$ from $1$ to $5$ reduces the route-switching frequency from $98.3\%$ to $20.0\%$ while maintaining $99.07\%$--$99.99\%$ PDR across $T_d \in [1, 8]$; only when $T_d \ge 10$ does the controller become overly sluggish during initial transient adaptation (PDR $86.46\%$). Thus, $\alpha=0.1, \beta_I=10, T_d=5$ represents a principled operating point balancing damping, responsiveness, and routing stability.
 
-\begin{figure*}[!t]
+\begin{figure*}[t]
     \centering
     \includegraphics[width=0.92\textwidth]{sensitivity_3d_surfaces_full.pdf}
     \caption{\rev{Three-dimensional hyperparameter sensitivity surfaces across learning rate $\alpha \in [0.05, 0.50]$ and pressure-cost gain $\beta_I \in [5.0, 50.0]$ on BA networks ($N=100, \rho=0.8$), showing (left) Throughput (packets/timestep), (center) Packet Loss Rate, and (right) Average Latency (timesteps). The wide, flat performance plateau across $\alpha \in [0.05, 0.30]$ and $\beta_I \in [10, 40]$ around $(\alpha=0.1, \beta_I=10)$ demonstrates high parameter robustness without overfitting.}}
@@ -891,14 +891,14 @@ Table~\ref{tab:scalability_table} and Fig.~\ref{fig:dwell_scalability}(b) report
     \item \textbf{Real-World Internet Topology Zoo Carrier Validation:} On realistic hierarchical wide-area fiber backbones where shortest paths concentrate on core transit POPs, SRA consistently achieves substantial structural stress relaxation and throughput expansion under identical default parameters: on \textbf{G\'EANT} ($N=40, E=61$), SRA reduces peak centrality by $36.32\%$ and boosts throughput by $\mathbf{+24.52\%}$ ($25.24 \to 31.43$~pkts/step, cutting packet loss from $25.59\%$ to $7.35\%$); on \textbf{Deltacom} ($N=113, E=161$), SRA reduces peak centrality by $46.03\%$ and increases throughput by $\mathbf{+38.45\%}$ ($38.62 \to 53.46$~pkts/step, cutting drop rate from $59.79\%$ to $44.33\%$); and on \textbf{UsCarrier} ($N=158, E=189$), a sparser long-haul backbone whose longer average path length drives physical bandwidth saturation under uniform $\rho=0.85$, SRA still reduces peak centrality by $31.36\%$ and increases delivered throughput by $\mathbf{+15.88\%}$ ($32.11 \to 37.20$~pkts/step).
 \end{itemize}}
 
-\begin{figure*}[!t]
+\begin{figure*}[t]
     \centering
     \includegraphics[width=0.92\textwidth]{fig_revision_dwell_scalability.pdf}
     \caption{\rev{Dwell-time sensitivity and network scalability analysis (30 trials, shaded bands and error bars denote 95\% confidence intervals). (a) Minimum dwell time $T_d \in \{1..10\}$ trade-off between packet delivery ratio and route-switching frequency $\bar{f}_{\text{sw}}$. (b) Per-evaluation wall-clock computation time (ms) vs. network size $N \in [50, 500]$ across BA and WS networks, closely matching the least-squares fitted $O(N(E+N\log N))$ theoretical curve.}}
     \label{fig:dwell_scalability}
 \end{figure*}
 
-\begin{table*}[t!]
+\begin{table*}[t]
 \centering
 \scriptsize\setlength{\tabcolsep}{1.2pt}\renewcommand{\arraystretch}{1.1}
 \caption{\rev{Computational Complexity, Runtime Benchmark, and Performance Scaling Across Real-World Internet Topology Zoo (TZ) Backbones (G\'EANT, Deltacom, UsCarrier) and Synthetic Topologies ($N=50..500$) Across 30 Trials (Uniform $\rho=0.85$; TP Gain Reports the Mean of Seedwise Relative Throughput Gains).}}
