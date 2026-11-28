@@ -70,7 +70,7 @@
 \maketitle
 
 \begin{abstract}
-Prevailing network control strategies, rooted in static shortest-path logic, inherently suffer from ``stress concentration,'' where traffic excessively gravitates toward critical nodes, causing structural vulnerabilities and premature capacity saturation. \rev{Existing dynamic link-weight optimization, reactive queue-aware routing, and AI-driven methods either operate in an open-loop manner, oscillate under delayed feedback due to the absence of temporal state damping, or lack formal stability guarantees.} To address this, we introduce the System Relaxation Algorithm (SRA), a model-driven supervisory governance layer inspired by physical relaxation that guides the network toward a ``relaxed'' emergent equilibrium of load balance. SRA functions as an interpretable ``white-box'' dynamical system where node costs evolve based on historically accumulated structural stress \rev{generalized to incorporate both topological betweenness and heterogeneous traffic-to-capacity ratios}. By modeling discrete path switching as a non-smooth dynamical system, we provide rigorous proofs of \rev{global convergence to a compact positively invariant attracting set} and practical stability using piecewise Lyapunov functions, revealing that traditional static routing \rev{($\alpha=0$) and memoryless reactive centrality routing ($\alpha=1$)} are degenerate boundary cases of this broader framework. Extensive simulations \rev{across synthetic (BA, WS, ER up to $N=500$) and real-world Internet Topology Zoo carrier backbones (G\'EANT, Deltacom, UsCarrier)---including component ablations, dynamic IGP weight-tuning baselines, skewed/time-varying traffic, and sensing noise injection---}demonstrate that SRA's behavior is profoundly topology-dependent: in heterogeneous networks, it acts as a proactive performance optimizer, reducing peak centrality by over 80\% \rev{at $N=100$} and increasing throughput by \rev{$+30.22\%$ to $+32.48\%$ on $N=100$ scale-free benchmarks, $+18.99\%$ to $+37.40\%$ on real ISP carrier backbones, and $+114.56\%$ at $N=500$ while slashing route-flapping frequency by $80.4\%$}; in homogeneous topologies, it intelligently shifts its objective to resilience enhancement. SRA thus establishes a predictable, mathematically tractable paradigm for network governance that achieves an intelligent, topology-aware trade-off between performance and resilience.
+Static shortest-path routing suffers from ``stress concentration,'' overloading critical nodes and causing premature saturation. \rev{Existing IGP weight tuning, queue-aware routing, and DRL methods either remain open-loop, oscillate under delayed feedback, or lack stability proofs.} We propose the System Relaxation Algorithm (SRA), a white-box controller evolving node costs via a leaky integrator of historical stress \rev{(topological betweenness or demand-to-capacity stress)}. Modeling path switching as a non-smooth dynamical system, we prove \rev{global convergence to a compact invariant set} and non-chattering stability via piecewise Lyapunov functions \rev{and dwell-time regularization}, unifying static \rev{($\alpha=0$) and memoryless reactive centrality ($\alpha=1$)} routing as boundaries. Simulations on \rev{BA, WS, ER ($N \le 500$) and ISP backbones (G\'EANT, Deltacom, UsCarrier)} show that in heterogeneous graphs SRA cuts peak centrality over $80\%$ \rev{($N=100$)}, boosts throughput \rev{$+30.22\%$--$+32.48\%$ ($N=100$ BA), $+18.99\%$--$+37.40\%$ (ISP), and $+114.56\%$ ($N=500$)}, and cuts route flapping \rev{$80.4\%$}, while boosting resilience in homogeneous graphs.
 \keywords{Network control; stress-aware governance; network resilience; self-organizing systems; load balancing; non-smooth dynamical systems; stability analysis}
 \end{abstract}
 
@@ -80,8 +80,7 @@ Prevailing network control strategies, rooted in static shortest-path logic, inh
 \section{Introduction}
 \label{sec:introduction}
 
-Modern communication networks face volatile traffic, yet static shortest-path protocols lack structural stress control. The resulting ``stress concentration'' directs disproportionate load toward a few topological bottlenecks.
-This is not merely a transient congestion issue but a structural vulnerability: it creates ``stress singularities'' that render the network fragile to cascading failures and causes premature capacity saturation, where bottlenecks induce massive packet loss and soaring latency long before the network's physical capacity is reached.
+Modern communication networks face volatile traffic, yet static shortest-path protocols lack structural stress control. The resulting ``stress concentration'' channels disproportionate load onto a few topological bottlenecks, creating ``stress singularities'' that trigger cascading failures and premature capacity saturation well before physical capacity is exhausted.
 
 
 \begin{figure}[!t]
@@ -152,24 +151,20 @@ This is not merely a transient congestion issue but a structural vulnerability: 
     \label{fig:intro_scenario}
 \end{figure}
 
-The root of this fragility lies in a flawed focus on reactive symptoms rather than proactive structural governance. 
-Prior work has largely attempted to patch this issue through \rev{three} dominant approaches, yet \rev{all} fall short of addressing the underlying cause:
+Prior work addresses congestion through \rev{three} dominant approaches, each leaving the structural cause unresolved:
 \begin{itemize}
-    \item \textbf{Reactive Load-Aware Routing (e.g., \cite{Macabale2020Cradle}):} These methods adjust paths based on transient metrics like queue length. They are essentially \textit{symptomatic treatments} that oscillate under high load due to delayed feedback loops.
-    \item \rev{\textbf{Dynamic Link-Weight and Open-Loop Centrality Optimization (e.g., \cite{Fortz2000OSPF,Upadhyay2024OpticalBC}):} Classical IGP/OSPF weight tuning searches for link weights via combinatorial local search, while static centrality-based routing assigns one-shot penalties to high-betweenness nodes. When applied iteratively without state damping or temporal dwell regularization, instantaneous weight/centrality updates trigger severe route flapping across discontinuous shortest-path boundaries.}
-    \item \textbf{Black-box AI Control (e.g., \cite{Wei2023GRLPS}):} While Deep Reinforcement Learning (DRL) agents can implicitly learn topology features, they function as uninterpretable ``black boxes,'' lacking the safety guarantees required for mission-critical infrastructure.
+    \item \textbf{Reactive Load-Aware Routing (e.g., \cite{Macabale2020Cradle}):} Deflects flows via transient queue lengths, oscillating under delayed feedback at high load.
+    \item \rev{\textbf{Dynamic Link-Weight and Open-Loop Centrality Optimization (e.g., \cite{Fortz2000OSPF,Upadhyay2024OpticalBC}):} Adjusts IGP weights via local search or applies one-shot betweenness penalties; repeated without state damping or dwell gating, discrete shortest-path jumps trigger severe route flapping.}
+    \item \textbf{Black-box AI Control (e.g., \cite{Wei2023GRLPS}):} Learns topology features via DRL, but remains an uninterpretable black box lacking formal stability guarantees.
 \end{itemize}
 
-\rev{\textbf{Explicit Research Gap:} Despite extensive progress in traffic engineering, a critical theoretical and architectural gap remains: \textit{how to design a white-box, closed-loop supervisory control law that actively reshapes the routing cost landscape to disperse structural stress concentration, while mathematically guaranteeing global set attractivity, bounded tracking energy, and non-chattering practical stability across discontinuous shortest-path switching boundaries.} As summarized in Table~\ref{tab:related_work_comparison}, existing solutions fail to couple historical stress integration with temporal switching regularization.}
+\rev{\textbf{Research Gap:} As contrasted in Table~\ref{tab:related_work_comparison}, existing solutions fail to couple historical stress integration with temporal switching regularization to reshape the routing cost landscape with guaranteed global set attractivity, bounded tracking energy, and non-chattering stability across discontinuous path-switching boundaries.}
 
-To bridge this gap, we propose a paradigm shift from reactive pathfinding to proactive \textit{stress governance}, inspired by the concept of ``relaxation'' in physical systems.
-We introduce the System Relaxation Algorithm (SRA), a model-driven control system designed to disperse structural stress by dynamically reshaping the network's cost landscape.
-Unlike black-box approaches, SRA operates as an interpretable, white-box dynamical system: it employs a ``leaky integrator'' mechanism \rev{coupled with a minimum dwell-time constraint} to accumulate historical stress into a controllable state variable, thereby guiding the network toward an emergent equilibrium of load balance (as conceptually illustrated in Fig.~\ref{fig:intro_scenario}).
-Crucially, this control paradigm aligns perfectly with Software-Defined Networking (SDN) architectures, leveraging the controller's global view to calculate stress and its centralized authority to enforce the resulting cost policies \cite{hou2020reliable}.
+We bridge this gap with the System Relaxation Algorithm (SRA), a white-box supervisory controller inspired by physical relaxation. Using a leaky integrator \rev{with minimum dwell-time regularization}, SRA accumulates historical stress into a state variable that reshapes node costs toward balanced load (Fig.~\ref{fig:intro_scenario}), matching Software-Defined Networking (SDN) global visibility and centralized cost enforcement \cite{hou2020reliable}.
 
 \begin{table*}[t]
 \centering
-\scriptsize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.12}
+\scriptsize\setlength{\tabcolsep}{3.5pt}\renewcommand{\arraystretch}{1.05}
 \caption{\rev{Systematic Feature-by-Feature Comparison of Network Routing and Traffic Governance Paradigms}}
 \label{tab:related_work_comparison}
 \begin{tabularx}{\textwidth}{@{}l*{5}{>{\raggedright\arraybackslash}X}@{}}
@@ -187,18 +182,14 @@ Crucially, this control paradigm aligns perfectly with Software-Defined Networki
 \end{tabularx}
 \end{table*}
 
-Our main contributions are summarized as follows:
+Our contributions are threefold:
 \begin{enumerate}
-    \item \textbf{A Unified Control-Theoretic Framework:} We formalize structural stress \rev{(both topological betweenness and demand/capacity-weighted load)} as a controllable state variable within a closed-loop dynamical system. \textbf{This framework explicitly decouples structural stress governance from low-level pathfinding}, treating conventional static routing \rev{($\alpha=0$) and memoryless reactive centrality routing ($\alpha=1$)} as degenerate boundary cases.
-    
-    \item \textbf{Rigorous Analysis of Discontinuous Dynamics:} We model discrete path switching in centrality-governed routing as a \textit{non-smooth dynamical system}. Using Krasovskii differential inclusions and piecewise Lyapunov functions, we provide formal proofs of \rev{global convergence to a compact invariant attracting set, bounded tracking energy under the Dissipation-Injection Law, and explicit peak-shaving capacity conditions}.
-    
-    \item \textbf{Topology-Dependent Intelligence \rev{and Comprehensive Validation}:} Through extensive simulations \rev{across BA, WS, ER, G\'EANT (\texttt{Geant2012}), Deltacom, and UsCarrier topologies---including component ablations, stronger baselines, skewed/time-varying traffic, and sensing noise---}we demonstrate that SRA acts as a \textit{proactive performance optimizer} in heterogeneous networks and shifts to a \textit{resilience enhancement mechanism} in homogeneous networks.
+    \item \textbf{Control-Theoretic Framework:} We model structural stress \rev{(topological BC and demand/capacity load)} as a controllable closed-loop state that decouples governance from pathfinding and recovers static routing \rev{($\alpha=0$) and memoryless reactive centrality routing ($\alpha=1$)} as boundary cases.
+    \item \textbf{Non-Smooth Stability Analysis:} Modeling path switching via Krasovskii differential inclusions and piecewise Lyapunov functions, we prove \rev{global convergence to a compact invariant attracting set, bounded tracking energy, and peak-shaving capacity expansion conditions}.
+    \item \textbf{Topology-Aware \rev{Validation}:} Simulations \rev{across BA, WS, ER, G\'EANT, Deltacom, and UsCarrier---including ablations, stronger baselines, skewed/time-varying demands, and noise---}show that SRA optimizes capacity in heterogeneous graphs and enhances resilience in homogeneous ones.
 \end{enumerate}
 
-This work focuses on the algorithmic foundations and stability analysis of stress-aware network governance. The remainder of this paper is organized as follows: Section~\ref{sec:related_work} categorizes the existing literature and positions SRA within the routing landscape. 
-Section~\ref{sec:model} establishes the unified theoretical framework, detailing the control-theoretic model, the rigorous stability analysis via non-smooth dynamics, and the formal bridge to capacity expansion. 
-Section~\ref{sec:simulation} presents the empirical validation and analysis across the topological spectrum, and Section~\ref{sec:discussion_conclusion} concludes the paper.
+The remainder of this paper covers related work (Section~\ref{sec:related_work}), the theoretical model and stability proofs (Section~\ref{sec:model}), simulation analysis (Section~\ref{sec:simulation}), and limitations and conclusion (Section~\ref{sec:discussion_conclusion}).
 
 
 
@@ -206,71 +197,49 @@ Section~\ref{sec:simulation} presents the empirical validation and analysis acro
 \section{Related Work}
 \label{sec:related_work}
 
-The mitigation of structural stress remains a fundamental challenge at the intersection of network science and traffic engineering. While existing methodologies strive to balance traffic distribution, they vary significantly in their perception of network states and their subsequent control mechanisms. As synthesized in Table~\ref{tab:related_work_comparison}, there exists a discernible gap between traditional path-finding strategies and the active reshaping of a network's cost landscape. To situate the proposed System Relaxation Algorithm (SRA) within the broader research context, we categorize the existing literature into three distinct paradigms: reactive symptomatic management, static structural optimization, and black-box learning control.
+Existing traffic engineering methods differ in how they sense congestion and actuate routing costs (Table~\ref{tab:related_work_comparison}). Below we review reactive control, static/IGP weight optimization, and AI-driven routing.
 
 \subsection{Reactive Control: Symptomatic Relief and Its Limitations}
 
-The most pervasive paradigm in network control relies on \textit{reactive} feedback loops that adjust paths based on real-time performance metrics. These protocols typically monitor local queue lengths \cite{Macabale2020Cradle}, energy-aware load indicators \cite{SM2025Novel}, or composite link quality in highly dynamic satellite and vehicular environments \cite{Wang2025VANET, Fu2024SatelliteBC,wang2022cdmr}. For instance, the CRADLE protocol \cite{Macabale2020Cradle} leverages cross-layer cues to deflect traffic, while multi-criteria decision models \cite{Fouad2014MultiCriteria} and hierarchical cluster-based scaling \cite{Guizani2011Hierarchical} attempt to optimize routing decisions under fluctuating demands. Recent explorations in IoT and smart cities further extend this logic to position-based and occlusion-driven routing \cite{Darabkh2025SmartCity, Aditya2020ClosenessCluster}, addressing delays that often cascade across high-speed transport nodes \cite{Wu2024RailwayNode,ma2022traffic}.
-
-While effective at mitigating immediate congestion, these methods essentially function as ``symptom relievers'' that address buffer overflows or link saturation rather than the underlying \textit{structural root causes}. By treating the network's cost landscape as an immutable constraint, reactive paradigms remain passive followers of instantaneous traffic noise. Consequently, they frequently suffer from the ``ping-pong'' effect---an instability where paths oscillate between overloaded and underloaded states due to delayed feedback. Lacking a long-term integration mechanism like SRA's leaky integrator, these approaches fail to distinguish between transient traffic spikes and endemic structural stress, and they lack the rigorous mathematical framework necessary to guarantee global stability under non-smooth traffic dynamics.
+Reactive protocols adjust routes using transient metrics such as queue length \cite{Macabale2020Cradle}, energy-aware load \cite{SM2025Novel}, or composite link quality in vehicular and satellite networks \cite{Wang2025VANET, Fu2024SatelliteBC,wang2022cdmr}. Examples include CRADLE's cross-layer deflection \cite{Macabale2020Cradle}, multi-criteria decision models \cite{Fouad2014MultiCriteria}, hierarchical clustering \cite{Guizani2011Hierarchical}, and IoT/transport-node routing \cite{Darabkh2025SmartCity, Aditya2020ClosenessCluster, Wu2024RailwayNode,ma2022traffic}. Because they treat link/node costs as immutable and lack temporal integration, these schemes act on instantaneous traffic noise rather than endemic bottlenecks, inducing delayed-feedback ping-pong oscillations without stability proofs.
 
 \subsection{Static Structural \rev{and IGP Weight} Optimization: The Open-Loop Governance Gap}
 
-Recognizing the decisive role of network topology, a significant body of research leverages \rev{link-weight tuning \cite{Fortz2000OSPF} and} centrality metrics to guide routing and resource allocation. \rev{Classical IGP weight optimization \cite{Fortz2000OSPF} adjusts OSPF link weights using piecewise-linear convex congestion penalties via local search.} Betweenness Centrality (BC) \cite{Brandes2001Faster} and its sophisticated variants, such as link-variance optimization for optical networks \cite{Upadhyay2024OpticalBC} and weighted gravity models for multiplex systems \cite{Ni2023Gravity}, represent the established methodologies for identifying topological bottlenecks and influential nodes \cite{Basaras2019Influential, Wehmuth2021SpuriousPaths}. Theoretical advancements have further underscored that routing via quasi-shortest paths ($\rho$-geodesics) \cite{DeMedeiros2017QuasiShortest} or optimizing connectivity under probabilistic failures \cite{Cavallaro2022Connectivity} can significantly enhance network resilience. To circumvent the $O(N^3)$ computational complexity inherent in global centrality analysis, recent literature has proposed efficient approximation techniques, including hyperbolic space embeddings \cite{Stai2017Hyperbolic}, clustered parallelization \cite{Suppa2015FastBC}, and distributed estimation frameworks \cite{Maccari2020DistributedLoad, Maccari2018DistributedDV}. These structural insights have been applied across diverse domains, from optimizing SDN flow table storage \cite{Ma2019FlowTable} to enabling greedy forwarding in sparse networks \cite{Ahmed2025SparseNet} and energy-efficient path-finding in sensor networks \cite{Oliveira2010WSNcentrality}.
-
-Despite their analytical depth, these structural optimization methods are fundamentally \textit{open-loop} and descriptive in nature. Even when accounting for temporal variations in centrality \cite{Ghanem2019DynamicCentrality}, the metrics are treated as passive observations rather than controllable state variables. \rev{When static centrality penalties or unregularized weight updates are applied repeatedly in closed loop, discrete shortest-path switching induces severe route oscillations.} Unlike SRA, these approaches lack a rigorous control-theoretic feedback law \rev{(combining leaky integration with dwell-time regularization)} to map structural observations into a provably stable cost landscape.
+A parallel line optimizes \rev{link weights \cite{Fortz2000OSPF} or} structural centrality. \rev{Classical IGP tuning \cite{Fortz2000OSPF} searches OSPF weights against convex utilization penalties via local search.} Betweenness Centrality (BC) \cite{Brandes2001Faster} and variants such as optical link-variance balancing \cite{Upadhyay2024OpticalBC}, multiplex gravity models \cite{Ni2023Gravity}, influential-node metrics \cite{Basaras2019Influential, Wehmuth2021SpuriousPaths}, $\rho$-geodesics \cite{DeMedeiros2017QuasiShortest}, and failure-resilient connectivity \cite{Cavallaro2022Connectivity} identify topological bottlenecks. To avoid $O(N^3)$ global recomputation, hyperbolic embeddings \cite{Stai2017Hyperbolic}, parallel clustering \cite{Suppa2015FastBC}, and distributed estimators \cite{Maccari2020DistributedLoad, Maccari2018DistributedDV} have been applied to SDN flow tables \cite{Ma2019FlowTable}, sparse forwarding \cite{Ahmed2025SparseNet}, and WSN routing \cite{Oliveira2010WSNcentrality}. Even with temporal centrality tracking \cite{Ghanem2019DynamicCentrality}, these approaches remain open-loop; \rev{applying static penalties or undamped weight updates iteratively triggers route oscillations across discontinuous shortest-path boundaries, lacking SRA's leaky integration and dwell regularization.}
 
 \subsection{AI-Driven and Self-Organizing Control: The Black-Box Dilemma}
 
-The recent surge in machine learning has catalyzed the deployment of Deep Reinforcement Learning (DRL) and Graph Neural Networks (GNNs) for complex network management. State-of-the-art agents, such as GRL-PS \cite{Wei2023GRLPS} and multi-agent GNN frameworks \cite{Feng2025MultiAgentGNN}, attempt to implicitly capture topological features to navigate intricate congestion scenarios. To mitigate the computational overhead of global metrics, some approaches utilize node embeddings to approximate traditional centrality measures \cite{Mendonca2021ApproxCentrality}. Parallel to these learning-based methods, bio-inspired self-organizing models \cite{Cheng2010SelfOrganizingModel, Guo2010HybridSelfOrg, Li2014PhysarumMulticast} and heuristic search strategies—including discrete particle swarm optimization \cite{Wang2019DPSO} and genetic algorithms \cite{Mu2024CarrierSelfOrg}—have been applied to dynamic cluster-based routing. These autonomous path-finding capabilities are particularly explored in mission-critical environments such as missile swarm networks \cite{Lu2022MissileSwarm,ma2021credibility}, where nodes must adapt to rapid topology changes.
-
-Despite their empirical performance, these approaches frequently operate as \textit{black boxes} with opaque decision logic. They generally lack formal safety verification or rigorous Lyapunov stability guarantees, posing systemic risks to critical infrastructure where the unpredictable convergence of DRL agents remains a significant concern. Furthermore, heuristic and self-organizing models often overlook the non-smooth discontinuities inherent in discrete path-switching actions. This theoretical void is bridged by SRA, which provides a ``white-box'' alternative through the rigorous application of non-smooth dynamical systems theory \cite{Aubin1984Differential}, ensuring both mathematical explainability and guaranteed global convergence.
-
-In summary, while the aforementioned paradigms have significantly advanced network engineering, a fundamental gap persists between topological awareness and active governance. Reactive methods prioritize speed over stability, static structural optimizations offer diagnostic depth but lack execution mechanisms, and learning-based controls trade mathematical explainability for empirical performance. Specifically, the networking community still lacks a unified framework that can bridge the ``governance gap'' between high-level structural observations (centrality) and low-level traffic control laws with guaranteed global stability. This paper addresses these limitations by introducing the System Relaxation Algorithm (SRA). By grounding the control logic in non-smooth dynamical systems theory and the ``Cost Law'' mechanism, SRA transitions the network management philosophy from passive path-finding to the active, stable, and explainable reshaping of the network's cost landscape.
+Machine learning and bio-inspired methods—such as DRL/GNN agents (GRL-PS \cite{Wei2023GRLPS}, multi-agent GNNs \cite{Feng2025MultiAgentGNN}), embedding-based centrality estimators \cite{Mendonca2021ApproxCentrality}, self-organizing/Physarum models \cite{Cheng2010SelfOrganizingModel, Guo2010HybridSelfOrg, Li2014PhysarumMulticast}, discrete PSO \cite{Wang2019DPSO}, and genetic or swarm routing \cite{Mu2024CarrierSelfOrg, Lu2022MissileSwarm,ma2021credibility}—capture complex traffic patterns empirically. However, their decision policies lack white-box interpretability and formal Lyapunov guarantees under discontinuous path switching, whereas SRA grounds its feedback law in non-smooth differential inclusions \cite{Aubin1984Differential}.
 
 \section{Theoretical Model and Methods}
 \label{sec:model}
 
-We formulate the problem of stress-aware network governance not as a sequence of heuristic routing updates, but as a \textbf{discrete-time, non-smooth dynamical system}. 
-This control-theoretic perspective is decisive: it allows us to transcend the stability pitfalls of naive reactive protocols, which often collapse into destructive oscillations due to their lack of system memory.
-In our framework, the network's cost landscape is no longer a static input, but a dynamic state variable governed by a physics-inspired ``leaky integrator.''
-This section provides a systematic construction of this system. 
-We first define the network model and formalize structural stress as a controllable state. 
-We then detail the core state evolution law that couples continuous stress accumulation with discrete path switching. 
-The culmination is a rigorous analysis using piecewise Lyapunov functions and discrete-time inclusion theory, proving that SRA guarantees global convergence to a \rev{compact invariant attracting set}---a theoretical guarantee that heuristic methods fundamentally lack.
+We formulate stress-aware governance as a \textbf{discrete-time, non-smooth dynamical system} in which the network cost landscape evolves as a dynamic state driven by a ``leaky integrator,'' avoiding the oscillatory collapse of memoryless protocols. Below we define the network model and generalized stress, construct the dwell-regularized update law, prove global convergence and bounded tracking energy, and link peak shaving to capacity expansion.
 
 \subsection{Network Model, \rev{Generalized Stress Metric, and Problem Formulation}}
 
-We model the underlying network topology as a connected undirected graph $G=(V,E)$ with $N=|V| \ge 3$ nodes. 
-From a control perspective, the network's ``plant'' is governed by a dynamically evolving node cost vector $C \in \mathbb{R}^N_+$. 
-This vector defines the instantaneous \textit{cost landscape}, where the cost of any path $P$ is the sum of the transit costs of its constituent nodes, i.e., $d(P) = \sum_{v \in P} C_v$. 
-Traffic flows are assumed to follow lowest-cost paths within this landscape.
-
-\rev{To ensure mathematical transparency, our control model operates under four explicit structural and operational assumptions:
-\begin{itemize}
-    \item \textbf{Assumption 1 (2-Vertex-Connected Core / Alternative Paths):} For bottleneck nodes of interest, the graph $G$ contains at least two vertex-disjoint simple paths between major source-destination pairs (for true cut-vertices or bridges, structural stress is physically irreducible; see Section~\ref{subsec:limitations}).
-    \item \textbf{Assumption 2 (Time-Scale Separation):} Control-plane cost updates occur at discrete epochs $k \in \mathbb{N}$ on a slower time scale than data-plane packet forwarding, allowing path-level flow rates to reach quasi-stationary equilibrium within each control epoch.
-    \item \textbf{Assumption 3 (Equal-Cost Shortest-Path Splitting / Finite Configurations):} Equal-cost shortest paths between any origin-destination pair $(s,t)$ split flow equally across the active shortest-path set (or follow a fixed tie-breaking rule on an arbitrarily small tie perturbation), guaranteeing that the family of realizable shortest-path configurations $\mathcal{P}$ on any finite graph $G$ is finite ($|\mathcal{P}| = M < \infty$).
-    \item \textbf{Assumption 4 (Quasi-Stationary Demand and Service Capacity):} Over a relaxation horizon, each origin-destination (OD) pair $(s,t)$ has a non-negative relative traffic weight $W_{st} \ge 0$, and each node $i \in V$ has an effective transit service capacity $\mu_i > 0$.
+Consider a connected undirected graph $G=(V,E)$ with $N=|V| \ge 3$. The routing plant is governed by node transit costs $C \in \mathbb{R}^N_+$, where path cost is $d(P) = \sum_{v \in P} C_v$ and flows take minimum-cost paths under four explicit assumptions:
+\rev{\begin{itemize}
+    \item \textbf{Assumption 1 (2-Vertex-Connected Core):} Between major source-destination pairs, $G$ provides at least two vertex-disjoint paths around bottleneck hubs (stress across true cut-vertices is irreducible; Section~\ref{subsec:limitations}).
+    \item \textbf{Assumption 2 (Time-Scale Separation):} Control-plane epochs $k \in \mathbb{N}$ evolve slower than packet forwarding, yielding quasi-stationary path flows per epoch.
+    \item \textbf{Assumption 3 (Finite Configurations):} Equal-cost shortest paths split flow equally (or break ties deterministically), ensuring the realizable path-configuration family $\mathcal{P}$ on finite $G$ is finite ($|\mathcal{P}| = M < \infty$).
+    \item \textbf{Assumption 4 (Quasi-Stationary Demand/Capacity):} Over a horizon, each OD pair $(s,t)$ has weight $W_{st} \ge 0$ and each node $i$ has transit capacity $\mu_i > 0$.
 \end{itemize}}
 
-To quantify the structural stress induced by a specific cost distribution, we employ \textbf{Betweenness Centrality (BC)} \cite{Brandes2001Faster} as the baseline topological feedback signal. 
-The unnormalized topological stress on node $i$, denoted $\kappa_i(S)$, represents its absolute path load under uniform unit demand ($W_{st} \equiv 1$):
+Baseline topological stress uses Betweenness Centrality (BC) \cite{Brandes2001Faster} under uniform demand ($W_{st} \equiv 1$):
 \begin{equation}
     \label{eq:bc_definition}
     \kappa_i(S) = \sum_{s\neq i\neq t\in V} \frac{\sigma^{\,C(S)}_{st}(i)}{\sigma^{\,C(S)}_{st}}
 \end{equation}
-where $\sigma^{\,C(S)}_{st}$ is the total number of shortest paths between $s$ and $t$ under the cost configuration $C(S)$, and $\sigma^{\,C(S)}_{st}(i)$ is the subset passing through $i$ \rev{(with convention $0/0 := 0$ if $\sigma^{\,C(S)}_{st} = 0$)}.
-
-\rev{Furthermore, to address non-uniform traffic matrices $W = [W_{st}]$ and heterogeneous node service capacities $\mu = (\mu_i)_{i \in V}$, we generalize Eq.~\eqref{eq:bc_definition} to the \textbf{Demand- and Capacity-Weighted Structural Stress}:
+where $\sigma^{\,C(S)}_{st}$ counts shortest paths between $s$ and $t$ under $C(S)$, $\sigma^{\,C(S)}_{st}(i)$ counts those traversing $i$, \rev{and $0/0 := 0$}.
+\rev{For heterogeneous demand matrices $W = [W_{st}]$ and node capacities $\mu = (\mu_i)_{i \in V}$, we define the \textbf{Demand- and Capacity-Weighted Structural Stress}:
 \begin{equation}
     \label{eq:generalized_stress}
-    \widetilde{\kappa}_i(S; W, \mu) := \frac{1}{\mu_i} \sum_{s\neq i\neq t\in V} W_{st}\,\frac{\sigma^{\,C(S)}_{st}(i)}{\sigma^{\,C(S)}_{st}}
+    \widetilde{\kappa}_i(S; W, \mu) := \frac{1}{\mu_i} \sum_{s\neq i\neq t\in V} W_{st}\,\frac{\sigma^{\,C(S)}_{st}(i)}{\sigma^{\,C(S)}_{st}},
 \end{equation}
-(under the same $0/0 := 0$ convention when $\sigma^{\,C(S)}_{st}=0$). When demands are uniform ($W_{st}\equiv 1$) and node capacities are homogeneous ($\mu_i \equiv \mu$), $\widetilde{\kappa}_i(S; W, \mu)$ reduces to $\kappa_i(S)/\mu$, whose max-normalization is identical to that of topological BC in Eq.~\eqref{eq:bc_definition}. Crucially, because $W_{st}$ and $\mu_i$ are constants within a control horizon, $\widetilde{\kappa}(S; W, \mu)$ remains piecewise constant over the same finite partition of the state space $X=[0,1]^N$, so all subsequent stability proofs hold identically for both $\kappa(S)$ and $\widetilde{\kappa}(S; W, \mu)$.}
+which reduces to $\kappa_i(S)/\mu$ when $W_{st}\equiv 1$ and $\mu_i \equiv \mu$ (giving identical max-normalization). Because $W_{st}$ and $\mu_i$ remain constant per horizon, $\widetilde{\kappa}(S; W, \mu)$ is piecewise constant over the same finite partition of $X=[0,1]^N$, so all stability proofs hold identically for $\kappa$ and $\widetilde{\kappa}$.}
 
-Since $\kappa_i(S)$ is unbounded with network size, we project this feedback signal into a compact state space to ensure system stability. 
-We define the max-normalized stress vector (with $\kappa_{\max}(S) := \max_{j \in V} \kappa_j(S)$) as:
+To keep the feedback bounded across network scales, we apply max-normalization ($\kappa_{\max}(S) := \max_{j \in V} \kappa_j(S)$):
 \begin{equation}
     \label{eq:bc_normalization}
     \mathrm{norm}(\kappa(S)) =
@@ -279,12 +248,9 @@ We define the max-normalized stress vector (with $\kappa_{\max}(S) := \max_{j \i
     \mathbf{0}, & \text{otherwise.}
     \end{cases}
 \end{equation}
-This normalization confines the feedback signal strictly within the unit hypercube $[0,1]^N$. 
-\textbf{Key Geometric Property:} Crucially, for any finite graph, the set of all possible shortest-path configurations (including boundary tie subsets) is finite. 
-This implies that $\mathrm{norm}(\kappa(S))$ does not vary continuously but jumps between a \textbf{finite set of constant vectors} \rev{$\{v_1, \dots, v_M\} \subset [0,1]^N$}. 
-This quantization is non-trivial; it renders the system dynamics \textit{piecewise constant}, forming the topological foundation for our non-smooth convergence analysis in Section~\ref{sec:convergence_analysis}.
+Because $\mathcal{P}$ is finite on $G$, $\mathrm{norm}(\kappa(S)) \in [0,1]^N$ takes values in a \textbf{finite set of constant vectors} \rev{$\{v_1, \dots, v_M\} \subset [0,1]^N$}, making the dynamics \textit{piecewise constant} (Section~\ref{sec:convergence_analysis}).
 
-\rev{\textbf{Formal Problem Formulation:} Formally, given $(G, W, \mu)$, we seek a closed-loop state feedback policy mapping historical stress observations $\{\kappa^{(0)}, \dots, \kappa^{(k)}\}$ to node transit costs $C^{(k+1)} \in [1, 1+\beta_I]^N$ so as to solve the bi-criteria resilient governance problem (with switching-cost weight $\eta_{\text{sw}} \ge 0$):
+\rev{\textbf{Problem Formulation:} Given $(G, W, \mu)$ and switching weight $\eta_{\text{sw}} \ge 0$, SRA finds feedback costs $C^{(k+1)} \in [1, 1+\beta_I]^N$ solving:
 \begin{equation}
     \label{eq:problem_formulation}
     \begin{aligned}
@@ -294,14 +260,14 @@ This quantization is non-trivial; it renders the system dynamics \textit{piecewi
     & \tau_{m+1} - \tau_m \ge T_d,\ \bar{f}_{\text{sw}} \le 1/T_d,
     \end{aligned}
 \end{equation}
-where $\widetilde{\kappa}_i(S^{(k)}) \equiv \widetilde{\kappa}_i(S^{(k)}; W, \mu)$, $\bar{f}_{\text{sw}} := \limsup_{K\to\infty}\frac{1}{K}\sum_{k=0}^{K-1}\mathbb{I}(\mathcal{P}^{(k+1)}\neq\mathcal{P}^{(k)})$ is the asymptotic switching frequency, $\mathcal{P}^{(k)}$ denotes the active shortest-path configuration at step $k$, and $\{\tau_m\}$ are the route-switching epochs separated by at least the minimum dwell time $T_d \ge 1$.}
+where $\widetilde{\kappa}_i(S^{(k)}) \equiv \widetilde{\kappa}_i(S^{(k)}; W, \mu)$, $\bar{f}_{\text{sw}} := \limsup_{K\to\infty}\frac{1}{K}\sum_{k=0}^{K-1}\mathbb{I}(\mathcal{P}^{(k+1)}\neq\mathcal{P}^{(k)})$ is the asymptotic switching frequency, and switching epochs $\{\tau_m\}$ satisfy minimum dwell time $T_d \ge 1$.}
 
 % --- 这是 Fig. 2 的完整代码 ---
 \begin{figure*}[t]
     \centering
     \begin{tikzpicture}[
         auto,
-        node distance=1.45cm and 2.1cm,
+        node distance=1.05cm and 1.75cm,
         plant/.style={rectangle, draw, fill=blue!10, text width=12em, text centered, rounded corners, minimum height=2.8em, font=\small},
         module/.style={rectangle, draw, fill=green!10, rounded corners, text width=9.4em, text centered, minimum height=2.8em, font=\small},
         line/.style={draw, -{Latex}},
@@ -356,7 +322,7 @@ where $1$ is the base physical cost and $\beta_I > 0$ is the pressure-to-cost ga
 % --- Fig. 3 Native TikZ 4-Stage SRA Control Loop ---
 \begin{figure}[!t]
     \centering
-    \resizebox{0.98\columnwidth}{!}{%
+    \resizebox{0.88\columnwidth}{!}{%
     \begin{tikzpicture}[
         stage/.style={rectangle, draw=blue!55!black, thick, rounded corners=4pt, fill=blue!6, text width=2.8cm, align=center, minimum height=1.35cm, inner sep=4pt, font=\scriptsize},
         arr/.style={-{Latex[length=2.2mm]}, thick, draw=blue!60!black},
@@ -408,49 +374,41 @@ The complete procedure is formalized in Algorithm~\ref{alg:sra} (Fig.~\ref{fig:s
 % --- 这是 Fig. 4 (原文fig 7) 的代码 ---
 \begin{figure}[!t]
     \centering
-    \includegraphics[width=0.86\columnwidth]{figure_7_microscopic_path_change.eps}
+    \includegraphics[width=0.76\columnwidth]{figure_7_microscopic_path_change.eps}
     \caption{A conceptual visualization of SRA's path reshaping mechanism. The algorithm diverts traffic from the efficient but congested 2-hop path (red dashed) through the central hub to a longer but more stable 4-hop peripheral path (green solid).}
     \label{fig:sra_mechanism_visualization}
 \end{figure}
 
 \subsection*{Complexity and Scalability Analysis}
 
-A full centrality evaluation in SRA uses Brandes' algorithm \cite{Brandes2001Faster}, requiring $O(N(E + N \log N))$ time and $O(N + E)$ working memory per source traversal \rev{(plus $O(N^2)$ routing-table storage). When dwell-time gating $T_d > 1$ is active, shortest-path and centrality recomputation executes only at block boundaries $\tau_m = m T_d$, while the $T_d - 1$ intra-block cooling steps reuse $q^{(\tau_m)}$ in $O(N)$ time, yielding an amortized complexity of $O(N(E + N \log N)/T_d + N)$ per epoch ($151.20$~ms per evaluation / $30.35$~ms amortized per epoch at $N=100$, and $4585.10$~ms per evaluation / $917.52$~ms amortized at $N=500$ under single-thread NetworkX Dijkstra traversal; see Section~\ref{subsec:scalability_eval}).} For hyper-scale deployments, nodes can approximate local stress in $O(1)$ per-packet time by counting transiting flows weighted by $1/\mu_i$ \cite{Maccari2020DistributedLoad} via OSPF-TE or SDN In-band Network Telemetry (INT).
+Full centrality evaluation uses Brandes' algorithm \cite{Brandes2001Faster}, taking $O(N(E + N \log N))$ time and $O(N+E)$ workspace \rev{(plus $O(N^2)$ routing tables). Under dwell gating $T_d > 1$, path/centrality updates run only at block boundaries $\tau_m = m T_d$, while the remaining $T_d - 1$ steps reuse $q^{(\tau_m)}$ in $O(N)$ time, giving an amortized epoch cost of $O(N(E + N \log N)/T_d + N)$ ($151.20$~ms eval / $30.35$~ms amortized at $N=100$; $4585.10$~ms eval / $917.52$~ms amortized at $N=500$ in single-threaded NetworkX; Section~\ref{subsec:scalability_eval}).} At larger scales, nodes can approximate local stress in $O(1)$ per packet by counting flows weighted by $1/\mu_i$ \cite{Maccari2020DistributedLoad} via OSPF-TE or SDN In-band Network Telemetry (INT).
 
 \subsection{Global Attractiveness and Existence Guarantee for Convergence}
 \label{sec:convergence_analysis}
 \label{subsec:attractivity}
 
-Because shortest-path routing switches discontinuously across polyhedral boundaries, we analyze the hybrid dynamics using discrete-time differential inclusions \cite{Aubin1984Differential}. Under $T_d=1$ (or at block boundaries $\tau_m = m T_d$ with effective step size $\alpha_{T_d} = 1 - (1-\alpha)^{T_d} \in (0,1)$), the state evolution on $X = [0,1]^N$ is governed by the set-valued map:
+Because shortest-path routing switches discontinuously across polyhedral boundaries, we analyze the hybrid dynamics using discrete-time differential inclusions \cite{Aubin1984Differential}. Under $T_d=1$ (or at block boundaries $\tau_m = m T_d$ with effective step size $\alpha_{T_d} = 1 - (1-\alpha)^{T_d} \in (0,1)$), the state evolution on $X = [0,1]^N$ is governed by:
 \begin{equation}\label{eq:inclusion_map}
 S^{(k+1)} \in F(S^{(k)}) := (1-\alpha)S^{(k)}+\alpha\,\mathcal{N}(S^{(k)})
 \end{equation}
-where $\mathcal{N}(S) := \bigcap_{\delta > 0} \overline{\mathrm{co}}\big(\mathrm{norm}(\kappa(B_\delta(S)))\big)$ is the \textbf{Krasovskii regularization} of the discontinuous mapping $\mathrm{norm}(\kappa(\cdot))$. 
-Geometrically, this operation takes the closed convex hull of all limit points in a vanishing neighborhood of $S$, effectively ``filling in the gaps'' caused by discrete routing decisions (including multi-path tie boundaries). 
-This yields a mathematically well-behaved map, allowing us to derive the following foundational properties.
+where $\mathcal{N}(S) := \bigcap_{\delta > 0} \overline{\mathrm{co}}\big(\mathrm{norm}(\kappa(B_\delta(S)))\big)$ is the \textbf{Krasovskii regularization} taking the closed convex hull of limit points around $S$ across discrete routing and tie boundaries.
 
 \begin{lemma}[Global Confinement and Safety]
 \label{lemma:invariance}
 Let the state space be the unit hypercube $X=[0,1]^N$. 
-The discrete-time inclusion for SRA, given by $S^{(k+1)}\in F(S^{(k)})$, is strictly confined within $X$. 
-Formally, $X$ is a \textbf{compact, positively invariant set} ($F(X) \subset X$) and is \rev{exponentially attracting for any out-of-bounds perturbation $S^{(0)} \in [-1/\beta_I + \epsilon, \infty)^N$}.
-\textit{Physical Interpretation:} This lemma guarantees that the structural stress never diverges to infinity; the system possesses an intrinsic ``safety boundary'' dictated by the normalization mechanism.
+The discrete-time inclusion $S^{(k+1)}\in F(S^{(k)})$ is strictly confined within $X$: $X$ is a \textbf{compact, positively invariant set} ($F(X) \subset X$) and is \rev{exponentially attracting for any out-of-bounds perturbation $S^{(0)} \in [-1/\beta_I + \epsilon, \infty)^N$}. Thus, normalized structural stress never diverges.
 \end{lemma}
 \begin{proof}[Proof Sketch]
-The proof demonstrates that if a state $S^{(k)}$ resides within the hypercube $X$, its successor $S^{(k+1)}$---being a convex combination of elements in $X$---must inherently remain within $X$. Moreover, for any perturbed initialization $S^{(0)} \notin X$, the $\ell_\infty$ distance to $X$ contracts geometrically by $(1-\alpha)$ at every step. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-A.}
+Convexity of $X=[0,1]^N$ preserves $F(X)\subset X$, while out-of-bounds $\ell_\infty$ distance contracts by $(1-\alpha)$ per step (full proof in Supplementary Material Section~S-A).
 \end{proof}
-
-With safety guaranteed, we verify the topological regularity of the control map.
 
 \begin{proposition}[Topological Regularity]
 \label{prop:usc}
 The set-valued map $F(\cdot)$ defined in \eqref{eq:inclusion_map} is \textbf{Upper Semi-Continuous (USC)} with \textbf{non-empty, compact, and convex} values.
 \end{proposition}
 \begin{proof}[Proof Sketch]
-The proof exploits the piecewise constant structure of $\mathcal{N}(S)$, which stems from the finite nature of the network's path configurations (Assumption 3). This structure ensures that the graph of the map is closed, a sufficient condition for the USC property in compact spaces. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-B.}
+Piecewise constancy of $\mathcal{N}(S)$ over finite path configurations (Assumption~3) ensures a closed graph on compact $X$, giving USC (Supplementary Material Section~S-B).
 \end{proof}
-
-Combining the global confinement (Lemma~\ref{lemma:invariance}) with topological regularity (Proposition~\ref{prop:usc}), we establish the system's ultimate destiny.
 
 \begin{theorem}[\rev{Global Convergence to a Compact Invariant Attracting Set}]
 \label{thm:attractor}
@@ -464,199 +422,175 @@ is a \textbf{non-empty, compact, and positively invariant global attracting set}
 \end{equation}
 \end{theorem}
 \begin{proof}[Proof Sketch]
-Because $X$ is compact and positively invariant ($F(X) \subset X$) and $F$ is USC with compact values (Proposition~\ref{prop:usc}), the forward images $K_n := F^n(X)$ form a nested sequence of non-empty compact subsets $K_{n+1} \subset K_n$. By Cantor's intersection theorem, $\Omega = \bigcap_{n\ge 0} K_n$ is non-empty, compact, and invariant, and attracts all trajectories initialized in $X$. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-C.}
+Since $F(X)\subset X$ and $F$ is USC with compact values (Proposition~\ref{prop:usc}), $K_n:=F^n(X)$ forms a nested compact chain whose intersection $\Omega$ is non-empty, invariant, and globally attracting by Cantor's intersection theorem (Supplementary Material Section~S-C).
 \end{proof}
 
 \rev{\begin{remark}[Attraction to a Limit Set vs. Unique Point Equilibrium]
 \label{rem:attractor_vs_unique}
-We emphasize that Theorem~\ref{thm:attractor} guarantees global convergence to a \textit{compact invariant set} $\Omega$ rather than a single static fixed point $S^\star$. In non-smooth routing systems where shortest-path trees switch discontinuously across polyhedral partition boundaries, a unique static fixed point does not generally exist unless a single routing configuration is self-consistent in the interior of its partition cell (Corollary~\ref{cor:local_convergence}). Otherwise, trajectories are attracted to bounded invariant orbits (such as multi-path switching cycles) within $\Omega$, whose tracking-energy radius is explicitly bounded by the Dissipation-Injection Law (Theorem~\ref{thm:drop_jump}) and contracted by the minimum dwell time $T_d$ (Theorem~\ref{thm:epsilon_tube}).
+Theorem~\ref{thm:attractor} proves convergence to a compact invariant set $\Omega$ rather than a unique fixed point $S^\star$. Across discontinuous shortest-path partition boundaries, trajectories settle into bounded invariant orbits in $\Omega$ (unless self-consistent inside a single partition cell, Corollary~\ref{cor:local_convergence}), whose tracking energy is bounded by Theorem~\ref{thm:drop_jump} and contracted by dwell time $T_d$ (Theorem~\ref{thm:epsilon_tube}).
 \end{remark}}
 
 \subsection{Energy Dissipation and Bounded Oscillation Analysis}
 \label{subsec:lyapunov}
 
-While the existence of a global attracting set $\Omega$ guarantees safety, it does not quantitatively bound the amplitude of steady-state oscillations across switching boundaries. 
-To rigorously characterize the system's steady-state dynamics, we introduce a specialized analytical tool from non-smooth mechanics: the \textbf{piecewise Lyapunov tracking function}.
-\rev{At any iteration $k$, let $q^{(k)} := \mathrm{norm}(\kappa^{(k)}) \in [0,1]^N$ denote the active normalized stress vector driving the state update $S^{(k+1)} = (1-\alpha)S^{(k)} + \alpha q^{(k)}$ in Algorithm~\ref{alg:sra}. We define the instantaneous tracking energy $E_k$ and the set-distance function $V(S)$ as:
+To bound steady-state oscillations across switching boundaries, we introduce a \textbf{piecewise Lyapunov tracking function}.
+\rev{At iteration $k$, with active target $q^{(k)} := \mathrm{norm}(\kappa^{(k)}) \in [0,1]^N$ driving $S^{(k+1)} = (1-\alpha)S^{(k)} + \alpha q^{(k)}$ in Algorithm~\ref{alg:sra}, define the instantaneous tracking energy $E_k$ and set-distance function $V(S)$:}
 \begin{equation}\label{eq:lyapunov_def}
 E_k := \|S^{(k)} - q^{(k)}\|_2^2, \qquad V(S) := \min_{c\in\mathcal N(S)}\|S-c\|_2^2.
 \end{equation}
-Whenever $q^{(k)} \in \mathcal{N}(S^{(k)})$ (which holds at every step when $T_d=1$ and at every block-onset recomputation step $k=\tau_m$ when $T_d > 1$), we have $V(S^{(k)}) \le E_k$, with exact equality $V(S^{(k)}) = E_k$ in the interior of each routing partition where $\mathcal{N}(S^{(k)}) = \{q^{(k)}\}$.}
-Let $\bar{\Delta} := \max_{\ell, m} \|v_\ell - v_m\|_2$ denote the maximum Euclidean diameter of the finite set of normalized centrality vectors $\{v_1, \dots, v_M\}$, representing the worst-case topological shock. 
-The following theorem reveals the fundamental \textit{thermodynamics} of the SRA control loop.
+\rev{Whenever $q^{(k)} \in \mathcal{N}(S^{(k)})$ (all steps for $T_d=1$, and block onsets $k=\tau_m$ for $T_d>1$), $V(S^{(k)}) \le E_k$, with equality in each partition interior where $\mathcal{N}(S^{(k)}) = \{q^{(k)}\}$.}
+Let $\bar{\Delta} := \max_{\ell, m} \|v_\ell - v_m\|_2$ denote the worst-case switching shock across $\{v_1, \dots, v_M\}$.
 
 \begin{theorem}[The Dissipation-Injection Law]
 \label{thm:drop_jump}
-\rev{For any iteration $k$ of the SRA dynamics $S^{(k+1)} = (1-\alpha)S^{(k)} + \alpha q^{(k)}$ with active target $q^{(k)} \in \{v_1, \dots, v_M\}$, the tracking energy $E_k = \|S^{(k)} - q^{(k)}\|_2^2$ satisfies the exact one-step dissipation-injection inequality:
+\rev{For any iteration $k$ of $S^{(k+1)} = (1-\alpha)S^{(k)} + \alpha q^{(k)}$ with $q^{(k)} \in \{v_1, \dots, v_M\}$, the tracking energy $E_k$ satisfies:
 \begin{equation}\label{eq:drop_jump_one_step}
 \begin{aligned}
 E_{k+1} &\le (1-\alpha)\,E_k + \frac{1}{\alpha}\,\|q^{(k)} - q^{(k+1)}\|_2^2 \\
 &\le \underbrace{(1-\alpha)\,E_k}_{\text{Dissipation (Drop)}}\ +\ \underbrace{\dfrac{1}{\alpha}\,\bar\Delta^{2}}_{\text{Injection (Jump)}}.
 \end{aligned}
 \end{equation}
-In particular, whenever the active path set does not change between steps $k$ and $k+1$ ($q^{(k+1)} = q^{(k)}$), the injection term vanishes identically and $E_{k+1} = (1-\alpha)^2 E_k \le (1-\alpha) E_k$. Consequently, $E_k$ (and $V(S^{(k)}) \le E_k$ at all recomputation epochs) is ultimately bounded, satisfying:}
+When the path set holds ($q^{(k+1)} = q^{(k)}$), the injection term vanishes and $E_{k+1} = (1-\alpha)^2 E_k \le (1-\alpha) E_k$. Hence $E_k$ (and $V(S^{(k)}) \le E_k$ at recomputation epochs) is ultimately bounded:}
 \begin{equation}\label{eq:limsup_boundedness}
 \rev{\limsup_{k\to\infty} E_k\ \le\ \frac{\bar\Delta^{2}}{\alpha^2}.}
 \end{equation}
 \end{theorem}
 \begin{proof}[Proof Sketch]
-Using the exact identity $S^{(k+1)} - q^{(k+1)} = (1-\alpha)(S^{(k)} - q^{(k)}) + (q^{(k)} - q^{(k+1)})$ and applying the Weighted Young's Inequality with weight $\lambda = \alpha/(1-\alpha)$, we decouple the one-step evolution into a contractive dissipation term $(1-\alpha)E_k$ and a switching disturbance term $\frac{1}{\alpha}\|q^{(k)} - q^{(k+1)}\|_2^2 \le \frac{1}{\alpha}\bar{\Delta}^2$. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-D.}
+Applying Weighted Young's Inequality ($\lambda = \alpha/(1-\alpha)$) to $S^{(k+1)} - q^{(k+1)} = (1-\alpha)(S^{(k)} - q^{(k)}) + (q^{(k)} - q^{(k+1)})$ yields \eqref{eq:drop_jump_one_step} and geometric ultimate boundedness (Supplementary Material Section~S-D).
 \end{proof}
 
-This theorem provides a profound physical insight: the stability of SRA is governed by two competing forces. 
-The \textbf{Dissipation Term} (Drop) represents the damping effect of the leaky integrator, continuously draining energy from the system with a contraction factor of $(1-\alpha)$. 
-The \textbf{Injection Term} (Jump) represents the energy injected by discrete topological switching. 
-Stability is achieved because the injection is bounded by $\bar{\Delta}^2$, ensuring the system settles into a low-energy orbit rather than diverging.
-
-To further validate the choice of the leaky integrator, we consider the local regime where the topology stabilizes.
+This balances leaky-integrator dissipation $(1-\alpha)E_k$ against bounded switching injections $\bar{\Delta}^2/\alpha$. When the topology locks onto a constant path set, injection vanishes:
 
 \begin{corollary}[Ideal Linear Convergence]
 \label{cor:local_convergence}
-In the local regime where the shortest-path set remains constant ($q^{(k)} \equiv c$), the injection term vanishes. The update rule simplifies to a linear contraction map:
+If the shortest-path set remains constant ($q^{(k)} \equiv c$), the update simplifies to a linear contraction map:
 \begin{equation}\label{eq:linear_update}
 S^{(k+1)}=(1-\alpha)S^{(k)}+\alpha c,
 \end{equation}
-which converges exponentially to the unique fixed point $S^\star=c$ at a rate of $(1-\alpha)$.
+which converges exponentially to $S^\star=c$ at rate $(1-\alpha)$.
 \end{corollary}
 \begin{proof}[Proof Sketch]
-The proof follows directly from the Banach Fixed-Point Theorem. By subtracting the fixed point from the update rule, we derive the linear error dynamics $\|S^{(k+1)}-S^\star\|_2 = (1-\alpha)\|S^{(k)}-S^\star\|_2$, confirming exponential decay. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-E.}
+Follows directly from the Banach Fixed-Point Theorem via $\|S^{(k+1)}-S^\star\|_2 = (1-\alpha)\|S^{(k)}-S^\star\|_2$ (Supplementary Material Section~S-E).
 \end{proof}
 
 \subsection{Convergence Rate and Practical Stability via Temporal Regularization}
 \label{subsec:practical_stability_rate}
 
-The ``Dissipation-Injection'' law (Theorem~\ref{thm:drop_jump}) guarantees that the system energy is ultimately bounded. 
-However, to bridge the gap between mathematical boundedness and engineering utility, two critical questions remain: \textit{At what rate} does the system relax to this bounded orbit, and how can we systematically suppress high-frequency \textit{route chattering}?
-We address these by introducing a \textbf{minimum dwell time, $T_d$}, as a rigorous \textbf{temporal regularization} for the hybrid dynamics.
-By decomposing the system's evolution into distinct ``dwell blocks'' of length $T_d$ in Algorithm~\ref{alg:sra}, we derive explicit convergence rates and a tunable stability guarantee.
-
-We define the $m$-th dwell block as the interval $[\tau_m, \tau_{m+1}-1]$, where $\tau_m = m T_d$ and $\tau_{m+1} = \tau_m + T_d$. 
-\rev{Let $S_m := S^{(\tau_m)}$ and $V_m := E_{\tau_m} = \|S^{(\tau_m)} - q^{(\tau_m)}\|_2^2$ denote the state and tracking energy at the onset of block $m$ (where $q^{(\tau_m)} \in \mathcal{N}(S^{(\tau_m)})$, so $V(S_m) \le V_m$).}
+To convert bounded energy into fast relaxation and chattering suppression, we impose a \textbf{minimum dwell time $T_d \ge 1$} partitioning iterations into dwell blocks $[\tau_m, \tau_{m+1}-1]$ with $\tau_m = m T_d$.
+\rev{Let $S_m := S^{(\tau_m)}$ and $V_m := E_{\tau_m} = \|S^{(\tau_m)} - q^{(\tau_m)}\|_2^2$ (where $q^{(\tau_m)} \in \mathcal{N}(S^{(\tau_m)})$, so $V(S_m) \le V_m$).}
 
 \begin{proposition}[Block-wise Dissipation Dynamics]
 \label{prop:block_dynamics}
-Under the temporal regularization $T_d$ in Algorithm~\ref{alg:sra}, the active routing topology and target vector $q^{(\tau_m+t)} \equiv q^{(\tau_m)}$ remain invariant within each block $t \in \{0, \dots, T_d-1\}$. 
-Letting $\gamma:=1-\alpha$ be the damping factor and $\tilde C:=\bar\Delta^2/\alpha$ be the injection bound, the system exhibits a \textbf{contract-then-jump} behavior:
+Under temporal regularization $T_d$ in Algorithm~\ref{alg:sra}, the active path set and $q^{(\tau_m+t)} \equiv q^{(\tau_m)}$ remain fixed for $t \in \{0, \dots, T_d-1\}$. With $\gamma:=1-\alpha$ and $\tilde C:=\bar\Delta^2/\alpha$:
 \begin{itemize}
-    \item[\textit{(i)}] \textbf{Intra-block Cooling:} Within a block, the injection term vanishes ($q^{(\tau_m+t)} = q^{(\tau_m)}$), and tracking energy decays exponentially for $t \in \{0, \dots, T_d-1\}$:
+    \item[\textit{(i)}] \textbf{Intra-block Cooling:} Tracking energy decays exponentially over $t \in \{0, \dots, T_d-1\}$:
     \begin{equation}\label{eq:intra_block}
     \rev{E_{\tau_m+t} = \gamma^{\,2t}V_m \le \gamma^{\,t}V_m.}
     \end{equation}
-    \item[\textit{(ii)}] \textbf{Inter-block Recurrence:} The energy state across adjacent blocks satisfies the linear recurrence:
+    \item[\textit{(ii)}] \textbf{Inter-block Recurrence:} Across adjacent blocks:
     \begin{equation}\label{eq:inter_block}
     V_{m+1}\ \le\ \gamma^{T_d}\,V_m\ +\ \tilde C.
     \end{equation}
 \end{itemize}
 \end{proposition}
 \begin{proof}[Proof Sketch]
-(i) During the dwell period, the path set is held fixed ($q^{(\tau_m+t)} \equiv q^{(\tau_m)}$), so the system operates as a pure leaky integrator (Corollary~\ref{cor:local_convergence}), resulting in strictly exponential decay. (ii) The recurrence combines $T_d-1$ steps of intra-block cooling with a single worst-case switching injection event at the block boundary $\tau_{m+1}$. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-F.}
+Fixed paths within a block give $T_d-1$ pure cooling steps via Corollary~\ref{cor:local_convergence}, followed by at most one switching injection at $\tau_{m+1}$ (Supplementary Material Section~S-F).
 \end{proof}
-
-This recurrence relation allows us to calculate the precise geometry of the system's final resting state.
 
 \begin{theorem}[Tunable Convergence to an $\varepsilon$-Attractor]
 \label{thm:epsilon_tube}
-Let $\gamma \in (0,1)$ and $\tilde C > 0$. The system trajectories are strictly confined as follows:
+Let $\gamma \in (0,1)$ and $\tilde C > 0$. System trajectories satisfy:
 \begin{itemize}
-    \item[\textit{(a)}] \textbf{Steady-State Radius:} The block-onset energy ultimately converges into a bounded tube of radius:
+    \item[\textit{(a)}] \textbf{Steady-State Radius:} Block-onset energy enters a bounded tube:
     \begin{equation}\label{eq:limsup_radius}
     \limsup_{m\to\infty}V_m\ \le\ \frac{\tilde C}{1-\gamma^{T_d}}.
     \end{equation}
-    \item[\textit{(b)}] \textbf{Finite-Time Entry:} For any target radius $\varepsilon^2 > \frac{\tilde C}{1-\gamma^{T_d}}$, the system enters the $\varepsilon$-tube ($V_m \le \varepsilon^2$) in a finite number of blocks $m \ge M(\varepsilon)$, explicitly bounded by $M(\varepsilon)=0$ when $V_0 \le \varepsilon^2 - \frac{\tilde C}{1-\gamma^{T_d}}$ and otherwise by:
+    \item[\textit{(b)}] \textbf{Finite-Time Entry:} For any $\varepsilon^2 > \frac{\tilde C}{1-\gamma^{T_d}}$, $V_m \le \varepsilon^2$ holds for $m \ge M(\varepsilon)$, where $M(\varepsilon)=0$ if $V_0 \le \varepsilon^2 - \frac{\tilde C}{1-\gamma^{T_d}}$ and otherwise:
     \begin{equation}\label{eq:finite_time_blocks}
     \rev{M(\varepsilon) := \left\lceil \frac{\ln\!\big((\varepsilon^2 - \frac{\tilde C}{1-\gamma^{T_d}})/V_0\big)}{T_d \ln \gamma} \right\rceil.}
     \end{equation}
 \end{itemize}
 \end{theorem}
 \begin{proof}[Proof Sketch]
-We iteratively expand the recurrence from Proposition~\ref{prop:block_dynamics}. The energy $V_m$ is upper-bounded by a geometric series which converges to the stated limit. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-G.}
+Unrolling the linear recurrence \eqref{eq:inter_block} yields a geometric series converging to \eqref{eq:limsup_radius} and giving bound \eqref{eq:finite_time_blocks} (Supplementary Material Section~S-G).
 \end{proof}
-
-Finally, we consolidate these findings into a definitive stability guarantee.
 
 \begin{theorem}[The Practical Stability Guarantee]
 \label{thm:practical_stability}
-With a minimum dwell time $T_d \ge 1$, the SRA framework guarantees:
+With minimum dwell time $T_d \ge 1$, SRA guarantees:
 \begin{itemize}
-    \item[\textit{(a)}] \textbf{Suppression of High-Frequency Chattering:} \rev{The number of route switches over any $T$-step horizon satisfies $N_{\text{sw}}(T) \le \lceil T/T_d \rceil$, so the asymptotic switching frequency is strictly bounded by $\bar{f}_{\text{sw}} = \limsup_{T\to\infty} N_{\text{sw}}(T)/T \le 1/T_d$.}
-    \item[\textit{(b)}] \textbf{Tunable Residual Energy Bound:} \rev{The ultimate upper bound on the block-onset tracking energy $\tilde{C}/(1-\gamma^{T_d})$ decreases monotonically toward $\tilde{C}$ as $T_d$ increases.}
+    \item[\textit{(a)}] \textbf{Chattering Suppression:} \rev{Over any $T$-step horizon, switches obey $N_{\text{sw}}(T) \le \lceil T/T_d \rceil$, so asymptotic switching frequency satisfies $\bar{f}_{\text{sw}} = \limsup_{T\to\infty} N_{\text{sw}}(T)/T \le 1/T_d$.}
+    \item[\textit{(b)}] \textbf{Tunable Residual Bound:} \rev{The asymptotic block-onset tracking energy bound $\tilde{C}/(1-\gamma^{T_d})$ decreases monotonically toward $\tilde{C}$ with $T_d$.}
 \end{itemize}
 \end{theorem}
 \begin{proof}[Proof Sketch]
-Direct consequence of the dwell time definition and Theorem~\ref{thm:epsilon_tube}. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-H.}
+Direct consequence of block-wise switching gating and Theorem~\ref{thm:epsilon_tube} (Supplementary Material Section~S-H).
 \end{proof}
 
-Equation~\eqref{eq:limsup_radius} also provides a closed-form design rule. Given a target stability margin $R_{\text{target}}^2 > \tilde C$, the required dwell time is:
+Equation~\eqref{eq:limsup_radius} yields a closed-form sizing rule: for target margin $R_{\text{target}}^2 > \tilde C$, choose
 \begin{equation}\label{eq:design_parameter_Td}
-T_d\ \ge\ \Big\lceil \frac{\ln(1-\tilde C/R_{\text{target}}^2)}{\ln \gamma}\Big\rceil.
+T_d\ \ge\ \Big\lceil \frac{\ln(1-\tilde C/R_{\text{target}}^2)}{\ln \gamma}\Big\rceil,
 \end{equation}
-This establishes a quantitative trade-off: operators can linearly increase the stabilization horizon $T_d$ to achieve an exponential reduction in the excess residual energy bound above $\tilde{C}$.
+trading linear horizon increases for exponential shrinkage of excess energy above $\tilde{C}$.
 
 \subsection{From Structural Stability to Capacity Expansion}
 \label{subsec:theory_bridge}
 
-Establishing convergence ensures the system is safe; however, strict stability is necessary but insufficient for utility. 
-We must now rigorously bridge the gap between \textit{dynamical stability} and \textit{network capacity}.
-In this section, we establish conditions under which SRA's stress relaxation directly improves network capacity.
-Specifically, we derive a formal link showing how peak-shaving switching events translate into an expansion of the network's robust and actual capacity regions.
-
-\rev{We first formalize the route-redistribution budget and establish a sufficient certificate under which a path-switching event strictly reduces peak centrality without creating a higher secondary peak.}
+We next connect peak-stress relaxation directly to network throughput capacity, establishing when path switching lowers peak centrality without creating a higher secondary bottleneck.
 
 \begin{lemma}[\rev{Peak-Shaving Certificate under Non-Overloading Diversion}]
 \label{lem:block-budget}
-\rev{Consider a switching boundary between dwell blocks $m$ and $m+1$ with unique current peak node $u$ ($\kappa_u^{(m)} = \kappa_{\max}^{(m)} > \kappa_j^{(m)}$ for all $j \neq u$). Suppose the updated cost vector $C^{(m+1)}$ diverts a subset of shortest paths away from $u$ so that $u$ sheds a positive path load $\Delta_u^- := \kappa_u^{(m)} - \kappa_u^{(m+1)} > 0$, while each other node $j \in V \setminus \{u\}$ experiences a net path-load increment bounded by $B_j^{(m)} := (\kappa_j^{(m+1)} - \kappa_j^{(m)})_+ \ge 0$. If the network satisfies the \textbf{Non-Overloading Diversion Condition} for some margin $\delta \in (0, \Delta_u^-]$:
+\rev{At a block boundary $m \to m+1$ with unique peak node $u$ ($\kappa_u^{(m)} = \kappa_{\max}^{(m)} > \kappa_j^{(m)}$ for $j \neq u$), suppose updated costs $C^{(m+1)}$ shed load $\Delta_u^- := \kappa_u^{(m)} - \kappa_u^{(m+1)} > 0$ from $u$ while each $j \neq u$ incurs net increment $B_j^{(m)} := (\kappa_j^{(m+1)} - \kappa_j^{(m)})_+ \ge 0$. Under the \textbf{Non-Overloading Diversion Condition} for $\delta \in (0, \Delta_u^-]$:
 \begin{equation}\label{eq:non_overloading_diversion}
 \kappa_j^{(m)} + B_j^{(m)} \le \kappa_{\max}^{(m)} - \delta, \qquad \forall j \in V \setminus \{u\},
 \end{equation}
-then the post-switch peak stress strictly decreases by at least $\delta$:
+the post-switch peak strictly drops:}
 \begin{equation}\label{eq:peak_shaving_bound}
 \kappa^{(m+1)}_{\max}\ \le\ \kappa^{(m)}_{\max} - \delta.
-\end{equation}}
+\end{equation}
 \end{lemma}
 \begin{proof}[Proof Sketch]
-Under the positive load shedding $\Delta_u^- \ge \delta > 0$ at node $u$, its post-switch load satisfies $\kappa_u^{(m+1)} = \kappa_{\max}^{(m)} - \Delta_u^- \le \kappa_{\max}^{(m)} - \delta$. Simultaneously, the non-overloading condition \eqref{eq:non_overloading_diversion} ensures that no other node $j \neq u$ receiving diverted traffic exceeds $\kappa_{\max}^{(m)} - \delta$. Taking the maximum over all $i \in V$ yields \eqref{eq:peak_shaving_bound}. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-I.}
+Load shedding at $u$ gives $\kappa_u^{(m+1)} \le \kappa_{\max}^{(m)} - \delta$, while \eqref{eq:non_overloading_diversion} keeps every $j\neq u$ at or below $\kappa_{\max}^{(m)} - \delta$ (Supplementary Material Section~S-I).
 \end{proof}
 
-This structural optimization---reducing the maximum stress across nodes---maps directly to network throughput gains. 
-\rev{Under a standard flow-conservation queuing model where $\rho > 0$ denotes the per-OD-pair traffic rate multiplier, transit node $i$ experiences arrival rate $\lambda_i(\rho) = \rho\,\kappa_i(S)$ under uniform unit weights $W_{st}\equiv 1$ (or $\lambda_i(\rho) = \rho\,\mu_i\,\widetilde{\kappa}_i(S;W,\mu)$ under general demand weights $W_{st}$) and remains stable in its transit queues if and only if $\lambda_i(\rho) < \mu_i$ for all active transit nodes $i \in V$ (with convention $\mu_i/0 = +\infty$). Thus, the maximum stable network traffic multiplier is $\rho_{\max}(\kappa) = \min_{i \in V} (\mu_i / \kappa_i)$, which is lower-bounded by the \textit{Robust Capacity Lower Bound} $L(\kappa) := \mu_{\min}/\kappa_{\max}$ where $\mu_{\min} := \min_{i \in V} \mu_i$.}
+\rev{Under flow-conservation queuing with OD rate multiplier $\rho > 0$, node $i$ receives arrival rate $\lambda_i(\rho) = \rho\,\kappa_i(S)$ for $W_{st}\equiv 1$ (or $\lambda_i(\rho) = \rho\,\mu_i\,\widetilde{\kappa}_i(S;W,\mu)$ in general) and remains queue-stable iff $\lambda_i(\rho) < \mu_i$ for all $i \in V$. Hence the maximum stable traffic multiplier is $\rho_{\max}(\kappa) = \min_{i \in V} (\mu_i / \kappa_i)$, lower-bounded by $L(\kappa) := \mu_{\min}/\kappa_{\max}$ where $\mu_{\min} := \min_{i \in V} \mu_i$.}
 
 \begin{proposition}[\rev{Expansion of Robust and Actual Network Capacity}]
 \label{prop:perf-bridge}
-\rev{Let $\kappa$ and $\kappa'$ denote the stress profiles before and after SRA relaxation, satisfying the strict peak reduction $\kappa'_{\max} \le \kappa_{\max} - \delta < \kappa_{\max}$ from Lemma~\ref{lem:block-budget} (with $\kappa_u' \le \kappa_{\max} - d$ at the initial peak $u$, where $d := \Delta_u^- \ge \delta > 0$, and $\kappa_j' \le \kappa_j + B_j$ for $j \neq u$). Then the following three properties hold:
+\rev{Let $\kappa, \kappa'$ be pre- and post-relaxation stress profiles satisfying $\kappa'_{\max} \le \kappa_{\max} - \delta < \kappa_{\max}$ (Lemma~\ref{lem:block-budget}, with $d := \Delta_u^- \ge \delta > 0$ and $\kappa_j' \le \kappa_j + B_j$ for $j \neq u$). Then:
 \begin{enumerate}[label=(\roman*)]
-\item \emph{Unconditional Expansion of Robust Capacity Lower Bound:} For any distribution of node service rates $\{\mu_i\}_{i \in V}$ with $\mu_{\min} = \min_i \mu_i$, the worst-case guaranteed capacity lower bound strictly increases:
+\item \emph{Robust Capacity Lower Bound:} For any $\{\mu_i\}_{i \in V}$, the worst-case capacity lower bound strictly expands:
 \begin{equation}\label{eq:robust_lower_bound_gain}
 L(\kappa') = \frac{\mu_{\min}}{\kappa'_{\max}} > \frac{\mu_{\min}}{\kappa_{\max}} = L(\kappa).
 \end{equation}
-\item \emph{Exact Capacity Proportionality under Homogeneous Service Rates or Generalized Stress:} If node service rates are homogeneous ($\mu_i \equiv \mu$, as in Table~\ref{tab:sim_params}), then $\rho_{\max}(\kappa) = \min_{i \in V}(\mu/\kappa_i) = \mu/\kappa_{\max}$. Consequently, the actual network capacity strictly increases in exact inverse proportion to peak centrality:
+\item \emph{Exact Proportionality (Homogeneous Rates or Generalized Stress):} When $\mu_i \equiv \mu$ (Table~\ref{tab:sim_params}), $\rho_{\max}(\kappa) = \mu/\kappa_{\max}$, yielding inverse-proportional capacity expansion:
 \begin{equation}\label{eq:exact_capacity_ratio}
 \frac{\rho_{\max}(\kappa')}{\rho_{\max}(\kappa)} = \frac{\kappa_{\max}}{\kappa'_{\max}} > 1.
 \end{equation}
-Furthermore, for arbitrary heterogeneous capacities $\mu_i > 0$ and demands $W_{st} \ge 0$, using the generalized stress $\widetilde{\kappa}_i(S; W, \mu)$ in Eq.~\eqref{eq:generalized_stress} yields $\rho_{\max}(\widetilde{\kappa}) = \min_{i \in V} (1/\widetilde{\kappa}_i) = 1/\widetilde{\kappa}_{\max}$; hence, whenever relaxation strictly reduces peak generalized stress ($\widetilde{\kappa}'_{\max} < \widetilde{\kappa}_{\max}$), actual capacity satisfies the exact identity $\rho_{\max}(\widetilde{\kappa}')/\rho_{\max}(\widetilde{\kappa}) = \widetilde{\kappa}_{\max}/\widetilde{\kappa}'_{\max} > 1$.
-\item \emph{Sufficient Condition under Heterogeneous Service Rates with Unweighted BC:} When unweighted topological BC $\kappa_i$ is used on a network with heterogeneous service rates $\mu_i$, let $\rho_0 := \rho_{\max}(\kappa) = \min_{i \in V}(\mu_i/\kappa_i)$. Then a sufficient condition for the post-relaxation capacity to satisfy $\rho_{\max}(\kappa') \ge \rho_0$ (and $\rho_{\max}(\kappa') > \rho_0$ when the inequalities are strict) is that both the relieved peak $u$ and all traffic-absorbing alternate nodes $j \neq u$ satisfy the joint service-rate slack conditions:
+For heterogeneous $\mu_i > 0$ and demands $W_{st} \ge 0$, generalized stress $\widetilde{\kappa}_i(S; W, \mu)$ (Eq.~\eqref{eq:generalized_stress}) similarly gives $\rho_{\max}(\widetilde{\kappa}) = 1/\widetilde{\kappa}_{\max}$ and $\rho_{\max}(\widetilde{\kappa}')/\rho_{\max}(\widetilde{\kappa}) = \widetilde{\kappa}_{\max}/\widetilde{\kappa}'_{\max} > 1$ whenever $\widetilde{\kappa}'_{\max} < \widetilde{\kappa}_{\max}$.
+\item \emph{Sufficient Condition for Unweighted BC under Heterogeneous Rates:} With $\rho_0 := \rho_{\max}(\kappa) = \min_{i \in V}(\mu_i/\kappa_i)$, unweighted BC achieves $\rho_{\max}(\kappa') \ge \rho_0$ (strictly $>$ under strict inequalities) if:
 \begin{equation}\label{eq:hetero_capacity_condition}
 \frac{\mu_u}{\kappa_{\max} - d} \ge \rho_0 \;\text{ and }\; \frac{\mu_j}{\kappa_j + B_j} \ge \rho_0,\; \forall j \neq u.
 \end{equation}
 \end{enumerate}}
 \end{proposition}
 \begin{proof}[Proof Sketch]
-(i) Follows directly from $\kappa'_{\max} < \kappa_{\max}$ with $\mu_{\min}$ constant. (ii) Follows from the exact identity $\min_{i \in V}(\mu/\kappa_i) = \mu / \max_{i \in V}\kappa_i = \mu/\kappa_{\max}$ (and similarly $\min_{i \in V}(1/\widetilde{\kappa}_i) = 1/\widetilde{\kappa}_{\max}$). (iii) Since $\rho_{\max}(\kappa') = \min_{i \in V}(\mu_i/\kappa'_i)$ and $\kappa'_u \le \kappa_{\max}-d$, $\kappa'_j \le \kappa_j+B_j$, satisfying \eqref{eq:hetero_capacity_condition} for $i=u$ and all $j \neq u$ guarantees $\mu_i/\kappa'_i \ge \rho_0$ for every $i \in V$. \textit{The complete step-by-step formal proof is provided in Supplementary Material Section S-J.}
+Follows directly from $\kappa'_{\max}<\kappa_{\max}$, taking extrema over $i\in V$, and substituting $\kappa'_u,\kappa'_j$ bounds into $\min_i (\mu_i/\kappa'_i)$ (Supplementary Material Section~S-J).
 \end{proof}
 
 \begin{remark}[Structural vs. Artificial Constraints]
-It is crucial to distinguish between \textit{artificial congestion} caused by shortest-path concentration and \textit{topological hard limits} (e.g., physical bridges or cuts). 
-SRA mitigates artificial peaks whenever slack alternate paths exist (Lemma~\ref{lem:block-budget}), whereas in topologies constrained by physical cuts, ultimate capacity remains bounded by the cut capacity (Section~\ref{subsec:limitations}).
+SRA removes \textit{artificial congestion} caused by shortest-path concentration whenever alternate paths exist (Lemma~\ref{lem:block-budget}), whereas capacity in cut-limited graphs remains bounded by physical cuts (Section~\ref{subsec:limitations}).
 \end{remark}
 
 \section{Simulation Analysis}
 \label{sec:simulation}
 
-We now subject the SRA framework to a comprehensive discrete-event simulation campaign designed to verify six dimensions: (1) microscopic validation of the structure-capacity bridge (Proposition~\ref{prop:perf-bridge}), Drop-Jump dynamics (Theorem~\ref{thm:drop_jump}), and dwell-time cooling (Proposition~\ref{prop:block_dynamics}); (2) macroscopic structural relaxation across heterogeneous, hybrid, and homogeneous graphs; (3) dynamic traffic performance and adversarial hub-removal robustness against static (Dijkstra), reactive (LIRP-D), and learning-based (Q-Routing \cite{Dou2020QLearningRouting}) protocols; \rev{(4) component ablations and comparisons against Static BC Routing and Fortz--Thorup IGP Weight Tuning \cite{Fortz2000OSPF}; (5) robustness under Pareto gravity traffic, heterogeneous capacities, time-varying traffic surges, and sensing noise; and (6) hyperparameter sensitivity, runtime scalability up to $N=500$, and validation on real-world carrier backbones from the Internet Topology Zoo \cite{Knight2011TopologyZoo} (G\'EANT, Deltacom, and UsCarrier).}
+We validate SRA via discrete-event simulations across six axes: (1) microscopic validation of Proposition~\ref{prop:perf-bridge}, Theorem~\ref{thm:drop_jump}, and Proposition~\ref{prop:block_dynamics}; (2) macroscopic stress relaxation across graph families; (3) dynamic performance and targeted-attack resilience against Dijkstra, LIRP-D, and Q-Routing \cite{Dou2020QLearningRouting}; \rev{(4) component ablations and comparisons against Static BC and Fortz--Thorup IGP Weight Tuning \cite{Fortz2000OSPF}; (5) robustness to skewed demand, heterogeneous capacities, surges, and sensing noise; and (6) hyperparameter sensitivity, runtime scaling ($N \le 500$), and Internet Topology Zoo backbones \cite{Knight2011TopologyZoo} (G\'EANT, Deltacom, UsCarrier).}
 
 \subsection{Experimental Design and Environment Setup}
 \label{subsec:sim_setup}
 
-We evaluate SRA across three synthetic topology classes—\textbf{Barabási-Albert (BA)} scale-free graphs (heterogeneous hubs), \textbf{Watts-Strogatz (WS)} small-world graphs (hybrid), and \textbf{Erd\H{o}s-Rényi (ER)} random graphs (homogeneous)—\rev{plus three real-world carrier backbones from the Internet Topology Zoo \cite{Knight2011TopologyZoo}: \textbf{G\'EANT (\texttt{Geant2012})} ($N=40, E=61$), \textbf{Deltacom} ($N=113, E=161$), and \textbf{UsCarrier} ($N=158, E=189$)}. Table~\ref{tab:sim_params} summarizes the simulation parameters. Baseline comparisons include \textbf{Dijkstra}, \textbf{LIRP-D}, \textbf{Q-Routing} \cite{Dou2020QLearningRouting} ($\alpha=0.1, \gamma=0.9, \epsilon=0.3$), \rev{\textbf{Static BC Routing}, and \textbf{IGP Weight Tuning} \cite{Fortz2000OSPF}}, evaluated over 100 independent runs for structural/baseline tests and \rev{30 independent runs (with 95\% confidence intervals and Holm--Bonferroni-corrected two-sided paired Wilcoxon signed-rank tests) for multi-factor ablation, noise, and scalability campaigns. In the 30-seed revision campaign, all-pairs shortest-path trees are evaluated via Dijkstra traversals in NetworkX ($O(N(E+N\log N))$, equivalent to Eqs.~\eqref{eq:bc_definition}--\eqref{eq:generalized_stress} under deterministic tie-breaking, Assumption 3) over $K_{\max}=200$ control iterations, and steady-state peak stresses are averaged over an even number of final dwell blocks ($\max\{8, 2\lceil 20/T_d\rceil\}$ blocks) with packet-level evaluation replaying the steady-state routing-table orbit at 5 packet timesteps per control epoch over $T=1000$ timesteps ($200$ warmup) so that multi-path limit cycles are faithfully reflected without parity bias.}
+We test three synthetic classes—\textbf{Barabási-Albert (BA)} scale-free, \textbf{Watts-Strogatz (WS)} small-world, and \textbf{Erd\H{o}s-Rényi (ER)} random graphs—\rev{plus three Internet Topology Zoo \cite{Knight2011TopologyZoo} carrier backbones: \textbf{G\'EANT (\texttt{Geant2012})} ($N=40, E=61$), \textbf{Deltacom} ($N=113, E=161$), and \textbf{UsCarrier} ($N=158, E=189$)}. Table~\ref{tab:sim_params} lists all parameters. Baselines comprise \textbf{Dijkstra}, \textbf{LIRP-D}, \textbf{Q-Routing} \cite{Dou2020QLearningRouting} ($\alpha=0.1, \gamma=0.9, \epsilon=0.3$), \rev{\textbf{Static BC}, and \textbf{IGP Weight Tuning} \cite{Fortz2000OSPF}}, evaluated over 100 runs for structural/baseline tests and \rev{30 trials (95\% CI and Holm--Bonferroni-corrected two-sided paired Wilcoxon signed-rank tests) for ablations, noise, and scaling. In the 30-seed campaign, all-pairs shortest-path trees run via NetworkX Dijkstra ($O(N(E+N\log N))$) over $K_{\max}=200$ control epochs, steady-state stress averages $\max\{8, 2\lceil 20/T_d\rceil\}$ terminal blocks, and packet replay executes the limit-cycle routing orbit at 5 packet timesteps per epoch over $T=1000$ steps ($200$ warmup).}
 
 \begin{table}[!t]
 \centering
@@ -694,27 +628,27 @@ Proc. / Queue Cap. & $10$ packets/timestep (default); Queue buffer $B_{\max} = 5
 
 \begin{figure}[!t]
     \centering
-    \includegraphics[width=0.90\columnwidth]{ren_fig1_validation.eps}
+    \includegraphics[width=0.78\columnwidth]{ren_fig1_validation.eps}
     \caption{Independently Measured Network Capacity Gain vs. Structural Optimization Ratio. The empirical data clusters tightly around the theoretical $y=x$ prediction, confirming that performance gains are deterministically driven by structural stress dispersion. ($R^2=0.951$, Sample size $N=100$).}
     \label{fig:peak_validation}
 \end{figure}
 
 \subsubsection{Validation of the Structure-Capacity Bridge}
-To verify Proposition~\ref{prop:perf-bridge}\rev{(ii)}, we tested 100 randomized network instances \rev{with homogeneous service rates ($\mu_i \equiv \mu$)}, comparing the static \textit{Structural Optimization Ratio} ($\kappa_{\max}/\kappa'_{\max}$, X-axis) against the packet-level \textit{Actual Capacity Gain} ($\rho'_{\text{crit}}/\rho_{\text{crit}}$, Y-axis). As shown in Fig.~\ref{fig:peak_validation}, the data points cluster tightly around $y=x$ ($\mathbf{R^2=0.951}$), confirming Eq.~\eqref{eq:exact_capacity_ratio}.
+Across 100 randomized graphs \rev{with $\mu_i \equiv \mu$}, the \textit{Structural Optimization Ratio} ($\kappa_{\max}/\kappa'_{\max}$) matches packet-level \textit{Actual Capacity Gain} ($\rho'_{\text{crit}}/\rho_{\text{crit}}$) closely around $y=x$ ($\mathbf{R^2=0.951}$; Fig.~\ref{fig:peak_validation}), confirming Proposition~\ref{prop:perf-bridge}\rev{(ii)} and Eq.~\eqref{eq:exact_capacity_ratio}.
 
 \rev{\subsubsection{Verification of Lyapunov Drop-Jump and Dwell-Time Cooling Dynamics}
-Figs.~\ref{fig:lyapunov_dynamics} and~\ref{fig:dwell_cooling} track the piecewise Lyapunov energy $V(S^{(k)})$ across iterations. Macroscopically (Fig.~\ref{fig:lyapunov_dynamics}(a)), $V(S^{(k)})$ decays rapidly into the low-energy invariant tube $\Omega$; microscopically (Fig.~\ref{fig:lyapunov_dynamics}(b)), it exhibits exponential intra-partition cooling at rate $(1-\alpha)^2$ punctuated by bounded switching impulses $\le \bar{\Delta}^2/\alpha$ (Eq.~\eqref{eq:drop_jump_one_step}). Comparing Stabilized SRA with dwell time $T_d=5$ (Fig.~\ref{fig:dwell_cooling}(a)) against Base SRA with $T_d=1$ (Fig.~\ref{fig:dwell_cooling}(b)) confirms that enforcing $T_d=5$ imposes $T_d-1=4$ uninterrupted exponential cooling steps per block ($E_{\tau_m+t}=\gamma^{2t}V_m$), suppressing irregular high-frequency switching chattering by $5\times$ in accordance with Proposition~\ref{prop:block_dynamics} and Theorem~\ref{thm:practical_stability}.}
+Figs.~\ref{fig:lyapunov_dynamics} and~\ref{fig:dwell_cooling} track $V(S^{(k)})$ across epochs: macroscopically (Fig.~\ref{fig:lyapunov_dynamics}(a)), $V(S^{(k)})$ enters the attracting set $\Omega$; microscopically (Fig.~\ref{fig:lyapunov_dynamics}(b)), exponential intra-partition cooling at rate $(1-\alpha)^2$ alternates with bounded switching jumps $\le \bar{\Delta}^2/\alpha$ (Eq.~\eqref{eq:drop_jump_one_step}). Setting $T_d=5$ (Fig.~\ref{fig:dwell_cooling}(a)) instead of $T_d=1$ (Fig.~\ref{fig:dwell_cooling}(b)) enforces $T_d-1=4$ cooling steps per block ($E_{\tau_m+t}=\gamma^{2t}V_m$), cutting route-switching frequency by $5\times$ in line with Proposition~\ref{prop:block_dynamics} and Theorem~\ref{thm:practical_stability}.}
 
 \begin{figure}[!t]
     \centering
-    \includegraphics[width=0.90\columnwidth]{ren_fig2_lyapunov.pdf}
+    \includegraphics[width=0.78\columnwidth]{ren_fig2_lyapunov.pdf}
     \caption{\rev{Empirical verification of the Dissipation-Injection Law (Theorem~\ref{thm:drop_jump}). (a) Macroscopic convergence of the piecewise Lyapunov energy $V(S^{(k)})$ into the bounded attracting set $\Omega$. (b) Microscopic steady-state trajectory exhibiting exponential intra-partition dissipation (smooth drops) punctuated by bounded path-switching injections (vertical jumps).}}
     \label{fig:lyapunov_dynamics}
 \end{figure}
 
 \begin{figure}[!t]
     \centering
-    \includegraphics[width=0.90\columnwidth]{ren_fig3_dwell_time.pdf}
+    \includegraphics[width=0.78\columnwidth]{ren_fig3_dwell_time.pdf}
     \caption{\rev{Empirical verification of Block-wise Dissipation Dynamics (Proposition~\ref{prop:block_dynamics} and Theorem~\ref{thm:practical_stability}). (a) Stabilized SRA with temporal dwell regularization ($T_d=5$) enforces $T_d-1=4$ consecutive intra-block exponential cooling steps between block-boundary updates, suppressing switching frequency by $5\times$. (b) Base SRA without dwell regularization ($T_d=1$) exhibits persistent irregular step-by-step chattering.}}
     \label{fig:dwell_cooling}
 \end{figure}
@@ -761,21 +695,21 @@ Table~\ref{tab:structural_benefits_stats} reports the macroscopic equilibrium pr
 \begin{figure*}[t]
     \centering
     \subfloat[BA network: SRA acts as a proactive performance optimizer.\label{fig:perf_ba_stacked}]{%
-    \begin{minipage}{0.88\textwidth}
+    \begin{minipage}{0.86\textwidth}
         \centering
-        \includegraphics[width=\textwidth,height=0.22\textheight,keepaspectratio]{performance_comparison_ba.eps}
+        \includegraphics[width=\textwidth,height=0.195\textheight,keepaspectratio]{performance_comparison_ba.eps}
     \end{minipage}
     }\\[-2pt]
     \subfloat[WS network: SRA maintains stability beyond the congestion knee.\label{fig:perf_ws_stacked}]{%
-    \begin{minipage}{0.88\textwidth}
+    \begin{minipage}{0.86\textwidth}
         \centering
-        \includegraphics[width=\textwidth,height=0.22\textheight,keepaspectratio]{performance_comparison_ws.eps}
+        \includegraphics[width=\textwidth,height=0.195\textheight,keepaspectratio]{performance_comparison_ws.eps}
     \end{minipage}
     }\\[-2pt]
     \subfloat[ER network: SRA trades latency for reliability under structural limits.\label{fig:perf_er_stacked}]{%
-    \begin{minipage}{0.88\textwidth}
+    \begin{minipage}{0.86\textwidth}
         \centering
-        \includegraphics[width=\textwidth,height=0.22\textheight,keepaspectratio]{performance_comparison_er.eps}
+        \includegraphics[width=\textwidth,height=0.195\textheight,keepaspectratio]{performance_comparison_er.eps}
     \end{minipage}
     }
     \caption{Comparative dynamic traffic performance across the topological spectrum. The results confirm SRA's ability to transition its control strategy based on the underlying network structure.}
@@ -785,16 +719,16 @@ Table~\ref{tab:structural_benefits_stats} reports the macroscopic equilibrium pr
 \subsection{Adversarial Robustness: Resilience Under Targeted Attack}
 \label{subsec:robustness_and_params}
 
-We next subject the network to sequential \textbf{targeted hub removals} in descending order of initial BC across 50 trials, measuring the \textbf{SRA PDR Advantage} over Dijkstra:
+Sequentially removing hubs in descending order of initial BC across 50 trials, we measure the \textbf{SRA PDR Advantage} over Dijkstra:
 \begin{equation}
 \label{eq:pdr_advantage}
 \text{Advantage (\%)} = \frac{\text{PDR}_{\text{SRA}} - \text{PDR}_{\text{Dijkstra}}}{\text{PDR}_{\text{Dijkstra}}} \times 100\%.
 \end{equation}
-As shown in Fig.~\ref{fig:robustness_summary_stats}, SRA sustains a $>60\%$ PDR advantage in BA networks through pre-attack stress dispersion, an emergent $\sim 20\%$ peak advantage in WS networks under critical damage, and a neutral $0\%$ overhead in homogeneous ER networks.
+Fig.~\ref{fig:robustness_summary_stats} shows a sustained $>60\%$ PDR advantage in BA graphs via pre-attack stress dispersion, an emergent $\sim 20\%$ peak advantage in WS graphs under heavy damage, and neutral $0\%$ overhead in ER graphs.
 
 \begin{figure}[!t]
     \centering
-    \includegraphics[width=0.90\columnwidth]{robustness_advantage_summary_stats.eps}
+    \includegraphics[width=0.78\columnwidth]{robustness_advantage_summary_stats.eps}
     \caption{The SRA PDR advantage over Dijkstra under a targeted hub-removal attack. The results validate SRA's capacity to provide topological hardening in vulnerable networks (BA) and adaptive survival in hybrid ones (WS).}
     \label{fig:robustness_summary_stats}
 \end{figure}
@@ -802,22 +736,11 @@ As shown in Fig.~\ref{fig:robustness_summary_stats}, SRA sustains a $>60\%$ PDR 
 \rev{\subsection{Component Ablation Study and Comparison Against Stronger Baselines}
 \label{subsec:ablation_baselines}
 
-To isolate the contribution of each architectural component in SRA and benchmark against stronger traffic-engineering baselines, we conducted a 30-seed controlled ablation campaign across BA, WS, and ER topologies ($N=100$, $K_{\max}=200$, $T=1{,}000$ packet-simulation steps with steady-state evaluation over the terminal $800$-step orbit window after a $200$-step warmup). We compare nine variants:
-\begin{enumerate}
-    \item \textbf{Dijkstra (Static Shortest Path):} Open-loop baseline with fixed unit node costs $C_i \equiv 1$.
-    \item \textbf{LIRP-D (Reactive Queue-Driven):} Local queue-length deflection baseline.
-    \item \textbf{Static BC Routing (One-Shot Centrality Penalty):} Open-loop structural heuristic setting $C_i = 1 + \beta_I\,\mathrm{norm}(\kappa_i^{(0)})$ in a single step without feedback integration.
-    \item \textbf{IGP Weight Tuning (Memoryless Fortz--Thorup \cite{Fortz2000OSPF}):} Pure memoryless iterative convex piecewise-linear utilization penalty adjusting weights at every control epoch without EWMA memory or dwell-time gating.
-    \item \textbf{IGP Damped FT (Fortz--Thorup + EWMA, $T_d=1$):} EWMA-smoothed Fortz--Thorup variant without dwell-time regularization, isolating temporal dwell gating from weight smoothing.
-    \item \textbf{Memoryless Reactive BC ($\alpha=1$, No Leaky Integrator):} Ablation variant removing historical memory ($S^{(k+1)} = \mathrm{norm}(\kappa^{(k)})$), corresponding to Remark~\ref{rem:reactive_routing}.
-    \item \textbf{Unnormalized SRA (No Max-Normalization):} Ablation variant feeding raw $\kappa^{(k)}/N^2$ directly into Eq.~\eqref{eq:pressure_update} without max-normalization $\mathrm{norm}(\cdot)$.
-    \item \textbf{SRA w/o Dwell ($T_d = 1$):} Ablation variant with leaky integrator ($\alpha=0.1$) and normalization, but without temporal dwell regularization.
-    \item \textbf{Full SRA ($\alpha=0.1, \beta_I=10, T_d=5$):} The complete closed-loop governance mechanism.
-\end{enumerate}
+To isolate each component of SRA and compare against stronger traffic-engineering baselines, we ran a 30-seed campaign across BA, WS, and ER graphs ($N=100, K_{\max}=200, T=1{,}000$, evaluating the terminal $800$-step steady-state orbit after $200$-step warmup) over nine variants (Table~\ref{tab:ablation_results}): open-loop \textit{Dijkstra} ($C_i \equiv 1$); queue-deflecting \textit{LIRP-D}; one-shot \textit{Static BC} ($C_i = 1 + \beta_I\,\mathrm{norm}(\kappa_i^{(0)})$); \textit{IGP Weight Tuning} (memoryless Fortz--Thorup \cite{Fortz2000OSPF} convex utilization penalties without EWMA or dwell gating); \textit{IGP Damped FT} (Fortz--Thorup + EWMA, $T_d=1$); \textit{Memoryless Reactive BC} ($\alpha=1$, Remark~\ref{rem:attractor_vs_unique} / $S^{(k+1)}=\mathrm{norm}(\kappa^{(k)})$); \textit{Unnormalized SRA} (feeding $\kappa^{(k)}/N^2$ without $\mathrm{norm}(\cdot)$); \textit{SRA w/o Dwell} ($\alpha=0.1, T_d=1$); and \textit{Full SRA} ($\alpha=0.1, \beta_I=10, T_d=5$).
 
 \begin{table*}[t]
 \centering
-\scriptsize\setlength{\tabcolsep}{2.2pt}\renewcommand{\arraystretch}{1.12}
+\scriptsize\setlength{\tabcolsep}{2.2pt}\renewcommand{\arraystretch}{1.05}
 \caption{\rev{Component Ablation Study and Comparison Against Stronger Baselines on BA Scale-Free Networks ($N=100$, Heavy Load $\rho=0.9$, $K_{\max}=200$, $T=1{,}000$, Mean $\pm$ Std and 95\% CI $[\bar{x} \pm 1.96\,s/\sqrt{30}]$ across 30 Independent Trials).}}
 \label{tab:ablation_results}
 \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lcccccc@{}}
@@ -839,16 +762,16 @@ SRA w/o Dwell ($T_d=1$) & $90.06 \pm 0.33$ & $[89.94, 90.18]$ & $100.01 \pm 0.03
 \end{tabular*}
 \end{table*}
 
-The quantitative results at heavy load ($\rho = 0.9$, 30 independent trials with normal-approximation 95\% confidence intervals $\bar{x} \pm 1.96\,s/\sqrt{30}$ and paired two-sided Wilcoxon signed-rank tests with Holm--Bonferroni correction) are summarized in Table~\ref{tab:ablation_results} and visualized across the full load spectrum in Fig.~\ref{fig:ablation_baselines}. Three key scientific insights emerge:
+Table~\ref{tab:ablation_results} ($\rho = 0.9$, 95\% CI and Holm--Bonferroni-corrected paired Wilcoxon tests) and Fig.~\ref{fig:ablation_baselines} yield three findings:
 \begin{itemize}
-    \item \textbf{Necessity of the Leaky Integrator ($\alpha=0.1$ vs.\ Memoryless Schemes):} Removing the leaky integrator (\textit{Memoryless Reactive BC}, $\alpha=1, T_d=1$) or applying memoryless Fortz--Thorup weights (\textit{IGP Weight Tuning}) causes continuous boundary route flapping ($\bar{f}_{\text{sw}} = 99.5\%$, $100.0\%$ tail switching) and peak centrality amplification ($\Delta \kappa_{\max} = -6.03\%$ and $-5.74\%$), degrading BA throughput to $78.25 \pm 3.73$ and $81.84 \pm 3.76$ pkts/step. Adding leaky-integrator smoothing (\textit{Full SRA}, $\alpha=0.1, T_d=5$) achieves $\mathbf{89.72 \pm 0.72}$ pkts/step ($99.63 \pm 0.72\%$ PDR, $+20.82 \pm 1.81$ pkts/step / $+30.22\%$ over Dijkstra, $+11.47 \pm 1.20$ / $+14.66\%$ over Reactive BC, and $+7.89 \pm 1.19$ / $+9.64\%$ over Memoryless IGP Weight Tuning, all $p_{\text{Holm}} = 1.39 \times 10^{-5}$) while cutting P95 latency from $10.47$ to $5.13$ steps.
-    \item \textbf{Role of Minimum Dwell Time ($T_d=5$ vs.\ $T_d=1$ and Damped IGP FT):} While \textit{IGP Damped FT} and \textit{SRA w/o Dwell ($T_d=1$)} match Full SRA's stationary-load throughput ($90.06 \pm 0.34$ and $90.06 \pm 0.33$ pkts/step), both still switch routing tables at virtually every control epoch ($\bar{f}_{\text{sw}} = 99.5\%$, $100.0\%$ steady-state tail). Incorporating $T_d=5$ in \textbf{Full SRA} slashes the control-plane route switching frequency by \textbf{80.4\%} (down to $\bar{f}_{\text{sw}} = 19.5\%$, $20.0\% = 1/T_d$ steady-state tail; $p_{\text{Holm}} = 3.46 \times 10^{-7}$) while preserving $99.63\%$ packet delivery and $69.44\%$ peak stress reduction.
-    \item \textbf{Role of Max-Normalization Across Scales:} While \textit{Unnormalized SRA} (scaling by raw $\kappa^{(k)}/N^2$) happens to match Full SRA at $N=100$ ($90.02 \pm 0.37$ pkts/step, $99.96\%$ PDR, $71.74\%$ peak reduction) because $\kappa_{\max}/N^2$ is $O(1)$ at that single scale, its effective loop gain collapses as $N$ grows: in Section~\ref{subsec:scalability_eval}, scaling BA networks from $N=50$ to $N=500$ degrades Unnormalized SRA's PDR to \textbf{$82.64\%$} ($351.05$ pkts/step), whereas max-normalized Full SRA maintains a scale-invariant state space $X=[0,1]^N$ (Lemma~\ref{lemma:invariance}) and sustains \textbf{$97.43\%$} PDR ($413.89$ pkts/step).
+    \item \textbf{Leaky Integrator ($\alpha=0.1$):} Memoryless Reactive BC ($\alpha=1$) and Memoryless IGP Weight Tuning suffer continuous route flapping ($\bar{f}_{\text{sw}} = 99.5\%$, $100.0\%$ tail) and peak stress amplification ($-6.03\%$, $-5.74\%$). Full SRA raises BA throughput by $+30.22\%$ over Dijkstra ($+20.82 \pm 1.81$ pkts/step), $+14.66\%$ over Reactive BC, and $+9.64\%$ over Memoryless IGP FT (all $p_{\text{Holm}} = 1.39 \times 10^{-5}$) while cutting P95 latency from $10.47$ to $5.13$ steps.
+    \item \textbf{Minimum Dwell Time ($T_d=5$):} IGP Damped FT and SRA w/o Dwell ($T_d=1$) match stationary throughput ($90.06$ pkts/step) but still switch every epoch ($\bar{f}_{\text{sw}} = 99.5\%$, $100.0\%$ tail). Setting $T_d=5$ in Full SRA cuts route switching by \textbf{80.4\%} ($\bar{f}_{\text{sw}} = 19.5\%$, $20.0\% = 1/T_d$ tail; $p_{\text{Holm}} = 3.46 \times 10^{-7}$) while retaining $99.63\%$ PDR and $69.44\%$ peak reduction.
+    \item \textbf{Scale-Invariant Max-Normalization:} Unnormalized SRA matches Full SRA at $N=100$ only because $\kappa_{\max}/N^2 = O(1)$ locally, but its loop gain collapses with $N$: at $N=500$ (Section~\ref{subsec:scalability_eval}), Unnormalized SRA drops to \textbf{$82.64\%$} PDR ($351.05$ pkts/step) vs.\ \textbf{$97.43\%$} ($413.89$ pkts/step) for Full SRA, confirming Lemma~\ref{lemma:invariance}.
 \end{itemize}}
 
 \begin{figure*}[t]
     \centering
-    \includegraphics[width=0.92\textwidth]{fig_revision_ablation_baselines.pdf}
+    \includegraphics[width=0.91\textwidth]{fig_revision_ablation_baselines.pdf}
     \caption{\rev{Component ablation and stronger baseline comparison across 30 trials (shaded bands and error bars denote 95\% confidence intervals). (a) Throughput vs.\ offered load on BA networks ($N=100$). (b) Packet loss rate and control-plane route switching frequency at $\rho=0.9$, demonstrating that Full SRA ($T_d=5$) reduces route flapping by $80.4\%$ ($99.5\% \to 19.5\%$) compared with memoryless ($\alpha=1$), $T_d=1$, Memoryless IGP FT, and Damped IGP FT baselines. (c) Cross-topology throughput comparison at $\rho=0.9$ across BA, WS, and ER networks.}}
     \label{fig:ablation_baselines}
 \end{figure*}
@@ -856,16 +779,16 @@ The quantitative results at heavy load ($\rho = 0.9$, 30 independent trials with
 \rev{\subsection{Evaluation Under Skewed Demand, Heterogeneous Capacities, Time-Varying Surges, and Sensing Noise}
 \label{subsec:hetero_noise_eval}
 
-To address realistic operational environments where traffic is non-uniform, node capacities are heterogeneous, traffic loads fluctuate over time, and telemetry measurements are corrupted by noise, we evaluated the generalized demand/capacity-weighted SRA controller ($\widetilde{\kappa}_i(S;W,\mu)$ in Eq.~\eqref{eq:generalized_stress}) across three challenging experiments (30 trials each), summarized in Fig.~\ref{fig:hetero_timevarying_noise}:
+We next evaluated the generalized controller ($\widetilde{\kappa}_i(S;W,\mu)$ in Eq.~\eqref{eq:generalized_stress}) across three 30-trial stress tests (Fig.~\ref{fig:hetero_timevarying_noise}):
 \begin{enumerate}
-    \item \textbf{Skewed Gravity Traffic \& Bimodal Heterogeneous Node Capacities (Fig.~\ref{fig:hetero_timevarying_noise}(a)):} Each node $i$ is assigned a Pareto traffic weight $w_i \sim \mathrm{Pareto}(1.5)$ ($W_{st} \propto w_s w_t$) and an independent degree-decoupled bimodal capacity ($35\%$ constrained nodes with $\mu_i \sim \mathrm{Uniform}[3, 5]$ pkts/step and $65\%$ standard nodes with $\mu_i \sim \mathrm{Uniform}[10, 16]$ pkts/step). Under heavy skewed demand ($\rho=0.85$), static Dijkstra suffers severe bottleneck saturation with throughput $51.81 \pm 9.13$ pkts/step (PDR $60.97\%$, Mean/P95 latency $8.44/21.67$ steps) and peak generalized stress $\max_i \widetilde{\kappa}_i = 3968.3$; Memoryless Reactive BC ($54.99 \pm 9.25$, PDR $64.72\%$, stress $4557.7$), Memoryless IGP Weight Tuning ($59.95 \pm 10.25$, PDR $70.56\%$, stress $4523.9$), and one-shot Static BC ($61.72 \pm 10.52$, PDR $72.64\%$, stress $2141.0$) likewise suffer either oscillation or low-capacity detour saturation. \textit{Topology-Only SRA} cuts peak generalized stress to $1725.4$ ($64.70 \pm 11.21$ pkts/step, PDR $76.14\%$, Mean/P95 latency $7.28/19.17$). \textbf{Generalized Weighted SRA} achieves the lowest peak generalized stress of $\mathbf{1651.1}$ ($-58.4\%$ vs.\ Dijkstra, $-22.9\%$ vs.\ Static BC), the highest throughput of $\mathbf{66.99 \pm 11.60}$~pkts/step ($+29.31\%$ over Dijkstra, $+11.74\%$ over IGP Weight Tuning, $+8.54\%$ over Static BC, and $+3.55\%$ / $+2.29 \pm 0.40$ pkts/step over Topology-Only SRA, all paired $p_{\text{Holm}} = 8.67 \times 10^{-6}$), $\mathbf{78.84\%}$ PDR, and the lowest Mean/P95 latency ($6.04/16.07$ steps), confirming Proposition~\ref{prop:perf-bridge}(ii)--(iii).
-    \item \textbf{Time-Varying Traffic Surge and Hotspot Permutation (Fig.~\ref{fig:hetero_timevarying_noise}(b)):} Starting from a fair cold start ($S^{(0)}=\mathbf{0}$), we subject the heterogeneous BA network ($N=100$) to a $1{,}000$-step non-stationary workload: moderate load ($\rho=0.6$ under $W^{(1)}$ for $t \in [0, 350)$), an abrupt heavy surge plus hotspot matrix permutation ($\rho=1.1, W^{(1)} \to W^{(2)}$ for $t \in [350, 700)$), and recovery ($\rho=0.7$ under $W^{(2)}$ for $t \in [700, 1{,}000]$). Across the pre-surge / surge / post-recovery windows, Dijkstra delivers $44.87 / 65.05 / 49.99$ pkts/step, Reactive BC delivers $48.82 / 74.25 / 57.52$, Static BC (frozen to $k=0$ topology) stalls at $49.29 / 75.03 / 57.35$, and Topology-Only SRA reaches $50.51 / 79.31 / 59.68$. By tracking both dynamic demand shifts and heterogeneous node capacities across 25-step control-plane telemetry epochs, \textbf{Generalized Weighted SRA} achieves $\mathbf{51.59 / 86.13 / 61.83}$ pkts/step ($+14.8\%$ over Static BC and $+32.4\%$ over Dijkstra during the surge).
-    \item \textbf{Controlled Sensing Noise Injection (Fig.~\ref{fig:hetero_timevarying_noise}(c)):} To test robustness against imperfect telemetry or approximate distributed centrality estimation, we inject multiplicative Gaussian noise into the sensed stress vector at every step: $\hat{\kappa}_i^{(k)} = \max\{0, \widetilde{\kappa}_i^{(k)}(1 + \mathcal{N}(0, \sigma^2))\}$ for $\sigma \in \{0\%, 5\%, 10\%, 20\%, 30\%\}$. Because Eq.~\eqref{eq:pressure_update} acts as a first-order low-pass filter ($\alpha=0.1$), high-frequency noise is strongly attenuated: across $\sigma \in [0\%, 30\%]$, Generalized Weighted SRA maintains virtually invariant performance from $66.99 \pm 11.60$ to $\mathbf{66.94 \pm 11.75}$~pkts/step (PDR $78.84\% \to 78.78\%$), consistently outperforming Topology-Only SRA ($64.70 \to 64.35$), Static BC ($61.72 \to 61.04$), and Reactive BC ($54.99 \to 54.55$).
+    \item \textbf{Skewed Gravity Traffic \& Bimodal Capacities (Fig.~\ref{fig:hetero_timevarying_noise}(a)):} With Pareto traffic weights $w_i \sim \mathrm{Pareto}(1.5)$ ($W_{st} \propto w_s w_t$) and degree-decoupled capacities ($35\%$ nodes at $\mathrm{Uniform}[3, 5]$, $65\%$ at $\mathrm{Uniform}[10, 16]$ pkts/step) under $\rho=0.85$, Dijkstra ($51.81 \pm 9.13$, PDR $60.97\%$, stress $3968.3$), Reactive BC ($54.99 \pm 9.25$, $64.72\%$, $4557.7$), IGP Weight Tuning ($59.95 \pm 10.25$, $70.56\%$, $4523.9$), and Static BC ($61.72 \pm 10.52$, $72.64\%$, $2141.0$) suffer oscillation or peripheral bottlenecking. Topology-Only SRA reaches $64.70 \pm 11.21$ pkts/step (stress $1725.4$). \textbf{Generalized Weighted SRA} achieves the lowest peak stress ($\mathbf{1651.1}$, $-58.4\%$ vs.\ Dijkstra, $-22.9\%$ vs.\ Static BC), highest throughput ($\mathbf{66.99 \pm 11.60}$ pkts/step: $+29.31\%$ vs.\ Dijkstra, $+11.74\%$ vs.\ IGP FT, $+8.54\%$ vs.\ Static BC, $+3.55\%$ / $+2.29 \pm 0.40$ vs.\ Topology-Only SRA; all $p_{\text{Holm}} = 8.67 \times 10^{-6}$), $\mathbf{78.84\%}$ PDR, and $6.04/16.07$ Mean/P95 latency, verifying Proposition~\ref{prop:perf-bridge}(ii)--(iii).
+    \item \textbf{Time-Varying Surge \& Hotspot Permutation (Fig.~\ref{fig:hetero_timevarying_noise}(b)):} Starting from $S^{(0)}=\mathbf{0}$ on heterogeneous BA ($N=100$) under a $1{,}000$-step non-stationary schedule—moderate load ($\rho=0.6, W^{(1)}, t<350$), surge plus hotspot shift ($\rho=1.1, W^{(2)}, t\in[350,700)$), and recovery ($\rho=0.7, W^{(2)}, t\ge 700$)—windowed throughput for Dijkstra ($44.87/65.05/49.99$), Reactive BC ($48.82/74.25/57.52$), frozen Static BC ($49.29/75.03/57.35$), and Topology-Only SRA ($50.51/79.31/59.68$) is surpassed by \textbf{Generalized Weighted SRA} at $\mathbf{51.59/86.13/61.83}$ pkts/step ($+14.8\%$ over Static BC, $+32.4\%$ over Dijkstra during the surge).
+    \item \textbf{Sensing Noise Injection (Fig.~\ref{fig:hetero_timevarying_noise}(c)):} Adding per-step multiplicative noise $\hat{\kappa}_i^{(k)} = \max\{0, \widetilde{\kappa}_i^{(k)}(1 + \mathcal{N}(0, \sigma^2))\}$ ($\sigma \in [0\%, 30\%]$), low-pass leaky integration ($\alpha=0.1$) holds Generalized Weighted SRA nearly invariant ($66.99 \pm 11.60 \to \mathbf{66.94 \pm 11.75}$ pkts/step; PDR $78.84\% \to 78.78\%$), outperforming Topology-Only SRA ($64.70 \to 64.35$), Static BC ($61.72 \to 61.04$), and Reactive BC ($54.99 \to 54.55$).
 \end{enumerate}}
 
 \begin{figure*}[t]
     \centering
-    \includegraphics[width=0.95\textwidth]{fig_revision_hetero_timevarying_noise.pdf}
+    \includegraphics[width=0.92\textwidth]{fig_revision_hetero_timevarying_noise.pdf}
     \caption{\rev{Robustness under non-uniform traffic, bimodal heterogeneous capacities, time-varying surges with hotspot permutation, and sensing noise (30 trials, 95\% CI). (a) Skewed Pareto gravity traffic $W_{st}$ and degree-decoupled bimodal capacities: Generalized Weighted SRA ($\widetilde{\kappa}_i$) significantly outperforms Dijkstra, Reactive BC ($\alpha=1$), Memoryless IGP Weight Tuning, Static BC, and Topology-Only SRA ($p_{\text{Holm}} = 8.67 \times 10^{-6}$). (b) Cold-start delivered throughput over $1{,}000$ steps under a surge plus hotspot shift at $t=350$ ($\rho: 0.6 \to 1.1 \to 0.7$). (c) Sensitivity to multiplicative sensing noise $\sigma \in [0\%, 30\%]$.}}
     \label{fig:hetero_timevarying_noise}
 \end{figure*}
@@ -873,37 +796,36 @@ To address realistic operational environments where traffic is non-uniform, node
 \rev{\subsection{Hyperparameter Sensitivity, Scalability, and Real-World Backbone Validation}
 \label{subsec:scalability_eval}
 
-Finally, we justify the selection of the controller hyperparameters $(\alpha, \beta_I, T_d)$ and evaluate computational scalability across network sizes $N \in \{50, 100, 200, 300, 500\}$ as well as three real-world carrier backbones from the Internet Topology Zoo \cite{Knight2011TopologyZoo}: \textbf{G\'EANT (\texttt{Geant2012}, $N=40, E=61$)}, \textbf{Deltacom ($N=113, E=161$)}, and \textbf{UsCarrier ($N=158, E=189$)}.
+We conclude by examining hyperparameter sensitivity $(\alpha, \beta_I, T_d)$, scaling across $N \in [50, 500]$, and three Internet Topology Zoo \cite{Knight2011TopologyZoo} backbones: \textbf{G\'EANT (\texttt{Geant2012}, $N=40, E=61$)}, \textbf{Deltacom ($N=113, E=161$)}, and \textbf{UsCarrier ($N=158, E=189$)}.
 
 \paragraph{1) Joint $(\alpha, \beta_I)$ and Dwell-Time $T_d$ Sensitivity}
-Fig.~\ref{fig:sensitivity_3d} displays the 3D response surfaces of Throughput (packets/timestep), Packet Loss Rate, and Average Latency (timesteps) across the parameter grid $\alpha \in [0.05, 0.50] \times \beta_I \in [5.0, 50.0]$ at $\rho = 0.8$ on BA scale-free networks ($N=100$). From a control-theoretic standpoint, $\alpha$ sets the discrete relaxation time constant $\tau_{\text{relax}} = -1/\ln(1-\alpha) \approx 1/\alpha$ epochs, while $\beta_I$ scales the maximum node-cost penalty $1+\beta_I$ relative to the network's shortest-path hop diameter. The surfaces exhibit a broad, flat plateau of high throughput ($\sim 74$--$75$~pkts/step), low packet loss ($\sim 0.06$), and minimal average latency ($\sim 0.5$--$0.6$~steps) across $\alpha \in [0.05, 0.30]$ and $\beta_I \in [10.0, 40.0]$, indicating low sensitivity to hyperparameter perturbations within this operating range. Furthermore, Fig.~\ref{fig:dwell_scalability}(a) quantifies the empirical effect of $T_d \in \{1, 2, 3, 5, 8, 10\}$ under the unified $K_{\max}=200, T=1{,}000$ protocol: increasing $T_d$ from $1$ to $5$ reduces overall route switching monotonically from $99.5\%$ ($100.0\%$ tail) to $19.5\%$ ($20.0\%$ tail) while maintaining $99.99\%$ PDR at $T_d \in \{1,2,3\}$ and $99.43\%$ PDR ($89.50$ pkts/step) at $T_d=5$; further increasing $T_d$ to $8$ and $10$ reduces switching to $12.0\%$ and $9.5\%$ at the expense of sluggish transient adaptation (PDR dropping monotonically to $93.15\%$ and $90.40\%$, throughput $83.85$ and $81.38$ pkts/step). Thus, $\alpha=0.1, \beta_I=10, T_d=5$ sits squarely at the Pareto knee balancing damping, responsiveness, and routing stability.
+Fig.~\ref{fig:sensitivity_3d} shows response surfaces over $\alpha \in [0.05, 0.50] \times \beta_I \in [5.0, 50.0]$ on BA ($N=100, \rho=0.8$). Here $\alpha$ sets relaxation time $\tau_{\text{relax}} = -1/\ln(1-\alpha) \approx 1/\alpha$ epochs and $\beta_I$ scales cost penalties relative to hop diameter; a wide plateau across $\alpha \in [0.05, 0.30]$ and $\beta_I \in [10, 40]$ sustains $\sim 74$--$75$~pkts/step throughput, $\sim 0.06$ loss, and $\sim 0.5$--$0.6$-step latency. In Fig.~\ref{fig:dwell_scalability}(a) ($T_d \in \{1..10\}$, $K_{\max}=200, T=1{,}000$), raising $T_d$ from $1$ to $5$ cuts switching monotonically from $99.5\%$ ($100.0\%$ tail) to $19.5\%$ ($20.0\%$ tail) while holding $99.43\%$ PDR ($89.50$ pkts/step), whereas $T_d \in \{8, 10\}$ reduces switching further ($12.0\%, 9.5\%$) at the cost of sluggish adaptation ($93.15\%, 90.40\%$ PDR). Thus $(\alpha=0.1, \beta_I=10, T_d=5)$ sits at the Pareto knee.
 
 \begin{figure*}[t]
     \centering
-    \includegraphics[width=0.92\textwidth]{sensitivity_3d_surfaces_full.pdf}
+    \includegraphics[width=0.90\textwidth]{sensitivity_3d_surfaces_full.pdf}
     \caption{\rev{Three-dimensional hyperparameter sensitivity surfaces across learning rate $\alpha \in [0.05, 0.50]$ and pressure-cost gain $\beta_I \in [5.0, 50.0]$ on BA networks ($N=100, \rho=0.8$), showing (left) Throughput (packets/timestep), (center) Packet Loss Rate, and (right) Average Latency (timesteps). The wide, flat performance plateau across $\alpha \in [0.05, 0.30]$ and $\beta_I \in [10, 40]$ around $(\alpha=0.1, \beta_I=10)$ shows stable performance across a wide hyperparameter range.}}
     \label{fig:sensitivity_3d}
 \end{figure*}
 
 \paragraph{2) Computational Scalability and Real-World Carrier Backbones}
-Table~\ref{tab:scalability_table} and Fig.~\ref{fig:dwell_scalability}(b) report both the per-evaluation wall-clock execution time of an active shortest-path and centrality update (\texttt{Eval (ms)}) and its $T_d=5$ amortized per-epoch cost (\texttt{Amort.\ (ms)})---benchmarked in pure Python/NetworkX single-threaded on an Intel Xeon Gold 6248R 3.0~GHz processor---alongside throughput gains from $N=50$ up to $N=500$ nodes and on three official Internet Topology Zoo carrier backbones \cite{Knight2011TopologyZoo} evaluated under identical fixed offered load ($\rho=0.85$), horizons ($K_{\max}=200, T=1{,}000$), and controller tuple ($\alpha=0.1, \beta_I=10, T_d=5$). Four findings stand out:
+Table~\ref{tab:scalability_table} and Fig.~\ref{fig:dwell_scalability}(b) summarize single-threaded pure-Python/NetworkX timings (Intel Xeon Gold 6248R, 3.0~GHz) and performance under unified $\rho=0.85, K_{\max}=200, T=1{,}000, (\alpha=0.1, \beta_I=10, T_d=5)$:
 \begin{itemize}
-    \item \textbf{Empirical $O(N(E + N\log N))$ Scaling:} Single-threaded pure-Python/NetworkX evaluation scales smoothly from $13.89 \pm 3.32$~ms ($2.82$~ms amortized) on G\'EANT ($N=40$), $160.16 \pm 4.07$~ms ($32.15$~ms amortized) on Deltacom ($N=113$), and $345.16 \pm 7.51$~ms ($69.20$~ms amortized) on UsCarrier ($N=158$) to $151.20 \pm 3.43$~ms ($30.35$~ms amortized) at $N=100$ and $4585.10 \pm 42.16$~ms ($917.52$~ms amortized at $T_d=5$) at $N=500$ on BA graphs, closely following the fitted theoretical $O(N(E+N\log N))$ curve in Fig.~\ref{fig:dwell_scalability}(b). Under multi-second to minute-scale SDN control-plane update intervals (Assumption 2), even this unoptimized single-threaded Python/NetworkX implementation remains below one second amortized per epoch up to $N=500$.
-    \item \textbf{Amplified Capacity Gains at Larger Scales:} As BA network size grows from $N=50$ to $N=500$, topological hub concentration intensifies, causing static Dijkstra's packet drop rate to surge from $8.92\%$ to $54.46\%$. Simultaneously, SRA's seedwise-averaged throughput advantage over Dijkstra grows monotonically from $\mathbf{+10.40\%}$ ($N=50$) and $\mathbf{+32.48\%}$ ($N=100$) to $\mathbf{+62.59\%}$ ($N=200$), $\mathbf{+84.29\%}$ ($N=300$), and $\mathbf{+114.56\%}$ ($N=500$), reducing packet loss at $N=500$ by more than $21\times$ (from $54.46\%$ down to $2.57\%$).
-    \item \textbf{Cross-Scale Necessity of Max-Normalization:} Removing max-normalization (raw $\kappa^{(k)}/N^2$) yields $99.99\%$ and $99.92\%$ PDR on small BA graphs ($N=50, 100$) only because $\kappa_{\max}/N^2$ happens to be $O(1)$, but collapses to $96.97\%$ ($N=200$), $90.99\%$ ($N=300$), and $\mathbf{82.64\%}$ PDR ($351.05$ pkts/step vs.\ $413.89$ pkts/step for Full SRA at $N=500$) as graph scale increases, empirically proving Lemma~\ref{lemma:invariance}.
-    \item \textbf{Real-World Internet Topology Zoo Carrier Validation:} On realistic hierarchical wide-area fiber backbones, SRA consistently reduces structural stress concentration and expands throughput under identical default parameters: on \textbf{G\'EANT} ($N=40, E=61$), SRA reduces peak centrality by $42.39\%$ and boosts throughput by $\mathbf{+28.64\%}$ ($25.23 \to 32.46$~pkts/step, cutting packet loss from $25.71\%$ to $4.43\%$); on \textbf{Deltacom} ($N=113, E=161$), SRA reduces peak centrality by $35.39\%$ and increases throughput by $\mathbf{+37.40\%}$ ($38.62 \to 53.07$~pkts/step, cutting drop rate from $59.78\%$ to $44.74\%$); and on \textbf{UsCarrier} ($N=158, E=189$), a sparser long-haul backbone whose longer average path length drives physical link saturation under uniform $\rho=0.85$, SRA still reduces peak centrality by $29.79\%$ and increases delivered throughput by $\mathbf{+18.99\%}$ ($32.10 \to 38.20$~pkts/step, cutting drop rate from $76.10\%$ to $71.56\%$).
+    \item \textbf{Empirical $O(N(E + N\log N))$ Runtime:} Per-evaluation runtime scales along the fitted $O(N(E+N\log N))$ curve from $13.89 \pm 3.32$~ms ($2.82$~ms amortized) on G\'EANT to $4585.10 \pm 42.16$~ms ($917.52$~ms amortized at $T_d=5$) at $N=500$, staying sub-second amortized per epoch within typical SDN control scales (Assumption~2).
+    \item \textbf{Scaling Gains vs.\ Unnormalized Collapse:} As BA size grows from $N=50$ to $500$, Dijkstra drop rate rises from $8.92\%$ to $54.46\%$, while SRA's seedwise throughput gain widens from $\mathbf{+10.40\%}$ ($N=50$) and $\mathbf{+32.48\%}$ ($N=100$) to $\mathbf{+114.56\%}$ ($N=500$, cutting loss $>21\times$ to $2.57\%$). By contrast, Unnormalized SRA ($\kappa^{(k)}/N^2$) falls to $96.97\%$ ($N=200$), $90.99\%$ ($N=300$), and $\mathbf{82.64\%}$ PDR ($351.05$ vs.\ $413.89$ pkts/step at $N=500$), empirically confirming Lemma~\ref{lemma:invariance}.
+    \item \textbf{Real ISP Carrier Validation:} Under identical defaults, SRA cuts peak stress and boosts throughput across all three Topology Zoo backbones \cite{Knight2011TopologyZoo}: \textbf{G\'EANT} ($-42.39\%$ stress, $\mathbf{+28.64\%}$ throughput, loss $25.71\% \to 4.43\%$), \textbf{Deltacom} ($-35.39\%$ stress, $\mathbf{+37.40\%}$ throughput, loss $59.78\% \to 44.74\%$), and sparser \textbf{UsCarrier} ($-29.79\%$ stress, $\mathbf{+18.99\%}$ throughput, loss $76.10\% \to 71.56\%$).
 \end{itemize}}
 
 \begin{figure*}[t]
     \centering
-    \includegraphics[width=0.92\textwidth]{fig_revision_dwell_scalability.pdf}
+    \includegraphics[width=0.90\textwidth]{fig_revision_dwell_scalability.pdf}
     \caption{\rev{Dwell-time sensitivity and network scalability analysis (30 trials, shaded bands and error bars denote 95\% confidence intervals). (a) Minimum dwell time $T_d \in \{1..10\}$ monotonic trade-off between packet delivery ratio and route-switching frequency $\bar{f}_{\text{sw}}$. (b) Per-evaluation pure-Python/NetworkX wall-clock computation time (ms) vs.\ network size $N \in [50, 500]$ across BA and WS networks, closely matching the least-squares fitted $O(N(E+N\log N))$ theoretical curve.}}
     \label{fig:dwell_scalability}
 \end{figure*}
 
 \begin{table*}[t]
 \centering
-\scriptsize\setlength{\tabcolsep}{1.2pt}\renewcommand{\arraystretch}{1.1}
+\scriptsize\setlength{\tabcolsep}{1.2pt}\renewcommand{\arraystretch}{1.04}
 \caption{\rev{Computational Complexity, Pure-Python/NetworkX Runtime Benchmark (Xeon Gold 6248R), and Performance Scaling Across Real-World Internet Topology Zoo (TZ) Backbones (G\'EANT, Deltacom, UsCarrier) and Synthetic Topologies ($N=50..500$) Across 30 Trials (Uniform $\rho=0.85, K_{\max}=200, T=1{,}000$; TP Gain Reports the Mean of Seedwise Relative Throughput Gains).}}
 \label{tab:scalability_table}
 \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lrrrrrrrrr@{}}
@@ -933,27 +855,26 @@ WS Small-World & 500 & 2000 & $4586.97 \pm 39.12$ & $917.91$ & $41.00\%$ & $389.
 \label{sec:discussion_conclusion}
 
 \subsection{\rev{Synthesis of Theoretical and Empirical Findings}}
-In this paper, we introduced, analyzed, and validated the System Relaxation Algorithm (SRA) as a model-driven closed-loop governance mechanism against structural stress concentration. 
-By synthesizing network centrality theory with non-smooth differential inclusions \cite{Aubin1984Differential}, we established formal global stability guarantees for discrete path-switching dynamics and demonstrated across synthetic and real-world topologies that SRA adapts its control behavior to the underlying network geometry:
+We modeled SRA as a non-smooth differential inclusion \cite{Aubin1984Differential}, proving global convergence and bounded tracking energy while validating topology-aware control across synthetic and carrier networks:
 \begin{itemize}
-    \item \textbf{In Heterogeneous Scale-Free and Carrier Landscapes (BA, G\'EANT, Deltacom, UsCarrier):} SRA acts as a \textit{proactive capacity expander}, reducing peak centrality by $29.79\%$--$83.76\%$ at a modest $5.63\%$ path-length stretch on BA, boosting effective throughput by $+18.99\%$ to $+37.40\%$ on official Internet Topology Zoo carrier backbones (and $+114.56\%$ on $N=500$ BA graphs) while yielding a $>60\%$ PDR advantage under targeted hub removal.
-    \item \textbf{In Hybrid and Homogeneous Landscapes (WS, ER):} SRA acts as a \textit{stability and resilience governor}, preventing post-knee congestion collapse while avoiding unnecessary path stretch when the topology is already balanced.
+    \item \textbf{Heterogeneous Graphs (BA, G\'EANT, Deltacom, UsCarrier):} Cuts peak centrality by $29.79\%$--$83.76\%$ ($5.63\%$ path stretch on BA), boosts throughput by $+18.99\%$--$+37.40\%$ on Topology Zoo backbones ($+114.56\%$ on $N=500$ BA), and holds $>60\%$ PDR advantage under hub removal.
+    \item \textbf{Hybrid/Homogeneous Graphs (WS, ER):} Suppresses post-knee congestion collapse without unnecessary detours on balanced topologies.
 \end{itemize}
 
 \rev{\subsection{Explicit Assumptions, Failure Cases, and Limitations}
 \label{subsec:limitations}
 
-The boundary conditions, failure regimes, and operational limits of SRA are summarized below:
+Key boundary conditions and limits are:
 \begin{enumerate}
-    \item \textbf{Limitations of Unweighted Betweenness Centrality vs.\ Generalized Weighted Stress:} Pure topological BC ($\kappa_i$ in Eq.~\eqref{eq:bc_definition}) assumes uniform all-pairs traffic ($W_{st} \equiv 1$) and homogeneous node service rates ($\mu_i \equiv \mu$). If a physically low-capacity node ($\mu_j \ll \mu_{\min,\text{core}}$) lies on a peripheral detour or if traffic is heavily concentrated between specific OD pairs, unweighted BC may divert heavy flows onto a low-capacity peripheral node, violating the slack condition in Eq.~\eqref{eq:hetero_capacity_condition}. In such heterogeneous environments, operators must deploy the generalized demand- and capacity-weighted stress metric $\widetilde{\kappa}_i(S; W, \mu)$ in Eq.~\eqref{eq:generalized_stress}, which explicitly normalizes path load by node capacity $\mu_i$ and weights paths by $W_{st}$ (validated in Fig.~\ref{fig:hetero_timevarying_noise}(a)).
-    \item \textbf{Topological Hard Limits (Cut-Vertices, Bridge Links, and Symmetric Regular Lattices):} SRA's peak-shaving guarantee (Lemma~\ref{lem:block-budget}) relies on Assumption 1 (existence of vertex-disjoint alternative paths) and initial centrality asymmetry. In tree-like topologies, star graphs, or networks partitioned by a single bridge link or cut-vertex $v_{\text{cut}}$, every path between separated components must traverse $v_{\text{cut}}$ regardless of its node cost $C_{v_{\text{cut}}}$; hence $\Delta_{v_{\text{cut}}}^- = 0$, and no routing algorithm can reduce the load on $v_{\text{cut}}$. Conversely, in perfectly symmetric regular lattices or tori where all nodes initially share identical centrality ($\kappa_{\max} = \bar{\kappa}$), there is no structural stress concentration to relax, so throughput gains are naturally marginal ($<2\%$).
-    \item \textbf{Latency-Stretch Trade-off in Ultra-Dense Homogeneous Grids:} Under moderate-to-high load in homogeneous ER graphs (Fig.~\ref{fig:perf_comparison_stacked}(c)), SRA trades a slight increase in mean hop count/latency to suppress tail packet drops. For ultra-low-latency traffic classes where even a 1-hop detour violates strict SLA deadlines under light load, SRA should be gated by a minimum congestion activation threshold ($\kappa_{\max}/\mu_u > \theta_{\text{act}}$).
-    \item \textbf{Centralized Control-Plane Overhead at Hyper-Scale ($N > 10^3$):} Exact shortest-path centrality evaluation scales as $O(N(E + N\log N))$ ($4585.10$~ms per evaluation / $917.52$~ms amortized at $T_d=5$ in single-threaded pure Python/NetworkX for $N=500$; Table~\ref{tab:scalability_table}). For hyper-scale topologies ($N \ge 5{,}000$) requiring sub-second control loops, exact centralized recomputation becomes a bottleneck, necessitating the distributed INT/flow-counting approximation discussed in Section~\ref{subsec:sra_mechanism} or $k$-shortest-path subgraph restriction.
-    \item \textbf{Hyperparameter Over-Regularization Regime ($\beta_I \gg 40$ or $T_d \ge 8$):} As shown in Fig.~\ref{fig:sensitivity_3d} and Fig.~\ref{fig:dwell_scalability}(a), driving the penalty gain excessively high ($\beta_I > 40$) slightly elevates packet latency due to unnecessary multi-hop detours, while setting an overly long dwell time ($T_d \ge 8$) over-freezes the routing table during initial adaptation, reducing transient throughput. Operators should size $(\alpha, \beta_I, T_d)$ within the flat plateau $\alpha \in [0.05, 0.30], \beta_I \in [10, 40]$, and $T_d \in [3, 5]$ (Eq.~\eqref{eq:design_parameter_Td}).
+    \item \textbf{Unweighted BC vs.\ Generalized Stress:} Unweighted BC ($\kappa_i$, Eq.~\eqref{eq:bc_definition}) assumes uniform demand ($W_{st} \equiv 1$) and homogeneous node capacity ($\mu_i \equiv \mu$), and can overload low-capacity peripheral detours unless replaced by generalized stress $\widetilde{\kappa}_i(S; W, \mu)$ in Eq.~\eqref{eq:generalized_stress} satisfying Eq.~\eqref{eq:hetero_capacity_condition} (Fig.~\ref{fig:hetero_timevarying_noise}(a)).
+    \item \textbf{Topological Hard Limits:} Peak shaving (Lemma~\ref{lem:block-budget}) requires alternate paths (Assumption~1) and centrality asymmetry; across cut-vertices or bridge links ($\Delta_{v_{\text{cut}}}^- = 0$) load is irreducible, while symmetric regular lattices ($\kappa_{\max}=\bar{\kappa}$) offer $<2\%$ gain.
+    \item \textbf{Latency-Stretch Trade-off:} In dense ER grids (Fig.~\ref{fig:perf_comparison_stacked}(c)), tail loss reduction adds slight mean hop/latency stretch; strict ultra-low-latency traffic should gate SRA with an activation threshold ($\kappa_{\max}/\mu_u > \theta_{\text{act}}$).
+    \item \textbf{Hyper-Scale Overhead ($N > 10^3$):} Exact $O(N(E + N\log N))$ evaluation ($4585.10$~ms / $917.52$~ms amortized at $N=500$, Table~\ref{tab:scalability_table}) becomes too slow for sub-second loops at $N \ge 5{,}000$, requiring distributed INT flow-counting (Section~\ref{subsec:sra_mechanism}) or $k$-shortest-path subgraph restriction.
+    \item \textbf{Over-Regularization ($\beta_I \gg 40$ or $T_d \ge 8$):} Excessive gain ($\beta_I > 40$) adds detour latency, while overly long dwell time ($T_d \ge 8$) slows transient adaptation (Figs.~\ref{fig:sensitivity_3d} and~\ref{fig:dwell_scalability}(a)); stay inside $\alpha \in [0.05, 0.30], \beta_I \in [10, 40]$, and $T_d \in [3, 5]$ (Eq.~\eqref{eq:design_parameter_Td}).
 \end{enumerate}
 
 \subsection{Reproducibility and Conclusion}
-The complete simulation source code, Topology Zoo benchmarks, ablation scripts, and statistical analysis pipelines have been open-sourced at \url{https://github.com/unicorners-compin/SRA-Resilient-Network-Governance}. In conclusion, by uniting leaky-integrator state memory ($\alpha=0.1$) with dwell-time temporal regularization ($T_d=5$) under a rigorous non-smooth Lyapunov framework, SRA eliminates the $99.5\%$ route chattering ($100.0\%$ steady-state tail) of memoryless and unregularized weight-tuning heuristics while delivering up to $83.76\%$ peak stress reduction, $+32.48\%$ throughput gain at $N=100$ ($+114.56\%$ at $N=500$), $+37.40\%$ on Deltacom, and $+29.31\%$ throughput gain over Dijkstra ($+8.54\%$ over Static BC) under skewed Pareto demand on bottleneck-prone networks.}
+Simulation code, Topology Zoo benchmarks, and analysis scripts are open-sourced at \url{https://github.com/unicorners-compin/SRA-Resilient-Network-Governance}. By uniting leaky-integrator memory ($\alpha=0.1$) and dwell regularization ($T_d=5$) under non-smooth Lyapunov bounds, SRA eliminates the $99.5\%$ route chattering ($100.0\%$ steady-state tail) of memoryless and unregularized heuristics while achieving up to $83.76\%$ peak stress reduction, $+32.48\%$ throughput gain at $N=100$ ($+114.56\%$ at $N=500$), $+37.40\%$ on Deltacom, and $+29.31\%$ over Dijkstra ($+8.54\%$ over Static BC) under skewed Pareto demand.}
 
 \section*{Acknowledgement}
 
