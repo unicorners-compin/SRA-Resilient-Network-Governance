@@ -626,7 +626,7 @@ Proc. / Queue Cap. & $10$ packets/timestep (default); Queue buffer $B_{\max} = 5
 \subsection{Microscopic Verification: Validating the Mechanism}
 \label{subsec:empirical_validation}
 
-\begin{figure}[!t]
+\begin{figure}[t]
     \centering
     \includegraphics[width=0.78\columnwidth]{ren_fig1_validation.eps}
     \caption{Independently Measured Network Capacity Gain vs. Structural Optimization Ratio. The empirical data clusters tightly around the theoretical $y=x$ prediction, confirming that performance gains are deterministically driven by structural stress dispersion. ($R^2=0.951$, Sample size $N=100$).}
@@ -639,14 +639,14 @@ Across 100 randomized graphs \rev{with $\mu_i \equiv \mu$}, the \textit{Structur
 \rev{\subsubsection{Verification of Lyapunov Drop-Jump and Dwell-Time Cooling Dynamics}
 Figs.~\ref{fig:lyapunov_dynamics} and~\ref{fig:dwell_cooling} track $V(S^{(k)})$ across epochs: macroscopically (Fig.~\ref{fig:lyapunov_dynamics}(a)), $V(S^{(k)})$ enters the attracting set $\Omega$; microscopically (Fig.~\ref{fig:lyapunov_dynamics}(b)), exponential intra-partition cooling at rate $(1-\alpha)^2$ alternates with bounded switching jumps $\le \bar{\Delta}^2/\alpha$ (Eq.~\eqref{eq:drop_jump_one_step}). Setting $T_d=5$ (Fig.~\ref{fig:dwell_cooling}(a)) instead of $T_d=1$ (Fig.~\ref{fig:dwell_cooling}(b)) enforces $T_d-1=4$ cooling steps per block ($E_{\tau_m+t}=\gamma^{2t}V_m$), cutting route-switching frequency by $5\times$ in line with Proposition~\ref{prop:block_dynamics} and Theorem~\ref{thm:practical_stability}.}
 
-\begin{figure}[!t]
+\begin{figure}[t]
     \centering
     \includegraphics[width=0.78\columnwidth]{ren_fig2_lyapunov.pdf}
     \caption{\rev{Empirical verification of the Dissipation-Injection Law (Theorem~\ref{thm:drop_jump}). (a) Macroscopic convergence of the piecewise Lyapunov energy $V(S^{(k)})$ into the bounded attracting set $\Omega$. (b) Microscopic steady-state trajectory exhibiting exponential intra-partition dissipation (smooth drops) punctuated by bounded path-switching injections (vertical jumps).}}
     \label{fig:lyapunov_dynamics}
 \end{figure}
 
-\begin{figure}[!t]
+\begin{figure}[t]
     \centering
     \includegraphics[width=0.78\columnwidth]{ren_fig3_dwell_time.pdf}
     \caption{\rev{Empirical verification of Block-wise Dissipation Dynamics (Proposition~\ref{prop:block_dynamics} and Theorem~\ref{thm:practical_stability}). (a) Stabilized SRA with temporal dwell regularization ($T_d=5$) enforces $T_d-1=4$ consecutive intra-block exponential cooling steps between block-boundary updates, suppressing switching frequency by $5\times$. (b) Base SRA without dwell regularization ($T_d=1$) exhibits persistent irregular step-by-step chattering.}}
@@ -656,7 +656,7 @@ Figs.~\ref{fig:lyapunov_dynamics} and~\ref{fig:dwell_cooling} track $V(S^{(k)})$
 \subsection{Macroscopic Structural Relaxation and Equilibrium Analysis}
 \label{subsec:dynamic_relaxation}
 
-\begin{table}[!t]
+\begin{table}[tb]
 \centering
 \scriptsize\setlength{\tabcolsep}{1.5pt}\renewcommand{\arraystretch}{1.05}
 \caption{Analysis of Structural Optimization Benefits of SRA (Mean $\pm$ Std Dev over 100 runs)}
@@ -726,7 +726,7 @@ Sequentially removing hubs in descending order of initial BC across 50 trials, w
 \end{equation}
 Fig.~\ref{fig:robustness_summary_stats} shows a sustained $>60\%$ PDR advantage in BA graphs via pre-attack stress dispersion, an emergent $\sim 20\%$ peak advantage in WS graphs under heavy damage, and neutral $0\%$ overhead in ER graphs.
 
-\begin{figure}[!t]
+\begin{figure}[t]
     \centering
     \includegraphics[width=0.78\columnwidth]{robustness_advantage_summary_stats.eps}
     \caption{The SRA PDR advantage over Dijkstra under a targeted hub-removal attack. The results validate SRA's capacity to provide topological hardening in vulnerable networks (BA) and adaptive survival in hybrid ones (WS).}
@@ -825,8 +825,8 @@ Table~\ref{tab:scalability_table} and Fig.~\ref{fig:dwell_scalability}(b) summar
 
 \begin{table*}[t]
 \centering
-\scriptsize\setlength{\tabcolsep}{1.2pt}\renewcommand{\arraystretch}{1.04}
-\caption{\rev{Computational Complexity, Pure-Python/NetworkX Runtime Benchmark (Xeon Gold 6248R), and Performance Scaling Across Real-World Internet Topology Zoo (TZ) Backbones (G\'EANT, Deltacom, UsCarrier) and Synthetic Topologies ($N=50..500$) Across 30 Trials (Uniform $\rho=0.85, K_{\max}=200, T=1{,}000$; TP Gain Reports the Mean of Seedwise Relative Throughput Gains).}}
+\scriptsize\setlength{\tabcolsep}{1.2pt}\renewcommand{\arraystretch}{0.95}
+\caption{\rev{Runtime Benchmark (Pure Python/NetworkX, Xeon Gold 6248R) and Scaling Across Internet Topology Zoo (TZ) Backbones and Synthetic Graphs ($N=50..500$, 30 Trials, $\rho=0.85, K_{\max}=200, T=1{,}000$; TP Gain = Mean Seedwise Relative Gain).}}
 \label{tab:scalability_table}
 \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lrrrrrrrrr@{}}
 \toprule
@@ -874,7 +874,7 @@ Key boundary conditions and limits are:
 \end{enumerate}
 
 \subsection{Reproducibility and Conclusion}
-Simulation code, Topology Zoo benchmarks, and analysis scripts are open-sourced at \url{https://github.com/unicorners-compin/SRA-Resilient-Network-Governance}. By uniting leaky-integrator memory ($\alpha=0.1$) and dwell regularization ($T_d=5$) under non-smooth Lyapunov bounds, SRA eliminates the $99.5\%$ route chattering ($100.0\%$ steady-state tail) of memoryless and unregularized heuristics while achieving up to $83.76\%$ peak stress reduction, $+32.48\%$ throughput gain at $N=100$ ($+114.56\%$ at $N=500$), $+37.40\%$ on Deltacom, and $+29.31\%$ over Dijkstra ($+8.54\%$ over Static BC) under skewed Pareto demand.}
+Code and benchmarks are open-sourced at \url{https://github.com/unicorners-compin/SRA-Resilient-Network-Governance}. Combining leaky-integrator memory ($\alpha=0.1$) and dwell gating ($T_d=5$) under non-smooth Lyapunov bounds, SRA eliminates the $99.5\%$ chattering ($100.0\%$ tail) of unregularized heuristics while achieving up to $83.76\%$ peak stress reduction, $+32.48\%$ throughput gain ($N=100$; $+114.56\%$ at $N=500$), $+37.40\%$ on Deltacom, and $+29.31\%$ vs.\ Dijkstra ($+8.54\%$ vs.\ Static BC) under skewed demand.}
 
 \section*{Acknowledgement}
 
