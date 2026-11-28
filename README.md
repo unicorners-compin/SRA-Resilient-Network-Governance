@@ -21,16 +21,17 @@ Official repository for the manuscript:
 - `data/topologies/`
   - Official Internet Topology Zoo GML carrier topologies (`Geant2012.gml`, `Deltacom.gml`, `UsCarrier.gml`).
 - `scripts/`
-  - `run_revision_campaign.py`: Multi-seed parallel simulation campaign runner implementing all 4 revision experiment suites (Exp-1: Component Ablation & Stronger Baselines including Fortz–Thorup IGP Weight Tuning and Static Centrality; Exp-2: Skewed Pareto Gravity Demand, Heterogeneous Capacities, Time-Varying Traffic Surge, and Telemetry Noise Injection; Exp-3: Dwell-Time $T_d$ and $(\alpha, \beta_I)$ Sensitivity; Exp-4: Computational Complexity, Runtime Overhead, and Scalability across $N=50..500$ + Real-World Internet Topology Zoo `Geant2012`, `Deltacom`, and `UsCarrier` backbones).
+  - `run_revision_campaign.py` & `test_revision_mechanisms.py`: Multi-seed parallel simulation campaign runner (with deterministic mechanism unit tests) implementing all 4 revision experiment suites under unified $K_{\max}=200, T=1000$ (warmup $=200$) steady-state orbit evaluation (Exp-1: Component Ablation & Stronger Baselines including memoryless/damped Fortz–Thorup IGP Weight Tuning and Static Centrality; Exp-2: Skewed Pareto Gravity Demand, Bimodal Heterogeneous Capacities, Time-Varying Traffic Surge + Hotspot Shift, and Telemetry Noise Injection; Exp-3: Dwell-Time $T_d$ Sensitivity; Exp-4: Computational Complexity, Runtime Overhead, and Scalability across $N=50..500$ incl. cross-scale `Unnormalized_SRA` + Real-World Internet Topology Zoo `Geant2012`, `Deltacom`, and `UsCarrier` backbones).
 - `src/`
   - Discrete-event simulator components (`base_simulator.py`, `dijkstra_final.py`, `lirp_d_final.py`, `qroute_final.py`, `sra_final.py`).
 - `results/cncomm-revision/`
-  - `summary_metrics.json`, `exp1_ablation_baselines.csv`, `exp2_hetero_noise.csv`, `exp3_dwell_sensitivity.csv`, `exp4_scalability_realworld.csv`, `manifest.json`, and `README.md`: Complete 30-seed statistical results (mean, SD, 95% CI) and SHA256 verification manifest.
+  - `summary_metrics.json`, `exp1_ablation_baselines.csv`, `exp2_hetero_noise.csv`, `exp3_dwell_sensitivity.csv`, `exp4_scalability_realworld.csv`, `manifest.json`, and `README.md`: Complete 30-seed statistical results (mean, SD, 95% CI, paired Holm–Bonferroni tests) and SHA256 verification manifest.
 
 ---
 
 ## Reproducing the Simulation Campaign
 
 ```bash
-python3 scripts/run_revision_campaign.py --max-workers 20 --num-seeds 30 --out-dir results/cncomm-revision
+python3 scripts/test_revision_mechanisms.py
+python3 scripts/run_revision_campaign.py --max-workers 36 --num-seeds 30 --out-dir results/cncomm-revision
 ```

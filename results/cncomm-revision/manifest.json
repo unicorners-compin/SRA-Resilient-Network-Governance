@@ -1,55 +1,44 @@
 {
   "project": "SRA-Resilient-Network-Governance",
-  "manuscript_id": "CNCOMM-2026-0222",
-  "generated_at_utc": "2026-11-23T07:54:45Z",
-  "hardware": "Intel Xeon Gold 6248R CPU @ 3.00GHz",
-  "command": "python3 scripts/run_revision_campaign.py --max-workers 20 --num-seeds 30 --out-dir results/cncomm-revision",
-  "topology_zoo_sources": [
-    "data/topologies/Geant2012.gml",
-    "data/topologies/Deltacom.gml",
-    "data/topologies/UsCarrier.gml"
-  ],
+  "run_id": "cncomm-revision-v2-30seed-20261128",
+  "generated_utc": "2026-11-28T14:04:48Z",
+  "git_branch": "revision/v2-hardened-experiments",
+  "hardware": "Intel Xeon Gold 6248R CPU @ 3.00GHz (36 workers)",
   "num_seeds": 30,
-  "files": [
-    {
-      "relative_path": "exp1_ablation_baselines.csv",
-      "size_bytes": 383768,
-      "sha256": "44082c6c6b0ad31f8c262bf9907be8c48c3cf0647cda49b7ad68ca6f86ab7482"
+  "elapsed_seconds": 2673.94,
+  "protocol": "K_max=200, T=1000, warmup=200, 800-step steady-state orbit replay, Holm-Bonferroni paired Wilcoxon",
+  "files": {
+    "exp1_ablation_baselines.csv": {
+      "bytes": 452831,
+      "sha256": "a7a889f2edad41a01d16e93f87dbe97c8468cf769fa9664f09debc9e3fed7411"
     },
-    {
-      "relative_path": "exp2_hetero_noise.csv",
-      "size_bytes": 83128,
-      "sha256": "03c7dbd30f1a2f727a858451923c076e27edf243c8b282676cf6f706d30a8c09"
+    "exp2_hetero_noise.csv": {
+      "bytes": 120481,
+      "sha256": "5b7eff43e490521ab57bc56ae877d82e1beb90524b096a7699dccf5506fbc164"
     },
-    {
-      "relative_path": "exp3_dwell_sensitivity.csv",
-      "size_bytes": 71839,
-      "sha256": "66d2f76cb98d86089bac7e3eed9e958c8d935cda24067614fbf6ad52f9181e95"
+    "exp3_dwell_sensitivity.csv": {
+      "bytes": 27121,
+      "sha256": "ef8a0ac1e1ffece6b3c93ee6a90cc74041f70a34fd5410898fb3a4d2d898536c"
     },
-    {
-      "relative_path": "exp4_scalability_realworld.csv",
-      "size_bytes": 69379,
-      "sha256": "ba18c85d317e960ad48a2a8e1b0aca0ee1ed7b33a2568aaa66660ccfed0c3ed1"
+    "exp4_scalability_realworld.csv": {
+      "bytes": 116260,
+      "sha256": "eb25c5ed81cec9daf5eabf11e9ca8692e7fa5bd41bbddbae8219451e7bb51c93"
     },
-    {
-      "relative_path": "summary_metrics.json",
-      "size_bytes": 25168,
-      "sha256": "3ac88d69486d02000b84dad33637bc4216cd94ee48bb6babdf8e63e8059b6502"
+    "fig_revision_ablation_baselines.pdf": {
+      "bytes": 34969,
+      "sha256": "15d32eb0ace27b9964421baae572ca6fc5382022fbf1105b032045f96eff8f1a"
     },
-    {
-      "relative_path": "fig_revision_ablation_baselines.pdf",
-      "size_bytes": 34343,
-      "sha256": "6cedc4db2c032f0a93077d8ee760825d6a4ffd9b508e56e101f1b6fe85cf5475"
+    "fig_revision_dwell_scalability.pdf": {
+      "bytes": 30333,
+      "sha256": "5cec8b824a8ca8684cc645ca4dec21940abaeb0eaeb2923da6caa32768965196"
     },
-    {
-      "relative_path": "fig_revision_hetero_timevarying_noise.pdf",
-      "size_bytes": 37513,
-      "sha256": "0d1aad4f4a0c822e35f885eb04bd4e4b903828c170ccd5d4cf743eb74835ba93"
+    "fig_revision_hetero_timevarying_noise.pdf": {
+      "bytes": 39778,
+      "sha256": "bf375d519012a35323f940865b7709765ac1d392c0b379e94986b1eb465e428a"
     },
-    {
-      "relative_path": "fig_revision_dwell_scalability.pdf",
-      "size_bytes": 30584,
-      "sha256": "910981d0cd9449d022b2f9c200a84d19c791ddfe729f9ef0515d404c0c267a58"
+    "summary_metrics.json": {
+      "bytes": 46755,
+      "sha256": "ac88e19b839b280261fe02afcf0395cd957f966a4dc18016ccb2706efaa2fbf3"
     }
-  ]
+  }
 }
